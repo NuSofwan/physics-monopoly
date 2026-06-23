@@ -1,0 +1,26 @@
+{
+  "name": "physics-monopoly",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "client",
+    "server",
+    "shared"
+  ],
+  "scripts": {
+    "dev": "concurrently -n server,client -c cyan,magenta \"npm run dev -w server\" \"npm run dev -w client\"",
+    "build": "npm run build -w shared && npm run build -w server && npm run build -w client",
+    "check": "npm run build -w shared && npm run build -w server && npm run build -w client",
+    "test": "vitest run",
+    "validate:questions": "tsx scripts/validateQuestions.ts",
+    "audit:questions": "npm run validate:questions"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "concurrently": "^9.1.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.8.3",
+    "vitest": "^3.0.9"
+  }
+}

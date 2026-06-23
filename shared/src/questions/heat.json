@@ -1,0 +1,152 @@
+[
+  {
+    "id": "heat-001",
+    "topic": "heat",
+    "difficulty": "easy",
+    "prompt": "น้ำมวล $1\\,\\text{kg}$ รับความร้อน $4200\\,\\text{J}$ ถ้า $c=4200\\,\\text{J/kg K}$ อุณหภูมิเพิ่มเท่าใด?",
+    "choices": [
+      "$0.5\\,\\text{K}$",
+      "$1\\,\\text{K}$",
+      "$2\\,\\text{K}$",
+      "$4\\,\\text{K}$"
+    ],
+    "answerIndex": 1,
+    "explanation": "$Q=mc\\Delta T$ ดังนั้น $\\Delta T=4200/(1\\cdot4200)=1\\,\\text{K}$",
+    "timeLimitSec": 30
+  },
+  {
+    "id": "heat-002",
+    "topic": "heat",
+    "difficulty": "easy",
+    "prompt": "หน่วย SI ของอุณหภูมิสัมบูรณ์คือ?",
+    "choices": [
+      "องศาเซลเซียส",
+      "เคลวิน",
+      "จูล",
+      "วัตต์"
+    ],
+    "answerIndex": 1,
+    "explanation": "อุณหภูมิสัมบูรณ์ใช้หน่วยเคลวิน",
+    "timeLimitSec": 30
+  },
+  {
+    "id": "heat-003",
+    "topic": "heat",
+    "difficulty": "easy",
+    "prompt": "ความร้อนแฝงใช้กับกระบวนการใด?",
+    "choices": [
+      "เปลี่ยนอุณหภูมิ",
+      "เปลี่ยนสถานะ",
+      "เปลี่ยนมวล",
+      "เปลี่ยนแรง"
+    ],
+    "answerIndex": 1,
+    "explanation": "ความร้อนแฝงคือพลังงานที่ใช้เปลี่ยนสถานะโดยอุณหภูมิไม่เปลี่ยน",
+    "timeLimitSec": 30
+  },
+  {
+    "id": "heat-004",
+    "topic": "heat",
+    "difficulty": "medium",
+    "prompt": "แก๊สอุดมคติ $PV=nRT$ ถ้า $n,T$ คงที่ เพิ่มปริมาตรเป็นสองเท่า ความดันเป็นอย่างไร?",
+    "choices": [
+      "เพิ่มสองเท่า",
+      "ลดครึ่งหนึ่ง",
+      "คงที่",
+      "เป็นศูนย์"
+    ],
+    "answerIndex": 1,
+    "explanation": "กฎบอยล์ $P\\propto1/V$ เมื่อ $V$ เพิ่มสองเท่า $P$ ลดครึ่งหนึ่ง",
+    "timeLimitSec": 35
+  },
+  {
+    "id": "heat-005",
+    "topic": "heat",
+    "difficulty": "medium",
+    "prompt": "น้ำแข็ง $0.5\\,\\text{kg}$ มี $L_f=334000\\,\\text{J/kg}$ ต้องใช้ความร้อนหลอมเหลวเท่าใด?",
+    "choices": [
+      "$167000\\,\\text{J}$",
+      "$334000\\,\\text{J}$",
+      "$668000\\,\\text{J}$",
+      "$83500\\,\\text{J}$"
+    ],
+    "answerIndex": 0,
+    "explanation": "$Q=mL=0.5(334000)=167000\\,\\text{J}$",
+    "timeLimitSec": 35
+  },
+  {
+    "id": "heat-006",
+    "topic": "heat",
+    "difficulty": "medium",
+    "prompt": "เครื่องยนต์ความร้อนรับ $1000\\,\\text{J}$ คาย $600\\,\\text{J}$ งานที่ได้คือ?",
+    "choices": [
+      "$400\\,\\text{J}$",
+      "$600\\,\\text{J}$",
+      "$1000\\,\\text{J}$",
+      "$1600\\,\\text{J}$"
+    ],
+    "answerIndex": 0,
+    "explanation": "$W=Q_h-Q_c=1000-600=400\\,\\text{J}$",
+    "timeLimitSec": 35
+  },
+  {
+    "id": "heat-007",
+    "topic": "heat",
+    "difficulty": "medium",
+    "prompt": "การนำความร้อนเกิดเด่นในสสารชนิดใด?",
+    "choices": [
+      "สุญญากาศ",
+      "ของแข็ง",
+      "แสง",
+      "คลื่นวิทยุ"
+    ],
+    "answerIndex": 1,
+    "explanation": "การนำความร้อนเกิดเด่นในของแข็งโดยเฉพาะโลหะ",
+    "timeLimitSec": 35
+  },
+  {
+    "id": "heat-008",
+    "topic": "heat",
+    "difficulty": "hard",
+    "prompt": "ประสิทธิภาพเครื่องยนต์ที่รับ $800\\,\\text{J}$ และทำงาน $200\\,\\text{J}$ คือ?",
+    "choices": [
+      "$20\\%$",
+      "$25\\%$",
+      "$40\\%$",
+      "$60\\%$"
+    ],
+    "answerIndex": 1,
+    "explanation": "$\\eta=W/Q_h=200/800=0.25=25\\%$",
+    "timeLimitSec": 40
+  },
+  {
+    "id": "heat-009",
+    "topic": "heat",
+    "difficulty": "hard",
+    "prompt": "แก๊สอุดมคติอุณหภูมิจาก $300\\,\\text{K}$ เป็น $600\\,\\text{K}$ ที่ปริมาตรคงที่ ความดันเป็นอย่างไร?",
+    "choices": [
+      "ลดครึ่งหนึ่ง",
+      "เพิ่มสองเท่า",
+      "เพิ่มสี่เท่า",
+      "คงที่"
+    ],
+    "answerIndex": 1,
+    "explanation": "ที่ $V,n$ คงที่ $P\\propto T$ จึงเพิ่มสองเท่า",
+    "timeLimitSec": 40
+  },
+  {
+    "id": "heat-010",
+    "topic": "heat",
+    "difficulty": "hard",
+    "prompt": "กระบวนการอะเดียแบติกมีลักษณะใด?",
+    "choices": [
+      "$Q=0$",
+      "$W=0$",
+      "$\\Delta U=0$",
+      "$P=0$"
+    ],
+    "answerIndex": 0,
+    "explanation": "อะเดียแบติกไม่มีการถ่ายเทความร้อน ดังนั้น $Q=0$",
+    "timeLimitSec": 40
+  }
+]

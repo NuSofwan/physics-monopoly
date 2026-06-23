@@ -1,0 +1,16 @@
+{
+  "name": "Physics Monopoly",
+  "short_name": "PhysMono",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#101827",
+  "theme_color": "#101827",
+  "icons": [
+    {
+      "src": "/assets/placeholders/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

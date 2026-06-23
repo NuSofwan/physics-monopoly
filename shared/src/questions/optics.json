@@ -1,0 +1,152 @@
+[
+  {
+    "id": "opti-001",
+    "topic": "optics",
+    "difficulty": "easy",
+    "prompt": "แสงในสุญญากาศมีอัตราเร็วประมาณเท่าใด?",
+    "choices": [
+      "$3\\times10^6\\,\\text{m/s}$",
+      "$3\\times10^8\\,\\text{m/s}$",
+      "$340\\,\\text{m/s}$",
+      "$9.8\\,\\text{m/s}^2$"
+    ],
+    "answerIndex": 1,
+    "explanation": "อัตราเร็วแสงในสุญญากาศคือประมาณ $3\\times10^8\\,\\text{m/s}$",
+    "timeLimitSec": 30
+  },
+  {
+    "id": "opti-002",
+    "topic": "optics",
+    "difficulty": "easy",
+    "prompt": "กฎการสะท้อนกล่าวว่าอย่างไร?",
+    "choices": [
+      "มุมตกกระทบเท่ามุมสะท้อน",
+      "มุมตกกระทบเป็นศูนย์",
+      "แสงหยุดนิ่ง",
+      "ความถี่เปลี่ยนเสมอ"
+    ],
+    "answerIndex": 0,
+    "explanation": "กฎสะท้อน: $\\theta_i=\\theta_r$",
+    "timeLimitSec": 30
+  },
+  {
+    "id": "opti-003",
+    "topic": "optics",
+    "difficulty": "easy",
+    "prompt": "เลนส์นูนรวมแสงขนานไปที่ใด?",
+    "choices": [
+      "จุดโฟกัส",
+      "ศูนย์กลางโลก",
+      "จุดอนันต์",
+      "ด้านหลังผู้สังเกต"
+    ],
+    "answerIndex": 0,
+    "explanation": "เลนส์นูนเป็นเลนส์รวมแสงที่โฟกัสลำแสงขนาน",
+    "timeLimitSec": 30
+  },
+  {
+    "id": "opti-004",
+    "topic": "optics",
+    "difficulty": "medium",
+    "prompt": "ดัชนีหักเห $n=c/v$ ถ้าแสงในตัวกลางเร็ว $2\\times10^8\\,\\text{m/s}$ ดัชนีคือ?",
+    "choices": [
+      "$0.67$",
+      "$1.0$",
+      "$1.5$",
+      "$2.0$"
+    ],
+    "answerIndex": 2,
+    "explanation": "$n=3\\times10^8/2\\times10^8=1.5$",
+    "timeLimitSec": 35
+  },
+  {
+    "id": "opti-005",
+    "topic": "optics",
+    "difficulty": "medium",
+    "prompt": "เลนส์มีความยาวโฟกัส $0.25\\,\\text{m}$ กำลังเลนส์คือ?",
+    "choices": [
+      "$2\\,\\text{D}$",
+      "$4\\,\\text{D}$",
+      "$25\\,\\text{D}$",
+      "$0.25\\,\\text{D}$"
+    ],
+    "answerIndex": 1,
+    "explanation": "$P=1/f=1/0.25=4\\,\\text{D}$",
+    "timeLimitSec": 35
+  },
+  {
+    "id": "opti-006",
+    "topic": "optics",
+    "difficulty": "medium",
+    "prompt": "วัตถุอยู่หน้าเลนส์นูนไกลกว่า $2f$ ภาพที่ได้เป็นอย่างไร?",
+    "choices": [
+      "จริง กลับหัว เล็กลง",
+      "เสมือน หัวตั้ง ใหญ่ขึ้น",
+      "จริง หัวตั้ง",
+      "ไม่มีภาพ"
+    ],
+    "answerIndex": 0,
+    "explanation": "เลนส์นูนเมื่อวัตถุไกลกว่า $2f$ ให้ภาพจริง กลับหัว และเล็กลง",
+    "timeLimitSec": 35
+  },
+  {
+    "id": "opti-007",
+    "topic": "optics",
+    "difficulty": "medium",
+    "prompt": "การแทรกสอดของแสงต้องการแหล่งกำเนิดแบบใด?",
+    "choices": [
+      "ไม่สัมพันธ์กัน",
+      "โคฮีเรนต์",
+      "ความถี่ศูนย์",
+      "ความเข้มศูนย์"
+    ],
+    "answerIndex": 1,
+    "explanation": "แทรกสอดชัดเจนต้องมีแหล่งกำเนิดโคฮีเรนต์",
+    "timeLimitSec": 35
+  },
+  {
+    "id": "opti-008",
+    "topic": "optics",
+    "difficulty": "hard",
+    "prompt": "มุมวิกฤตเกิดเมื่อแสงเดินทางจากตัวกลางใดไปใด?",
+    "choices": [
+      "เบาไปหนาแน่นกว่า",
+      "หนาแน่นกว่าไปเบากว่า",
+      "สุญญากาศไปแก้วเท่านั้น",
+      "อากาศไปน้ำเท่านั้น"
+    ],
+    "answerIndex": 1,
+    "explanation": "มุมวิกฤตเกิดเมื่อแสงจากตัวกลางดัชนีสูงไปดัชนีต่ำ",
+    "timeLimitSec": 40
+  },
+  {
+    "id": "opti-009",
+    "topic": "optics",
+    "difficulty": "hard",
+    "prompt": "ในการทดลองยัง ถ้าเพิ่มระยะห่างฉาก $L$ ระยะริ้ว $\\Delta y$ เป็นอย่างไร?",
+    "choices": [
+      "ลดลง",
+      "เพิ่มขึ้น",
+      "คงที่",
+      "เป็นศูนย์"
+    ],
+    "answerIndex": 1,
+    "explanation": "$\\Delta y=\\lambda L/d$ จึงเพิ่มตาม $L$",
+    "timeLimitSec": 40
+  },
+  {
+    "id": "opti-010",
+    "topic": "optics",
+    "difficulty": "hard",
+    "prompt": "โพลาไรเซชันเป็นสมบัติที่ยืนยันว่าแสงเป็นคลื่นชนิดใด?",
+    "choices": [
+      "ตามยาว",
+      "ตามขวาง",
+      "กล",
+      "เสียง"
+    ],
+    "answerIndex": 1,
+    "explanation": "โพลาไรเซชันเกิดกับคลื่นตามขวาง จึงยืนยันว่าแสงเป็นคลื่นตามขวาง",
+    "timeLimitSec": 40
+  }
+]

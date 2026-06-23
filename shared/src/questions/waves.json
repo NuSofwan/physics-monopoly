@@ -1,0 +1,152 @@
+[
+  {
+    "id": "wave-001",
+    "topic": "waves",
+    "difficulty": "easy",
+    "prompt": "คลื่นมีความถี่ $5\\,\\text{Hz}$ ความยาวคลื่น $2\\,\\text{m}$ อัตราเร็วคือ?",
+    "choices": [
+      "$2.5\\,\\text{m/s}$",
+      "$7\\,\\text{m/s}$",
+      "$10\\,\\text{m/s}$",
+      "$25\\,\\text{m/s}$"
+    ],
+    "answerIndex": 2,
+    "explanation": "$v=f\\lambda=5(2)=10\\,\\text{m/s}$",
+    "timeLimitSec": 30
+  },
+  {
+    "id": "wave-002",
+    "topic": "waves",
+    "difficulty": "easy",
+    "prompt": "คาบของคลื่นความถี่ $20\\,\\text{Hz}$ คือ?",
+    "choices": [
+      "$0.05\\,\\text{s}$",
+      "$0.20\\,\\text{s}$",
+      "$5\\,\\text{s}$",
+      "$20\\,\\text{s}$"
+    ],
+    "answerIndex": 0,
+    "explanation": "$T=1/f=1/20=0.05\\,\\text{s}$",
+    "timeLimitSec": 30
+  },
+  {
+    "id": "wave-003",
+    "topic": "waves",
+    "difficulty": "easy",
+    "prompt": "เสียงเดินทางเร็วประมาณเท่าใดในอากาศที่อุณหภูมิห้อง?",
+    "choices": [
+      "$34\\,\\text{m/s}$",
+      "$340\\,\\text{m/s}$",
+      "$3000\\,\\text{m/s}$",
+      "$3\\times10^8\\,\\text{m/s}$"
+    ],
+    "answerIndex": 1,
+    "explanation": "อัตราเร็วเสียงในอากาศประมาณ $340\\,\\text{m/s}$",
+    "timeLimitSec": 30
+  },
+  {
+    "id": "wave-004",
+    "topic": "waves",
+    "difficulty": "medium",
+    "prompt": "คลื่นนิ่งบนเชือกยาว $1\\,\\text{m}$ ปลายตรึงทั้งสอง เกิดฮาร์มอนิกพื้นฐาน ความยาวคลื่นคือ?",
+    "choices": [
+      "$0.5\\,\\text{m}$",
+      "$1\\,\\text{m}$",
+      "$2\\,\\text{m}$",
+      "$4\\,\\text{m}$"
+    ],
+    "answerIndex": 2,
+    "explanation": "พื้นฐานของเชือกปลายตรึงมี $L=\\lambda/2$ ดังนั้น $\\lambda=2L=2\\,\\text{m}$",
+    "timeLimitSec": 35
+  },
+  {
+    "id": "wave-005",
+    "topic": "waves",
+    "difficulty": "medium",
+    "prompt": "บีตเกิดจากเสียง $256\\,\\text{Hz}$ กับ $260\\,\\text{Hz}$ ความถี่บีตคือ?",
+    "choices": [
+      "$2\\,\\text{Hz}$",
+      "$4\\,\\text{Hz}$",
+      "$258\\,\\text{Hz}$",
+      "$516\\,\\text{Hz}$"
+    ],
+    "answerIndex": 1,
+    "explanation": "$f_b=|260-256|=4\\,\\text{Hz}$",
+    "timeLimitSec": 35
+  },
+  {
+    "id": "wave-006",
+    "topic": "waves",
+    "difficulty": "medium",
+    "prompt": "คลื่นสะท้อนจากปลายตรึง เฟสเปลี่ยนไปเท่าใด?",
+    "choices": [
+      "$0$",
+      "$\\pi/2$",
+      "$\\pi$",
+      "$2\\pi$"
+    ],
+    "answerIndex": 2,
+    "explanation": "สะท้อนจากปลายตรึงกลับเฟส $180^\\circ$ หรือ $\\pi$",
+    "timeLimitSec": 35
+  },
+  {
+    "id": "wave-007",
+    "topic": "waves",
+    "difficulty": "medium",
+    "prompt": "ความเข้มเสียงเพิ่มเป็น 100 เท่า ระดับเสียงเพิ่มกี่เดซิเบล?",
+    "choices": [
+      "$10\\,\\text{dB}$",
+      "$20\\,\\text{dB}$",
+      "$40\\,\\text{dB}$",
+      "$100\\,\\text{dB}$"
+    ],
+    "answerIndex": 1,
+    "explanation": "$\\Delta\\beta=10\\log(100)=20\\,\\text{dB}$",
+    "timeLimitSec": 35
+  },
+  {
+    "id": "wave-008",
+    "topic": "waves",
+    "difficulty": "hard",
+    "prompt": "แหล่งกำเนิดเสียงเคลื่อนเข้าหาผู้ฟัง ความถี่ที่ได้ยินเป็นอย่างไร?",
+    "choices": [
+      "ต่ำลง",
+      "สูงขึ้น",
+      "เท่าเดิม",
+      "เป็นศูนย์"
+    ],
+    "answerIndex": 1,
+    "explanation": "โดปเพลอร์เมื่อแหล่งกำเนิดเข้าใกล้ ผู้ฟังรับคลื่นถี่ขึ้น จึงได้ยินความถี่สูงขึ้น",
+    "timeLimitSec": 40
+  },
+  {
+    "id": "wave-009",
+    "topic": "waves",
+    "difficulty": "hard",
+    "prompt": "คลื่นน้ำหักเหจากบริเวณลึกไปตื้น ความเร็วลดลง ทิศคลื่นเบนอย่างไร?",
+    "choices": [
+      "เบนเข้าหาเส้นปกติ",
+      "เบนออกจากเส้นปกติ",
+      "ไม่เปลี่ยนทิศ",
+      "สะท้อนหมด"
+    ],
+    "answerIndex": 0,
+    "explanation": "ความเร็วลดลงจึงเบนเข้าหาเส้นปกติ",
+    "timeLimitSec": 40
+  },
+  {
+    "id": "wave-010",
+    "topic": "waves",
+    "difficulty": "hard",
+    "prompt": "สองแหล่งกำเนิดเฟสเดียวกัน เกิดเสริมกันเมื่อผลต่างทางเดินเท่ากับข้อใด?",
+    "choices": [
+      "$(m+1/2)\\lambda$",
+      "$m\\lambda$",
+      "$\\lambda/4$",
+      "$3\\lambda/4$"
+    ],
+    "answerIndex": 1,
+    "explanation": "แหล่งเฟสเดียวกันเสริมกันเมื่อ $\\Delta L=m\\lambda$",
+    "timeLimitSec": 40
+  }
+]

@@ -1,0 +1,152 @@
+[
+  {
+    "id": "mode-001",
+    "topic": "modern",
+    "difficulty": "easy",
+    "prompt": "พลังงานโฟตอนสัมพันธ์กับความถี่อย่างไร?",
+    "choices": [
+      "$E=hf$",
+      "$E=mc$",
+      "$E=IR$",
+      "$E=PV$"
+    ],
+    "answerIndex": 0,
+    "explanation": "พลังงานโฟตอนคือ $E=hf$",
+    "timeLimitSec": 30
+  },
+  {
+    "id": "mode-002",
+    "topic": "modern",
+    "difficulty": "easy",
+    "prompt": "นิวเคลียสอะตอมประกอบด้วยอะไร?",
+    "choices": [
+      "โปรตอนและนิวตรอน",
+      "อิเล็กตรอนเท่านั้น",
+      "โฟตอนเท่านั้น",
+      "โมเลกุลน้ำ"
+    ],
+    "answerIndex": 0,
+    "explanation": "นิวเคลียสประกอบด้วยโปรตอนและนิวตรอน",
+    "timeLimitSec": 30
+  },
+  {
+    "id": "mode-003",
+    "topic": "modern",
+    "difficulty": "easy",
+    "prompt": "เลขอะตอมบอกจำนวนอนุภาคใด?",
+    "choices": [
+      "นิวตรอน",
+      "โปรตอน",
+      "โฟตอน",
+      "เมซอน"
+    ],
+    "answerIndex": 1,
+    "explanation": "เลขอะตอม $Z$ คือจำนวนโปรตอน",
+    "timeLimitSec": 30
+  },
+  {
+    "id": "mode-004",
+    "topic": "modern",
+    "difficulty": "medium",
+    "prompt": "ถ้ามวลพร่อง $\\Delta m$ เกิดขึ้น พลังงานยึดเหนี่ยวคือ?",
+    "choices": [
+      "$\\Delta m g$",
+      "$\\Delta m c^2$",
+      "$hf$",
+      "$qV$"
+    ],
+    "answerIndex": 1,
+    "explanation": "จากสัมพัทธภาพ $E=\\Delta mc^2$",
+    "timeLimitSec": 35
+  },
+  {
+    "id": "mode-005",
+    "topic": "modern",
+    "difficulty": "medium",
+    "prompt": "ปรากฏการณ์โฟโตอิเล็กทริกแสดงว่าแสงมีสมบัติแบบใด?",
+    "choices": [
+      "อนุภาค",
+      "ของไหล",
+      "คลื่นเสียง",
+      "ความร้อนเท่านั้น"
+    ],
+    "answerIndex": 0,
+    "explanation": "โฟโตอิเล็กทริกอธิบายด้วยโฟตอน จึงแสดงสมบัติอนุภาคของแสง",
+    "timeLimitSec": 35
+  },
+  {
+    "id": "mode-006",
+    "topic": "modern",
+    "difficulty": "medium",
+    "prompt": "ครึ่งชีวิต $10$ วัน เหลือสารกัมมันตรังสีเท่าใดหลัง $20$ วัน?",
+    "choices": [
+      "$1/2$",
+      "$1/3$",
+      "$1/4$",
+      "$1/8$"
+    ],
+    "answerIndex": 2,
+    "explanation": "$20$ วันคือ 2 ครึ่งชีวิต จึงเหลือ $(1/2)^2=1/4$",
+    "timeLimitSec": 35
+  },
+  {
+    "id": "mode-007",
+    "topic": "modern",
+    "difficulty": "medium",
+    "prompt": "อิเล็กตรอนเปลี่ยนระดับพลังงานลง จะเกิดอะไร?",
+    "choices": [
+      "ดูดกลืนโฟตอน",
+      "ปล่อยโฟตอน",
+      "หยุดนิ่งถาวร",
+      "มวลหายหมด"
+    ],
+    "answerIndex": 1,
+    "explanation": "เมื่อลงระดับพลังงานต่ำกว่า จะปล่อยโฟตอน",
+    "timeLimitSec": 35
+  },
+  {
+    "id": "mode-008",
+    "topic": "modern",
+    "difficulty": "hard",
+    "prompt": "ความยาวคลื่นเดอบรอยล์ของอนุภาคโมเมนตัม $p$ คือ?",
+    "choices": [
+      "$\\lambda=hp$",
+      "$\\lambda=h/p$",
+      "$\\lambda=p/h$",
+      "$\\lambda=mc^2$"
+    ],
+    "answerIndex": 1,
+    "explanation": "เดอบรอยล์ให้ $\\lambda=h/p$",
+    "timeLimitSec": 40
+  },
+  {
+    "id": "mode-009",
+    "topic": "modern",
+    "difficulty": "hard",
+    "prompt": "ถ้าความถี่แสงต่ำกว่าความถี่ขีดเริ่มในโฟโตอิเล็กทริก จะเกิดอะไร?",
+    "choices": [
+      "อิเล็กตรอนหลุดมากขึ้น",
+      "ไม่มีอิเล็กตรอนหลุดแม้เพิ่มความเข้ม",
+      "พลังงานจลน์สูงสุดเพิ่ม",
+      "โลหะกลายเป็นฉนวนสมบูรณ์"
+    ],
+    "answerIndex": 1,
+    "explanation": "ถ้า $f<f_0$ พลังงานโฟตอนไม่พอ อิเล็กตรอนไม่หลุดแม้เพิ่มความเข้ม",
+    "timeLimitSec": 40
+  },
+  {
+    "id": "mode-010",
+    "topic": "modern",
+    "difficulty": "hard",
+    "prompt": "ฟิชชันนิวเคลียร์คือกระบวนการใด?",
+    "choices": [
+      "นิวเคลียสเบารวมกัน",
+      "นิวเคลียสหนักแตกตัว",
+      "อิเล็กตรอนเปลี่ยนวง",
+      "คลื่นสะท้อน"
+    ],
+    "answerIndex": 1,
+    "explanation": "ฟิชชันคือการแตกตัวของนิวเคลียสหนักเป็นนิวเคลียสเล็กลง",
+    "timeLimitSec": 40
+  }
+]

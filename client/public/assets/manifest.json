@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "basePath": "/assets",
+  "items": {
+    "appIcon": { "path": "placeholders/icon.svg", "kind": "icon" },
+    "board": { "path": "placeholders/board.svg", "kind": "board", "size": [1024, 1024] },
+    "avatarAstro": { "path": "placeholders/avatar_astro.svg", "kind": "sprite", "frame": [128, 128], "frames": 8 },
+    "avatarRobot": { "path": "placeholders/avatar_robot.svg", "kind": "sprite", "frame": [128, 128], "frames": 8 },
+    "avatarGirl": { "path": "placeholders/avatar_girl.svg", "kind": "sprite", "frame": [128, 128], "frames": 8 },
+    "avatarBoy": { "path": "placeholders/avatar_boy.svg", "kind": "sprite", "frame": [128, 128], "frames": 8 },
+    "dice": { "path": "placeholders/dice.svg", "kind": "sprite", "frame": [128, 128], "frames": 6 },
+    "propertyLand": { "path": "placeholders/property_land.svg", "kind": "card" },
+    "propertyHouse": { "path": "placeholders/property_house.svg", "kind": "card" },
+    "propertyCondo": { "path": "placeholders/property_condo.svg", "kind": "card" },
+    "propertyHotel": { "path": "placeholders/property_hotel.svg", "kind": "card" },
+    "chanceBack": { "path": "placeholders/chance_back.svg", "kind": "card" },
+    "fxCorrect": { "path": "placeholders/fx_correct.svg", "kind": "effect" },
+    "fxWrong": { "path": "placeholders/fx_wrong.svg", "kind": "effect" }
+  }
+}

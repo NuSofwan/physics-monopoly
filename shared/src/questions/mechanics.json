@@ -1,0 +1,152 @@
+[
+  {
+    "id": "mech-001",
+    "topic": "mechanics",
+    "difficulty": "easy",
+    "prompt": "รถเริ่มจากหยุดนิ่ง มีความเร่ง $2\\,\\text{m/s}^2$ นาน $3\\,\\text{s}$ ความเร็วสุดท้ายเท่าใด?",
+    "choices": [
+      "$3\\,\\text{m/s}$",
+      "$6\\,\\text{m/s}$",
+      "$9\\,\\text{m/s}$",
+      "$12\\,\\text{m/s}$"
+    ],
+    "answerIndex": 1,
+    "explanation": "$v=u+at=0+2(3)=6\\,\\text{m/s}$",
+    "timeLimitSec": 30
+  },
+  {
+    "id": "mech-002",
+    "topic": "mechanics",
+    "difficulty": "easy",
+    "prompt": "วัตถุมวล $5\\,\\text{kg}$ ถูกแรงลัพธ์ $20\\,\\text{N}$ กระทำ ความเร่งเป็นเท่าใด?",
+    "choices": [
+      "$2\\,\\text{m/s}^2$",
+      "$4\\,\\text{m/s}^2$",
+      "$10\\,\\text{m/s}^2$",
+      "$25\\,\\text{m/s}^2$"
+    ],
+    "answerIndex": 1,
+    "explanation": "$F=ma$ ดังนั้น $a=20/5=4\\,\\text{m/s}^2$",
+    "timeLimitSec": 30
+  },
+  {
+    "id": "mech-003",
+    "topic": "mechanics",
+    "difficulty": "easy",
+    "prompt": "งานที่แรง $10\\,\\text{N}$ ทำให้วัตถุเคลื่อนที่ $4\\,\\text{m}$ ในทิศแรงคือเท่าใด?",
+    "choices": [
+      "$14\\,\\text{J}$",
+      "$25\\,\\text{J}$",
+      "$40\\,\\text{J}$",
+      "$80\\,\\text{J}$"
+    ],
+    "answerIndex": 2,
+    "explanation": "$W=Fs=10(4)=40\\,\\text{J}$",
+    "timeLimitSec": 30
+  },
+  {
+    "id": "mech-004",
+    "topic": "mechanics",
+    "difficulty": "medium",
+    "prompt": "วัตถุมีพลังงานจลน์ $100\\,\\text{J}$ และมวล $2\\,\\text{kg}$ ความเร็วเป็นเท่าใด?",
+    "choices": [
+      "$5\\,\\text{m/s}$",
+      "$10\\,\\text{m/s}$",
+      "$20\\,\\text{m/s}$",
+      "$50\\,\\text{m/s}$"
+    ],
+    "answerIndex": 1,
+    "explanation": "$K=\\frac12mv^2$ จึงได้ $100=v^2$ และ $v=10\\,\\text{m/s}$",
+    "timeLimitSec": 35
+  },
+  {
+    "id": "mech-005",
+    "topic": "mechanics",
+    "difficulty": "medium",
+    "prompt": "โยนวัตถุขึ้นด้วย $20\\,\\text{m/s}$ ใช้ $g=10\\,\\text{m/s}^2$ เวลาถึงจุดสูงสุดคือ?",
+    "choices": [
+      "$1\\,\\text{s}$",
+      "$2\\,\\text{s}$",
+      "$3\\,\\text{s}$",
+      "$4\\,\\text{s}$"
+    ],
+    "answerIndex": 1,
+    "explanation": "ที่จุดสูงสุด $v=0$ ดังนั้น $t=u/g=20/10=2\\,\\text{s}$",
+    "timeLimitSec": 35
+  },
+  {
+    "id": "mech-006",
+    "topic": "mechanics",
+    "difficulty": "medium",
+    "prompt": "โมเมนตัมของวัตถุมวล $3\\,\\text{kg}$ เคลื่อนที่ $4\\,\\text{m/s}$ คือ?",
+    "choices": [
+      "$7\\,\\text{kg m/s}$",
+      "$12\\,\\text{kg m/s}$",
+      "$16\\,\\text{kg m/s}$",
+      "$24\\,\\text{kg m/s}$"
+    ],
+    "answerIndex": 1,
+    "explanation": "$p=mv=3(4)=12\\,\\text{kg m/s}$",
+    "timeLimitSec": 35
+  },
+  {
+    "id": "mech-007",
+    "topic": "mechanics",
+    "difficulty": "medium",
+    "prompt": "สปริงค่าคงตัว $200\\,\\text{N/m}$ ยืด $0.10\\,\\text{m}$ มีพลังงานศักย์เท่าใด?",
+    "choices": [
+      "$0.5\\,\\text{J}$",
+      "$1.0\\,\\text{J}$",
+      "$2.0\\,\\text{J}$",
+      "$10\\,\\text{J}$"
+    ],
+    "answerIndex": 1,
+    "explanation": "$U=\\frac12kx^2=\\frac12(200)(0.1)^2=1\\,\\text{J}$",
+    "timeLimitSec": 35
+  },
+  {
+    "id": "mech-008",
+    "topic": "mechanics",
+    "difficulty": "hard",
+    "prompt": "วัตถุเคลื่อนที่เป็นวงกลมรัศมี $2\\,\\text{m}$ ด้วยความเร็ว $6\\,\\text{m/s}$ ความเร่งสู่ศูนย์กลางคือ?",
+    "choices": [
+      "$6\\,\\text{m/s}^2$",
+      "$12\\,\\text{m/s}^2$",
+      "$18\\,\\text{m/s}^2$",
+      "$36\\,\\text{m/s}^2$"
+    ],
+    "answerIndex": 2,
+    "explanation": "$a_c=v^2/r=36/2=18\\,\\text{m/s}^2$",
+    "timeLimitSec": 40
+  },
+  {
+    "id": "mech-009",
+    "topic": "mechanics",
+    "difficulty": "hard",
+    "prompt": "แรงเสียดทานสถิตสูงสุดเมื่อ $\\mu_s=0.4$ และแรงปกติ $50\\,\\text{N}$ คือ?",
+    "choices": [
+      "$10\\,\\text{N}$",
+      "$20\\,\\text{N}$",
+      "$40\\,\\text{N}$",
+      "$125\\,\\text{N}$"
+    ],
+    "answerIndex": 1,
+    "explanation": "$f_s^{max}=\\mu_sN=0.4(50)=20\\,\\text{N}$",
+    "timeLimitSec": 40
+  },
+  {
+    "id": "mech-010",
+    "topic": "mechanics",
+    "difficulty": "hard",
+    "prompt": "เครื่องกลมีงานออก $300\\,\\text{J}$ งานเข้า $500\\,\\text{J}$ ประสิทธิภาพคือ?",
+    "choices": [
+      "$40\\%$",
+      "$50\\%$",
+      "$60\\%$",
+      "$80\\%$"
+    ],
+    "answerIndex": 2,
+    "explanation": "$\\eta=W_{out}/W_{in}=300/500=0.60=60\\%$",
+    "timeLimitSec": 40
+  }
+]

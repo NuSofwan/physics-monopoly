@@ -1,0 +1,10 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "rootDir": "..",
+    "noEmit": true,
+    "moduleResolution": "Bundler"
+  },
+  "include": ["src", "../shared/src"]
+}

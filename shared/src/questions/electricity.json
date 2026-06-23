@@ -1,0 +1,152 @@
+[
+  {
+    "id": "elec-001",
+    "topic": "electricity",
+    "difficulty": "easy",
+    "prompt": "ตัวต้านทาน $4\\,\\Omega$ มีกระแส $3\\,\\text{A}$ ความต่างศักย์คือ?",
+    "choices": [
+      "$7\\,\\text{V}$",
+      "$12\\,\\text{V}$",
+      "$16\\,\\text{V}$",
+      "$24\\,\\text{V}$"
+    ],
+    "answerIndex": 1,
+    "explanation": "$V=IR=3(4)=12\\,\\text{V}$",
+    "timeLimitSec": 30
+  },
+  {
+    "id": "elec-002",
+    "topic": "electricity",
+    "difficulty": "easy",
+    "prompt": "ประจุ $2\\,\\text{C}$ ผ่านจุดหนึ่งใน $4\\,\\text{s}$ กระแสไฟฟ้าคือ?",
+    "choices": [
+      "$0.5\\,\\text{A}$",
+      "$2\\,\\text{A}$",
+      "$4\\,\\text{A}$",
+      "$8\\,\\text{A}$"
+    ],
+    "answerIndex": 0,
+    "explanation": "$I=Q/t=2/4=0.5\\,\\text{A}$",
+    "timeLimitSec": 30
+  },
+  {
+    "id": "elec-003",
+    "topic": "electricity",
+    "difficulty": "easy",
+    "prompt": "กำลังไฟฟ้าของเครื่องใช้ $220\\,\\text{V}$ กระแส $2\\,\\text{A}$ คือ?",
+    "choices": [
+      "$110\\,\\text{W}$",
+      "$222\\,\\text{W}$",
+      "$440\\,\\text{W}$",
+      "$880\\,\\text{W}$"
+    ],
+    "answerIndex": 2,
+    "explanation": "$P=VI=220(2)=440\\,\\text{W}$",
+    "timeLimitSec": 30
+  },
+  {
+    "id": "elec-004",
+    "topic": "electricity",
+    "difficulty": "medium",
+    "prompt": "ตัวต้านทาน $6\\,\\Omega$ และ $3\\,\\Omega$ ต่อขนาน ความต้านทานรวมคือ?",
+    "choices": [
+      "$2\\,\\Omega$",
+      "$3\\,\\Omega$",
+      "$6\\,\\Omega$",
+      "$9\\,\\Omega$"
+    ],
+    "answerIndex": 0,
+    "explanation": "$1/R=1/6+1/3=1/2$ ดังนั้น $R=2\\,\\Omega$",
+    "timeLimitSec": 35
+  },
+  {
+    "id": "elec-005",
+    "topic": "electricity",
+    "difficulty": "medium",
+    "prompt": "สนามไฟฟ้าจากแรง $0.2\\,\\text{N}$ บนประจุ $0.01\\,\\text{C}$ คือ?",
+    "choices": [
+      "$0.002\\,\\text{N/C}$",
+      "$2\\,\\text{N/C}$",
+      "$20\\,\\text{N/C}$",
+      "$200\\,\\text{N/C}$"
+    ],
+    "answerIndex": 2,
+    "explanation": "$E=F/q=0.2/0.01=20\\,\\text{N/C}$",
+    "timeLimitSec": 35
+  },
+  {
+    "id": "elec-006",
+    "topic": "electricity",
+    "difficulty": "medium",
+    "prompt": "พลังงานของประจุ $3\\,\\text{C}$ เคลื่อนผ่าน $12\\,\\text{V}$ คือ?",
+    "choices": [
+      "$4\\,\\text{J}$",
+      "$15\\,\\text{J}$",
+      "$36\\,\\text{J}$",
+      "$108\\,\\text{J}$"
+    ],
+    "answerIndex": 2,
+    "explanation": "$W=qV=3(12)=36\\,\\text{J}$",
+    "timeLimitSec": 35
+  },
+  {
+    "id": "elec-007",
+    "topic": "electricity",
+    "difficulty": "medium",
+    "prompt": "ลวดในสนามแม่เหล็กตั้งฉาก $0.5\\,\\text{T}$ ยาว $0.2\\,\\text{m}$ กระแส $4\\,\\text{A}$ แรงคือ?",
+    "choices": [
+      "$0.1\\,\\text{N}$",
+      "$0.4\\,\\text{N}$",
+      "$2.5\\,\\text{N}$",
+      "$4.7\\,\\text{N}$"
+    ],
+    "answerIndex": 1,
+    "explanation": "$F=BIL=0.5(4)(0.2)=0.4\\,\\text{N}$",
+    "timeLimitSec": 35
+  },
+  {
+    "id": "elec-008",
+    "topic": "electricity",
+    "difficulty": "hard",
+    "prompt": "คาปาซิเตอร์ $10\\,\\mu\\text{F}$ ต่อกับ $100\\,\\text{V}$ เก็บประจุเท่าใด?",
+    "choices": [
+      "$1\\times10^{-3}\\,\\text{C}$",
+      "$1\\times10^{-4}\\,\\text{C}$",
+      "$10\\,\\text{C}$",
+      "$1000\\,\\text{C}$"
+    ],
+    "answerIndex": 0,
+    "explanation": "$Q=CV=10^{-5}(100)=10^{-3}\\,\\text{C}$",
+    "timeLimitSec": 40
+  },
+  {
+    "id": "elec-009",
+    "topic": "electricity",
+    "difficulty": "hard",
+    "prompt": "หม้อแปลงมีรอบปฐมภูมิ 1000 รอบ ทุติยภูมิ 250 รอบ รับ $220\\,\\text{V}$ ออกเท่าใด?",
+    "choices": [
+      "$55\\,\\text{V}$",
+      "$110\\,\\text{V}$",
+      "$440\\,\\text{V}$",
+      "$880\\,\\text{V}$"
+    ],
+    "answerIndex": 0,
+    "explanation": "$V_s/V_p=N_s/N_p=250/1000$ ดังนั้น $V_s=55\\,\\text{V}$",
+    "timeLimitSec": 40
+  },
+  {
+    "id": "elec-010",
+    "topic": "electricity",
+    "difficulty": "hard",
+    "prompt": "กำลังสูญเสียในตัวต้านทาน $8\\,\\Omega$ มีกระแส $2\\,\\text{A}$ คือ?",
+    "choices": [
+      "$16\\,\\text{W}$",
+      "$24\\,\\text{W}$",
+      "$32\\,\\text{W}$",
+      "$64\\,\\text{W}$"
+    ],
+    "answerIndex": 2,
+    "explanation": "$P=I^2R=2^2(8)=32\\,\\text{W}$",
+    "timeLimitSec": 40
+  }
+]

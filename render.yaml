@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: physics-monopoly-server
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm run start -w server
+    envVars:
+      - key: PORT
+        value: 2567
+      - key: ALLOWED_ORIGINS
+        sync: false
