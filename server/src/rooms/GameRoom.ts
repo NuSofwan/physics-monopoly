@@ -17,6 +17,7 @@ import {
   movePlayerByDice,
   pay,
   rollDice,
+  sellProperty,
   upgradeProperty,
   type AnswerResult,
   type GameState,
@@ -40,6 +41,18 @@ interface TradePayload {
   tileIndex: number;
 }
 
+interface AuctionBidPayload {
+  amount: number;
+}
+
+interface PlayerPayload {
+  playerId: string;
+}
+
+interface TilePayload {
+  tileIndex: number;
+}
+
 const avatars = ["astro", "robot", "girl", "boy"];
 
 export class GameRoom extends Room<GameState> {
@@ -56,11 +69,20 @@ export class GameRoom extends Room<GameState> {
     this.onMessage("answer", (client, payload: AnswerPayload) => this.answer(client, payload));
     this.onMessage("buy", (client) => this.requestBuy(client));
     this.onMessage("upgrade", (client) => this.requestUpgrade(client));
-    this.onMessage("skipBuy", (client) => this.finishTurnIfCurrent(client));
+    this.onMessage("skipBuy", (client) => this.skipBuy(client));
     this.onMessage("payJailFine", (client) => this.payJailFine(client));
     this.onMessage("jailQuestion", (client) => this.askJailQuestion(client));
     this.onMessage("trade", (_client, payload: TradePayload) => this.trade(payload));
-    this.clock.setInterval(() => this.checkQuestionTimeout(), 1000);
+    this.onMessage("auctionBid", (client, payload: AuctionBidPayload) => this.auctionBid(client, payload));
+    this.onMessage("auctionPass", (client) => this.auctionPass(client));
+    this.onMessage("sellProperty", (client, payload: TilePayload) => this.sellOwnedProperty(client, payload));
+    this.onMessage("addBot", (client) => this.addLobbyBot(client));
+    this.onMessage("kickPlayer", (client, payload: PlayerPayload) => this.kickPlayer(client, payload));
+    this.clock.setInterval(() => {
+      this.checkQuestionTimeout();
+      this.checkAuctionTimeout();
+      this.checkTurnTimeout();
+    }, 1000);
   }
 
   override onJoin(client: Client, options: JoinOptions): void {
@@ -100,7 +122,8 @@ export class GameRoom extends Room<GameState> {
     if (this.state.players.length < 2) this.addBotPlayers(2 - this.state.players.length);
     this.state.phase = "rolling";
     this.state.currentPlayerIndex = 0;
-    this.state.log.unshift("เริ่มเกมแล้ว");
+    this.state.log.unshift("????????????");
+    this.refreshTurnTimer();
     this.sendSnapshot();
   }
 
@@ -111,6 +134,7 @@ export class GameRoom extends Room<GameState> {
       player.skipNextTurn = false;
       this.state.log.unshift(`${player.name} ถูกข้าม 1 ตา`);
       endTurn(this.state);
+      this.refreshTurnTimer();
       this.sendSnapshot();
       return;
     }
@@ -127,10 +151,12 @@ export class GameRoom extends Room<GameState> {
       this.sendToJail(player.id);
       player.doublesInRow = 0;
       endTurn(this.state);
+      this.refreshTurnTimer();
       this.sendSnapshot();
       return;
     }
     this.state.phase = "moving";
+    this.state.turnDeadline = null;
     const path = movePlayerByDice(this.state, player.id, dice);
     this.broadcast("tokenMove", { playerId: player.id, path, dice });
     this.state.log.unshift(`${player.name} ทอยได้ ${dice[0]} + ${dice[1]}`);
@@ -147,7 +173,9 @@ export class GameRoom extends Room<GameState> {
     if (tile.type === "property") {
       if (!tile.ownerId) {
         this.state.phase = "buying";
-        this.state.log.unshift(`${player.name} หยุดที่ ${tile.name} เลือกซื้อได้`);
+        this.state.turnDeadline = null;
+        this.state.log.unshift(`${player.name} ??????? ${tile.name} ????????????`);
+        if (this.isBot(player.id)) this.clock.setTimeout(() => this.botBuyDecision(player.id), 900);
       } else if (tile.ownerId !== player.id) {
         const rent = calculateRent(tile);
         pay(this.state, player.id, tile.ownerId, rent);
@@ -293,6 +321,10 @@ export class GameRoom extends Room<GameState> {
       deadline: Date.now() + question.timeLimitSec * 1000,
     };
     this.state.phase = "answering";
+    this.state.turnDeadline = null;
+    if (this.isBot(player.id)) {
+      this.clock.setTimeout(() => this.botAnswer(player.id, id), 1200);
+    }
   }
 
   private resolveChance(player: { id: string; name: string; money: number }): void {
@@ -321,13 +353,95 @@ export class GameRoom extends Room<GameState> {
   private finishLanding(keepTurnOnDouble: boolean): void {
     this.state.winnerId = checkWinner(this.state);
     endTurn(this.state, keepTurnOnDouble && !this.state.winnerId);
+    this.refreshTurnTimer();
   }
 
-  private finishTurnIfCurrent(client: Client): void {
+  private skipBuy(client: Client): void {
     const player = currentPlayer(this.state);
-    if (!player || player.id !== client.sessionId) return;
+    if (!player || player.id !== client.sessionId || this.state.phase !== "buying") return;
+    const tile = this.state.tiles[player.tileIndex];
+    if (!tile || tile.type !== "property" || tile.ownerId) {
+      this.finishLanding(false);
+      this.sendSnapshot();
+      return;
+    }
+    this.startAuction(tile.index, player.id);
+    this.sendSnapshot();
+  }
+
+  private startAuction(tileIndex: number, firstPassPlayerId: string): void {
+    const tile = this.state.tiles[tileIndex];
+    if (!tile || tile.type !== "property") return;
+    this.state.phase = "auctioning";
+    this.state.pendingAuction = {
+      tileIndex,
+      currentBid: Math.max(100, Math.round((tile.price ?? 1000) * 0.35)),
+      bidderId: null,
+      passes: [firstPassPlayerId],
+      deadline: Date.now() + 25000,
+    };
+    this.state.turnDeadline = null;
+    this.state.log.unshift("Auction started: " + tile.name);
+  }
+
+  private auctionBid(client: Client, payload: AuctionBidPayload): void {
+    const auction = this.state.pendingAuction;
+    const player = findPlayer(this.state, client.sessionId);
+    if (!auction || !player || player.bankrupt || player.money < payload.amount) return;
+    const minimum = auction.bidderId ? auction.currentBid + 100 : auction.currentBid;
+    if (payload.amount < minimum) return;
+    auction.currentBid = payload.amount;
+    auction.bidderId = player.id;
+    auction.passes = auction.passes.filter((id) => id !== player.id);
+    auction.deadline = Date.now() + 18000;
+    this.state.log.unshift(player.name + " bids " + payload.amount.toLocaleString("th-TH"));
+    this.sendSnapshot();
+  }
+
+  private auctionPass(client: Client): void {
+    const auction = this.state.pendingAuction;
+    const player = findPlayer(this.state, client.sessionId);
+    if (!auction || !player) return;
+    if (!auction.passes.includes(player.id)) auction.passes.push(player.id);
+    this.state.log.unshift(player.name + " passed auction");
+    this.resolveAuctionIfReady();
+    this.sendSnapshot();
+  }
+
+  private checkAuctionTimeout(): void {
+    if (!this.state.pendingAuction || Date.now() < this.state.pendingAuction.deadline) return;
+    this.resolveAuction(true);
+  }
+
+  private resolveAuctionIfReady(): void {
+    const auction = this.state.pendingAuction;
+    if (!auction) return;
+    const active = this.state.players.filter((player) => !player.bankrupt);
+    const passCount = active.filter((player) => auction.passes.includes(player.id)).length;
+    if (auction.bidderId && passCount >= active.length - 1) this.resolveAuction(true);
+    if (!auction.bidderId && passCount >= active.length) this.resolveAuction(false);
+  }
+
+  private resolveAuction(sold: boolean): void {
+    const auction = this.state.pendingAuction;
+    if (!auction) return;
+    const tile = this.state.tiles[auction.tileIndex];
+    const bidder = auction.bidderId ? findPlayer(this.state, auction.bidderId) : undefined;
+    if (sold && tile?.type === "property" && bidder && bidder.money >= auction.currentBid) {
+      bidder.money -= auction.currentBid;
+      tile.ownerId = bidder.id;
+      tile.level = 0;
+      this.state.log.unshift(bidder.name + " won auction: " + tile.name);
+    } else if (tile) {
+      this.state.log.unshift("Auction ended without winner: " + tile.name);
+    }
+    this.state.pendingAuction = null;
     this.finishLanding(false);
     this.sendSnapshot();
+  }
+
+  private sellOwnedProperty(client: Client, payload: TilePayload): void {
+    if (sellProperty(this.state, client.sessionId, payload.tileIndex)) this.sendSnapshot();
   }
 
   private sendToJail(playerId: string): void {
@@ -358,6 +472,76 @@ export class GameRoom extends Room<GameState> {
     if (!pending || Date.now() < pending.deadline) return;
     const fakeClient = { sessionId: pending.playerId } as Client;
     this.answer(fakeClient, { questionId: pending.id, choiceIndex: -1 });
+  }
+
+  private addLobbyBot(client: Client): void {
+    if (this.state.phase !== "lobby" || this.state.players[0]?.id !== client.sessionId) return;
+    if (this.state.players.length >= MAX_PLAYERS) return;
+    this.addBotPlayers(1);
+    this.sendSnapshot();
+  }
+
+  private kickPlayer(client: Client, payload: PlayerPayload): void {
+    if (this.state.phase !== "lobby" || this.state.players[0]?.id !== client.sessionId) return;
+    if (payload.playerId === client.sessionId) return;
+    const player = findPlayer(this.state, payload.playerId);
+    if (!player) return;
+    this.state.players = this.state.players.filter((item) => item.id !== payload.playerId);
+    this.state.log.unshift(player.name + " left lobby");
+    this.sendSnapshot();
+  }
+
+  private refreshTurnTimer(): void {
+    if (this.state.phase === "rolling" && !this.state.winnerId) {
+      this.state.turnDeadline = Date.now() + this.state.turnTimeSec * 1000;
+      const player = currentPlayer(this.state);
+      if (player && this.isBot(player.id)) {
+        this.clock.setTimeout(() => this.rollBot(player.id), 900);
+      }
+    } else {
+      this.state.turnDeadline = null;
+    }
+  }
+
+  private checkTurnTimeout(): void {
+    if (this.state.phase !== "rolling" || !this.state.turnDeadline || Date.now() < this.state.turnDeadline) return;
+    const player = currentPlayer(this.state);
+    if (player) this.state.log.unshift(player.name + " timed out");
+    endTurn(this.state);
+    this.refreshTurnTimer();
+    this.sendSnapshot();
+  }
+
+  private rollBot(playerId: string): void {
+    const player = currentPlayer(this.state);
+    if (!player || player.id !== playerId || this.state.phase !== "rolling") return;
+    this.roll({ sessionId: playerId } as Client);
+  }
+
+  private botBuyDecision(playerId: string): void {
+    const player = currentPlayer(this.state);
+    if (!player || player.id !== playerId || this.state.phase !== "buying") return;
+    const tile = this.state.tiles[player.tileIndex];
+    if (!tile || tile.type !== "property" || tile.ownerId || (tile.price ?? 0) > player.money * 0.75) {
+      this.startAuction(player.tileIndex, player.id);
+      this.sendSnapshot();
+      return;
+    }
+    this.askQuestion(player, "buy", tile.index, tile.difficulty ?? "easy");
+    this.sendSnapshot();
+  }
+
+  private botAnswer(playerId: string, pendingId: string): void {
+    const pending = this.state.pendingQuestion;
+    const question = this.pendingAnswers.get(pendingId);
+    if (!pending || pending.id !== pendingId || pending.playerId !== playerId || !question) return;
+    const skill = question.difficulty === "hard" ? 0.48 : question.difficulty === "medium" ? 0.62 : 0.76;
+    const choiceIndex = Math.random() < skill ? question.answerIndex : Math.floor(Math.random() * question.choices.length);
+    this.answer({ sessionId: playerId } as Client, { questionId: pendingId, choiceIndex });
+  }
+
+  private isBot(playerId: string): boolean {
+    return playerId.startsWith("bot-");
   }
 
   private addBotPlayers(count: number): void {

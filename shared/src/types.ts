@@ -76,6 +76,7 @@ export type GamePhase =
   | "resolving_tile"
   | "answering"
   | "buying"
+  | "auctioning"
   | "turn_end"
   | "game_over";
 
@@ -88,13 +89,31 @@ export interface PendingQuestion {
   deadline: number;
 }
 
+export interface AuctionState {
+  tileIndex: number;
+  currentBid: number;
+  bidderId: string | null;
+  passes: string[];
+  deadline: number;
+}
+
+export interface TradeOffer {
+  id: string;
+  fromPlayerId: string;
+  toPlayerId: string;
+  tileIndex: number;
+  money: number;
+  status: "pending" | "accepted" | "declined";
+}
+
 export interface ChanceCard {
   id: string;
   title: string;
   description: string;
-  effect: "money" | "move" | "jail" | "question" | "freeParking";
+  effect: "money" | "move" | "jail" | "question" | "freeParking" | "collectFromEach" | "repair" | "moveRelative";
   amount?: number;
   moveTo?: number;
+  moveBy?: number;
   difficulty?: Difficulty;
 }
 
@@ -110,7 +129,11 @@ export interface GameState {
   log: string[];
   winnerId: string | null;
   pendingQuestion: PendingQuestion | null;
+  pendingAuction: AuctionState | null;
+  tradeOffers: TradeOffer[];
   lastMovePath: number[];
+  turnDeadline: number | null;
+  turnTimeSec: number;
 }
 
 export interface AnswerResult {

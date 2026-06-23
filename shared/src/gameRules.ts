@@ -46,7 +46,11 @@ export function createInitialGameState(roomCode: string): GameState {
     log: [`ห้อง ${roomCode} พร้อมแล้ว`],
     winnerId: null,
     pendingQuestion: null,
+    pendingAuction: null,
+    tradeOffers: [],
     lastMovePath: [],
+    turnDeadline: null,
+    turnTimeSec: 45,
   };
 }
 
@@ -125,6 +129,37 @@ export function buyProperty(state: GameState, playerId: string, tileIndex: numbe
   tile.level = Math.max(tile.level ?? 0, 0);
   state.log.unshift(`${player.name} ซื้อ ${tile.name} สำเร็จ`);
   return true;
+}
+
+export function sellProperty(state: GameState, playerId: string, tileIndex: number): boolean {
+  const player = findPlayer(state, playerId);
+  const tile = state.tiles[tileIndex];
+  if (!player || !tile || tile.type !== "property" || tile.ownerId !== playerId) return false;
+  const base = Math.round((tile.price ?? 0) * 0.55);
+  const upgradeRefund = Math.round((tile.level ?? 0) * (tile.price ?? 0) * 0.25);
+  const refund = base + upgradeRefund;
+  player.money += refund;
+  tile.ownerId = null;
+  tile.level = 0;
+  state.log.unshift(`${player.name} ??? ${tile.name} ????????? ??? ?${refund.toLocaleString("th-TH")}`);
+  return true;
+}
+
+export function mortgageValue(tile: Tile): number {
+  if (tile.type !== "property") return 0;
+  return Math.round((tile.price ?? 0) * 0.55 + (tile.level ?? 0) * (tile.price ?? 0) * 0.25);
+}
+
+export function exportTopicReport(player: Player): Array<{ topic: PhysicsTopic; correct: number; total: number; accuracy: number }> {
+  return physicsTopics.map((topic) => {
+    const stats = player.stats[topic];
+    return {
+      topic,
+      correct: stats.correct,
+      total: stats.total,
+      accuracy: stats.total === 0 ? 0 : Math.round((stats.correct / stats.total) * 100),
+    };
+  });
 }
 
 export function upgradeProperty(state: GameState, playerId: string, tileIndex: number): boolean {

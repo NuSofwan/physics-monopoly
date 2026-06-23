@@ -73,3 +73,23 @@ export function sendJailQuestion(): void {
 export function sendTrade(toPlayerId: string, tileIndex: number, money: number): void {
   useGameStore.getState().room?.send("trade", { toPlayerId, tileIndex, money });
 }
+
+export function sendAuctionBid(amount: number): void {
+  useGameStore.getState().room?.send("auctionBid", { amount });
+}
+
+export function sendAuctionPass(): void {
+  useGameStore.getState().room?.send("auctionPass");
+}
+
+export function sendSellProperty(tileIndex: number): void {
+  useGameStore.getState().room?.send("sellProperty", { tileIndex });
+}
+
+export function sendAddBot(): void {
+  useGameStore.getState().room?.send("addBot");
+}
+
+export function sendKickPlayer(playerId: string): void {
+  useGameStore.getState().room?.send("kickPlayer", { playerId });
+}

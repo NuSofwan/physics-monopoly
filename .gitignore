@@ -9,3 +9,7 @@ client/dist/
 server/dist/
 shared/dist/
 *.tsbuildinfo
+
+# Browser-automation / screenshot scratch (do not commit)
+.chrome-profile/
+dev-server*.log
