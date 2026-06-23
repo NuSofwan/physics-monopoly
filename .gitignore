@@ -15,3 +15,5 @@ shared/dist/
 dev-server*.log
 server-dev.log
 .claude/launch.json
+
+.vercel
