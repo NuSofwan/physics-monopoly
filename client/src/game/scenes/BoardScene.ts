@@ -4,6 +4,7 @@ import type { GameState, Tile } from "@physics-monopoly/shared";
 const boardSize = 760;
 const tileSize = 96;
 const center = boardSize / 2;
+const nightBg = "#0b1224";
 const tokenColors: Record<string, number> = {
   astro: 0x34d399,
   robot: 0xf8c24a,
@@ -26,8 +27,13 @@ export class BoardScene extends Phaser.Scene {
     super("BoardScene");
   }
 
+  preload(): void {
+    // Physics-city night backdrop (also used on the lobby). Served from /public.
+    this.load.image("citybg", "/assets/art/physics_city_backdrop.png");
+  }
+
   create(): void {
-    this.cameras.main.setBackgroundColor("#edf5ff");
+    this.cameras.main.setBackgroundColor(nightBg);
     this.tokenGroup = this.add.group();
     this.ready = true;
     if (this.latestState) {
@@ -57,12 +63,12 @@ export class BoardScene extends Phaser.Scene {
     this.tilePositions.clear();
     this.drawBoard(state.tiles);
     this.stepLabel = this.add
-      .text(center, boardSize - 34, "", {
+      .text(center, boardSize - 30, "", {
         fontFamily: "Arial",
-        fontSize: "22px",
-        color: "#101827",
-        backgroundColor: "#ffffffcc",
-        padding: { x: 14, y: 8 },
+        fontSize: "20px",
+        color: "#eaf2ff",
+        backgroundColor: "#101a33dd",
+        padding: { x: 14, y: 7 },
       })
       .setOrigin(0.5)
       .setDepth(50);
@@ -105,11 +111,43 @@ export class BoardScene extends Phaser.Scene {
   }
 
   private drawBoard(tiles: Tile[]): void {
-    const bg = this.add.rectangle(center, center, boardSize - 64, boardSize - 64, 0xf8fbff, 1);
-    bg.setStrokeStyle(3, 0x101827, 0.14);
-    this.add.text(center, center - 42, "Physics", { fontFamily: "Arial", fontSize: "46px", color: "#101827", fontStyle: "bold" }).setOrigin(0.5);
-    this.add.text(center, center + 10, "Monopoly", { fontFamily: "Arial", fontSize: "42px", color: "#ff6b5f", fontStyle: "bold" }).setOrigin(0.5);
-    this.add.text(center, center + 62, "ตอบโจทย์ให้ถูกเพื่อซื้อ อัปเกรด และเอาชนะ", { fontFamily: "Arial", fontSize: "20px", color: "#475569" }).setOrigin(0.5);
+    // 1) Physics-city backdrop (cover-fit the square board) + dark overlay for contrast.
+    if (this.textures.exists("citybg")) {
+      const src = this.textures.get("citybg").getSourceImage() as HTMLImageElement;
+      const scale = Math.max(boardSize / src.width, boardSize / src.height);
+      this.add.image(center, center, "citybg").setScale(scale).setDepth(-20);
+      this.add.rectangle(center, center, boardSize, boardSize, 0x0b1224, 0.5).setDepth(-19);
+    } else {
+      this.add.rectangle(center, center, boardSize, boardSize, 0x0b1224, 1).setDepth(-20);
+    }
+
+    // 2) Central glowing emblem panel (translucent so the city lake shows through).
+    const panelSize = boardSize - tileSize * 2 - 40;
+    const panel = this.add.graphics().setDepth(-10);
+    panel.fillStyle(0x0e1730, 0.6);
+    panel.fillRoundedRect(center - panelSize / 2, center - panelSize / 2, panelSize, panelSize, 28);
+    panel.lineStyle(2, 0x6ea8ff, 0.35);
+    panel.strokeRoundedRect(center - panelSize / 2, center - panelSize / 2, panelSize, panelSize, 28);
+
+    this.add
+      .text(center, center - 34, "PHYSICS", { fontFamily: "Arial", fontSize: "46px", color: "#eaf2ff", fontStyle: "bold" })
+      .setOrigin(0.5)
+      .setDepth(-9)
+      .setShadow(0, 0, "#3b6fd4", 18);
+    this.add
+      .text(center, center + 16, "MONOPOLY", { fontFamily: "Arial", fontSize: "40px", color: "#ff6b5f", fontStyle: "bold" })
+      .setOrigin(0.5)
+      .setDepth(-9)
+      .setShadow(0, 0, "#ff6b5f", 16);
+    this.add
+      .text(center, center + 62, "ตอบโจทย์ฟิสิกส์ให้ถูก เพื่อซื้อ อัปเกรด และเอาชนะ", {
+        fontFamily: "Arial",
+        fontSize: "16px",
+        color: "#9fb4d8",
+      })
+      .setOrigin(0.5)
+      .setDepth(-9);
+
     tiles.forEach((tile) => this.drawTile(tile));
   }
 
@@ -117,29 +155,71 @@ export class BoardScene extends Phaser.Scene {
     const pos = tilePosition(tile.index);
     this.tilePositions.set(tile.index, new Phaser.Math.Vector2(pos.x, pos.y));
     const fill = tile.type === "property" ? colorToNumber(tile.groupColor ?? "#94a3b8") : specialColor(tile.type);
-    const rect = this.add.rectangle(pos.x, pos.y, tileSize, tileSize, 0xffffff, 1);
-    rect.setStrokeStyle(2, 0x101827, 0.18);
-    this.add.rectangle(pos.x, pos.y - tileSize / 2 + 10, tileSize, 20, fill, 1);
-    const label = tile.name.length > 12 ? `${tile.name.slice(0, 12)}…` : tile.name;
-    this.add.text(pos.x, pos.y + 4, label, { fontFamily: "Arial", fontSize: "13px", color: "#101827", align: "center", wordWrap: { width: 82 } }).setOrigin(0.5);
-    if (tile.type === "property") {
-      this.add.text(pos.x, pos.y + 32, `฿${tile.price}`, { fontFamily: "Arial", fontSize: "12px", color: "#475569" }).setOrigin(0.5);
+    const half = tileSize / 2;
+    const x = pos.x - half;
+    const y = pos.y - half;
+
+    // Vibrant rounded tile: drop shadow, color fill, glossy top highlight, light border.
+    const g = this.add.graphics();
+    g.fillStyle(0x05070f, 0.5);
+    g.fillRoundedRect(x + 2, y + 5, tileSize - 4, tileSize - 4, 15);
+    g.fillStyle(fill, 1);
+    g.fillRoundedRect(x, y, tileSize, tileSize, 15);
+    g.fillStyle(0xffffff, 0.16);
+    g.fillRoundedRect(x, y, tileSize, tileSize * 0.4, 15);
+    g.lineStyle(2, 0xffffff, 0.55);
+    g.strokeRoundedRect(x, y, tileSize, tileSize, 15);
+
+    // Tile name — white, bold, dark-stroked so it reads on any tile colour.
+    const label = tile.name.length > 13 ? `${tile.name.slice(0, 13)}…` : tile.name;
+    this.add
+      .text(pos.x, pos.y - 2, label, {
+        fontFamily: "Arial",
+        fontSize: "12.5px",
+        color: "#ffffff",
+        fontStyle: "bold",
+        align: "center",
+        wordWrap: { width: 82 },
+      })
+      .setOrigin(0.5)
+      .setStroke("#0b1224", 3)
+      .setShadow(0, 1, "#0b1224", 3);
+
+    // Price pill for properties.
+    if (tile.type === "property" && tile.price) {
+      const pw = 60;
+      const ph = 18;
+      const pill = this.add.graphics();
+      pill.fillStyle(0x0b1224, 0.62);
+      pill.fillRoundedRect(pos.x - pw / 2, pos.y + half - 26, pw, ph, 9);
+      this.add
+        .text(pos.x, pos.y + half - 17, `฿${tile.price.toLocaleString()}`, {
+          fontFamily: "Arial",
+          fontSize: "11px",
+          color: "#eaf2ff",
+          fontStyle: "bold",
+        })
+        .setOrigin(0.5);
     }
   }
 
   private addToken(playerId: string, avatar: string, tileIndex: number, offset: number): Phaser.GameObjects.Container {
     const pos = this.positionForToken(tileIndex, offset);
+    const color = tokenColors[avatar] ?? 0x34d399;
     const container = this.add.container(pos.x, pos.y).setDepth(20 + offset);
-    const shadow = this.add.ellipse(0, 20, 34, 12, 0x101827, 0.2);
-    const body = this.add.circle(0, 0, 19, tokenColors[avatar] ?? 0x34d399);
+    const shadow = this.add.ellipse(0, 20, 34, 12, 0x05070f, 0.35);
+    const glow = this.add.circle(0, 0, 24, color, 0.28);
+    const body = this.add.circle(0, 0, 19, color);
     body.setStrokeStyle(3, 0xffffff, 1);
-    const face = this.add.text(0, -2, avatar === "robot" ? "R" : avatar === "astro" ? "A" : avatar === "girl" ? "G" : "B", {
-      fontFamily: "Arial",
-      fontSize: "16px",
-      color: "#101827",
-      fontStyle: "bold",
-    }).setOrigin(0.5);
-    container.add([shadow, body, face]);
+    const face = this.add
+      .text(0, -2, avatar === "robot" ? "R" : avatar === "astro" ? "A" : avatar === "girl" ? "G" : "B", {
+        fontFamily: "Arial",
+        fontSize: "16px",
+        color: "#0b1224",
+        fontStyle: "bold",
+      })
+      .setOrigin(0.5);
+    container.add([shadow, glow, body, face]);
     this.tokens.set(playerId, container);
     return container;
   }
@@ -169,14 +249,14 @@ function tilePosition(index: number): { x: number; y: number } {
 
 function specialColor(type: Tile["type"]): number {
   const map: Record<Tile["type"], number> = {
-    start: 0x34d399,
+    start: 0x22c55e,
     property: 0x94a3b8,
     challenge: 0xff6b5f,
     chance: 0xf8c24a,
     tax: 0x64748b,
-    jail: 0x111827,
+    jail: 0x1f2a44,
     goToJail: 0xef4444,
-    freeParking: 0x60a5fa,
+    freeParking: 0x3b82f6,
   };
   return map[type];
 }

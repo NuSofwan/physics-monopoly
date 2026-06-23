@@ -25,7 +25,7 @@ export function PhaserGame({ state, moveEvent }: Props): JSX.Element {
       parent: hostRef.current,
       width: 760,
       height: 760,
-      backgroundColor: "#edf5ff",
+      backgroundColor: "#0b1224",
       scene,
       scale: {
         mode: Phaser.Scale.FIT,
