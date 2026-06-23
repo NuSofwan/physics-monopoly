@@ -13,3 +13,5 @@ shared/dist/
 # Browser-automation / screenshot scratch (do not commit)
 .chrome-profile/
 dev-server*.log
+server-dev.log
+.claude/launch.json

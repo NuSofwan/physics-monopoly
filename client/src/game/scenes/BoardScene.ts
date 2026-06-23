@@ -15,7 +15,12 @@ export class BoardScene extends Phaser.Scene {
   private tokenGroup!: Phaser.GameObjects.Group;
   private tilePositions = new Map<number, Phaser.Math.Vector2>();
   private tokens = new Map<string, Phaser.GameObjects.Container>();
-  private stepLabel!: Phaser.GameObjects.Text;
+  private stepLabel?: Phaser.GameObjects.Text;
+  // Phaser boots the scene asynchronously; React can push state in before
+  // create() runs. Guard with a ready flag and replay the latest state once the
+  // scene is live so syncState/animateMove never touch uninitialised systems.
+  private ready = false;
+  private latestState: GameState | null = null;
 
   constructor() {
     super("BoardScene");
@@ -24,16 +29,26 @@ export class BoardScene extends Phaser.Scene {
   create(): void {
     this.cameras.main.setBackgroundColor("#edf5ff");
     this.tokenGroup = this.add.group();
-    this.stepLabel = this.add
-      .text(center, boardSize - 34, "", {
-        fontFamily: "Arial",
-        fontSize: "22px",
-        color: "#101827",
-        backgroundColor: "#ffffffcc",
-        padding: { x: 14, y: 8 },
-      })
-      .setOrigin(0.5)
-      .setDepth(50);
+    this.ready = true;
+    if (this.latestState) {
+      this.renderBoard(this.latestState);
+    }
+  }
+
+  syncState(state: GameState): void {
+    this.latestState = state;
+    if (!this.ready) return;
+    if (this.tilePositions.size === 0 || this.tokens.size !== state.players.length) {
+      this.renderBoard(state);
+      return;
+    }
+    state.players.forEach((player, index) => {
+      let token = this.tokens.get(player.id);
+      if (!token) token = this.addToken(player.id, player.avatar, player.tileIndex, index);
+      const pos = this.positionForToken(player.tileIndex, index);
+      token.setPosition(pos.x, pos.y);
+      token.setAlpha(player.bankrupt ? 0.3 : player.connected ? 1 : 0.55);
+    });
   }
 
   renderBoard(state: GameState): void {
@@ -54,34 +69,21 @@ export class BoardScene extends Phaser.Scene {
     state.players.forEach((player, index) => this.addToken(player.id, player.avatar, player.tileIndex, index));
   }
 
-  syncState(state: GameState): void {
-    if (this.tilePositions.size === 0 || this.tokens.size !== state.players.length) {
-      this.renderBoard(state);
-      return;
-    }
-    state.players.forEach((player, index) => {
-      let token = this.tokens.get(player.id);
-      if (!token) token = this.addToken(player.id, player.avatar, player.tileIndex, index);
-      const pos = this.positionForToken(player.tileIndex, index);
-      token.setPosition(pos.x, pos.y);
-      token.setAlpha(player.bankrupt ? 0.3 : player.connected ? 1 : 0.55);
-    });
-  }
-
   animateMove(playerId: string, path: number[], playerOffset: number): void {
+    if (!this.ready) return;
     const token = this.tokens.get(playerId);
     if (!token || path.length === 0) return;
     let step = 0;
     const runStep = (): void => {
       const tileIndex = path[step];
       if (tileIndex === undefined) {
-        this.stepLabel.setText("");
+        this.stepLabel?.setText("");
         this.cameras.main.pan(center, center, 380, "Sine.easeInOut");
         this.cameras.main.zoomTo(1, 380);
         return;
       }
       const pos = this.positionForToken(tileIndex, playerOffset);
-      this.stepLabel.setText(`${step + 1}/${path.length}`);
+      this.stepLabel?.setText(`${step + 1}/${path.length}`);
       this.cameras.main.pan(pos.x, pos.y, 260, "Sine.easeInOut");
       this.cameras.main.zoomTo(1.16, 260);
       this.tweens.add({

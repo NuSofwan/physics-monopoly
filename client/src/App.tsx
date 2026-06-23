@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Bot, Copy, Dice5, DoorOpen, Link, Play, RefreshCw, Shield, UserMinus, Volume2 } from "lucide-react";
 import { currentPlayer } from "@physics-monopoly/shared";
 import { PhaserGame } from "./game/PhaserGame";
+import { ErrorBoundary } from "./ui/ErrorBoundary";
 import {
   createGame,
   joinGame,
@@ -181,7 +182,9 @@ export function App(): JSX.Element {
         </aside>
 
         <section className="min-h-[420px]">
-          <PhaserGame state={state} moveEvent={moveEvent} />
+          <ErrorBoundary>
+            <PhaserGame state={state} moveEvent={moveEvent} />
+          </ErrorBoundary>
         </section>
 
         <aside className="grid content-start gap-4">

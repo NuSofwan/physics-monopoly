@@ -122,7 +122,7 @@ export class GameRoom extends Room<GameState> {
     if (this.state.players.length < 2) this.addBotPlayers(2 - this.state.players.length);
     this.state.phase = "rolling";
     this.state.currentPlayerIndex = 0;
-    this.state.log.unshift("????????????");
+    this.state.log.unshift("เกมเริ่มแล้ว");
     this.refreshTurnTimer();
     this.sendSnapshot();
   }
@@ -174,7 +174,7 @@ export class GameRoom extends Room<GameState> {
       if (!tile.ownerId) {
         this.state.phase = "buying";
         this.state.turnDeadline = null;
-        this.state.log.unshift(`${player.name} ??????? ${tile.name} ????????????`);
+        this.state.log.unshift(`${player.name} หยุดที่ ${tile.name} ตอบโจทย์เพื่อซื้อได้`);
         if (this.isBot(player.id)) this.clock.setTimeout(() => this.botBuyDecision(player.id), 900);
       } else if (tile.ownerId !== player.id) {
         const rent = calculateRent(tile);
@@ -546,8 +546,9 @@ export class GameRoom extends Room<GameState> {
 
   private addBotPlayers(count: number): void {
     for (let i = 0; i < count; i += 1) {
-      const id = `bot-${i}-${Date.now()}`;
-      this.state.players.push(createPlayer(id, `Bot ${i + 1}`, avatars[(this.state.players.length + i) % avatars.length] ?? "robot"));
+      const botNumber = this.state.players.filter((p) => this.isBot(p.id)).length + 1;
+      const id = `bot-${botNumber}-${Date.now()}`;
+      this.state.players.push(createPlayer(id, `Bot ${botNumber}`, avatars[this.state.players.length % avatars.length] ?? "robot"));
     }
   }
 
