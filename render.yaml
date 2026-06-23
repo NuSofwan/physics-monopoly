@@ -5,8 +5,10 @@ services:
     plan: free
     buildCommand: npm install
     startCommand: npm run start -w server
+    healthCheckPath: /health
     envVars:
-      - key: PORT
-        value: 2567
+      # Render injects PORT automatically; the server reads process.env.PORT.
+      # Set ALLOWED_ORIGINS in the Render dashboard to your Vercel domain, e.g.
+      # https://physics-monopoly.vercel.app (comma-separated for multiple).
       - key: ALLOWED_ORIGINS
         sync: false
