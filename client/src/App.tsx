@@ -26,6 +26,7 @@ import { MiniQr } from "./ui/MiniQr";
 import { PlayerPanel } from "./ui/PlayerPanel";
 import { PropertyPortfolio } from "./ui/PropertyPortfolio";
 import { QuestionModal } from "./ui/QuestionModal";
+import { BuyDecisionPanel } from "./ui/BuyDecisionPanel";
 import { GameResults } from "./ui/GameResults";
 import type { ActivitySummary } from "./teacher/ActivityEntry";
 import { AppearanceEditor } from "./ui/AppearanceEditor";
@@ -281,17 +282,7 @@ export function App({ activity }: { activity?: ActivitySummary } = {}): JSX.Elem
             ) : null}
           </div>
 
-          {state.phase === "buying" && isMyTurn && landedTile?.type === "property" ? (
-            <div className="panel rounded-lg p-4">
-              <p className="text-sm font-black text-coral">{landedTile.ownerId ? "ทรัพย์สินของคุณ" : "ที่ดินว่าง"}</p>
-              <h3 className="mt-1 text-lg font-black">{landedTile.name}</h3>
-              <p className="text-sm text-slate-600">Price ${landedTile.price?.toLocaleString("th-TH")} · Base rent ${landedTile.rentByLevel?.[0]}</p>
-              <div className="mt-4 grid grid-cols-2 gap-2">
-                <button className="rounded-lg bg-ink px-3 py-2 font-bold text-white" onClick={landedTile.ownerId ? sendUpgrade : sendBuy}>{landedTile.ownerId ? "Upgrade with quiz" : "Buy with quiz"}</button>
-                <button className="rounded-lg bg-white px-3 py-2 font-bold" onClick={sendSkipBuy}>Pass</button>
-              </div>
-            </div>
-          ) : null}
+          <BuyDecisionPanel open={state.phase === "buying" && isMyTurn && landedTile?.type === "property"} tile={landedTile} deadline={state.turnDeadline} now={now} onBuy={sendBuy} onUpgrade={sendUpgrade} onPass={sendSkipBuy} />
 
           {!state.classroomMode && landedTile?.type === "property" && landedTile.ownerId === playerId && state.phase === "rolling" ? (
             <button className="panel rounded-lg p-4 text-left font-black" onClick={sendUpgrade}>Upgrade {landedTile.name}</button>

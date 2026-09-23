@@ -21,6 +21,7 @@ import {
   isLocationId,
   locationById,
   avatarPresets,
+  BUY_DECISION_MS,
   safeAppearance,
   sellProperty,
   upgradeProperty,
@@ -325,7 +326,7 @@ export class GameRoom extends Room<{ state: GameState }> {
     if (tile.type === "property") {
       if (!tile.ownerId) {
         this.state.phase = "buying";
-        this.state.turnDeadline = Date.now() + 15000;
+        this.state.turnDeadline = Date.now() + BUY_DECISION_MS;
         this.state.log.unshift(`${player.name} หยุดที่ ${tile.name} ตอบโจทย์เพื่อซื้อได้`);
       } else if (tile.ownerId !== player.id) {
         const rent = calculateRent(tile);
@@ -596,6 +597,10 @@ export class GameRoom extends Room<{ state: GameState }> {
   private checkTurnTimeout(): void {
     if (!this.state.turnDeadline || Date.now() < this.state.turnDeadline) return;
     if (this.state.phase === "buying" || this.state.phase === "reveal") {
+      if (this.state.phase === "buying") {
+        const player = currentPlayer(this.state), tile = player ? this.state.tiles[player.tileIndex] : undefined;
+        if (player && tile) this.state.log.unshift(`${player.name} หมดเวลาตัดสินใจ ไม่ได้ซื้อ ${tile.name}`);
+      }
       this.lastAnswerResult = null;
       this.finishLanding(false);
       this.sendSnapshot();

@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { GameRoom } from "../server/src/rooms/GameRoom";
 import { RequestGate } from "../server/src/logic/RequestGate";
-import { chanceCards, createInitialGameState, createPlayer } from "../shared/src";
+import { BUY_DECISION_MS, chanceCards, createInitialGameState, createPlayer } from "../shared/src";
 import { useGameStore } from "../client/src/store/gameStore";
 
 function fixture() {
@@ -68,13 +68,15 @@ describe("review regressions", () => {
     const room = fixture();
     room.state.phase = "rolling";
     room.state.players[0].tileIndex = 1;
+    const landedAt = Date.now();
     room.resolveLanding("p1");
     expect(room.state.phase).toBe("buying");
-    expect(room.state.turnDeadline).toBeGreaterThan(Date.now());
+    expect(room.state.turnDeadline).toBeGreaterThanOrEqual(landedAt + BUY_DECISION_MS);
     room.state.turnDeadline = Date.now() - 1;
     room.checkTurnTimeout();
     expect(room.state.phase).toBe("rolling");
     expect(room.state.currentPlayerIndex).toBe(1);
+    expect(room.state.log.some((entry: string) => entry.includes("หมดเวลาตัดสินใจ"))).toBe(true);
   });
 
   it("disconnects kicked sockets and revokes credentials", () => {
