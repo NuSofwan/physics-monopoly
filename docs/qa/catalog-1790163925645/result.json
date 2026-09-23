@@ -1,0 +1,261 @@
+{
+  "passed": true,
+  "checks": [
+    {
+      "map": "bangkok",
+      "mode": "city",
+      "drawCalls": 31,
+      "triangles": 27250,
+      "fpsSample": 60
+    },
+    {
+      "map": "bangkok",
+      "mode": "buildings",
+      "drawCalls": 438,
+      "triangles": 5282,
+      "fpsSample": 35
+    },
+    {
+      "map": "bangkok",
+      "mode": "board",
+      "drawCalls": 143,
+      "triangles": 54052,
+      "fpsSample": 27
+    },
+    {
+      "map": "tokyo",
+      "mode": "city",
+      "drawCalls": 24,
+      "triangles": 14786,
+      "fpsSample": 53.9
+    },
+    {
+      "map": "tokyo",
+      "mode": "buildings",
+      "drawCalls": 344,
+      "triangles": 4226,
+      "fpsSample": 60
+    },
+    {
+      "map": "tokyo",
+      "mode": "board",
+      "drawCalls": 137,
+      "triangles": 42548,
+      "fpsSample": 46.8
+    },
+    {
+      "map": "new-york",
+      "mode": "city",
+      "drawCalls": 24,
+      "triangles": 14474,
+      "fpsSample": 54.9
+    },
+    {
+      "map": "new-york",
+      "mode": "buildings",
+      "drawCalls": 320,
+      "triangles": 3938,
+      "fpsSample": 60
+    },
+    {
+      "map": "new-york",
+      "mode": "board",
+      "drawCalls": 137,
+      "triangles": 41852,
+      "fpsSample": 48.9
+    },
+    {
+      "map": "singapore",
+      "mode": "city",
+      "drawCalls": 25,
+      "triangles": 26202,
+      "fpsSample": 55.3
+    },
+    {
+      "map": "singapore",
+      "mode": "buildings",
+      "drawCalls": 330,
+      "triangles": 3986,
+      "fpsSample": 60
+    },
+    {
+      "map": "singapore",
+      "mode": "board",
+      "drawCalls": 139,
+      "triangles": 54156,
+      "fpsSample": 48.9
+    },
+    {
+      "map": "paris",
+      "mode": "city",
+      "drawCalls": 24,
+      "triangles": 15546,
+      "fpsSample": 55.1
+    },
+    {
+      "map": "paris",
+      "mode": "buildings",
+      "drawCalls": 368,
+      "triangles": 4466,
+      "fpsSample": 60
+    },
+    {
+      "map": "paris",
+      "mode": "board",
+      "drawCalls": 137,
+      "triangles": 42988,
+      "fpsSample": 47.5
+    },
+    {
+      "map": "kyoto",
+      "mode": "city",
+      "drawCalls": 28,
+      "triangles": 16666,
+      "fpsSample": 55
+    },
+    {
+      "map": "kyoto",
+      "mode": "buildings",
+      "drawCalls": 542,
+      "triangles": 6530,
+      "fpsSample": 59.9
+    },
+    {
+      "map": "kyoto",
+      "mode": "board",
+      "drawCalls": 140,
+      "triangles": 50956,
+      "fpsSample": 50.6
+    },
+    {
+      "map": "cairo-giza",
+      "mode": "city",
+      "drawCalls": 26,
+      "triangles": 24966,
+      "fpsSample": 54.7
+    },
+    {
+      "map": "cairo-giza",
+      "mode": "buildings",
+      "drawCalls": 302,
+      "triangles": 4082,
+      "fpsSample": 60
+    },
+    {
+      "map": "cairo-giza",
+      "mode": "board",
+      "drawCalls": 140,
+      "triangles": 50232,
+      "fpsSample": 48.5
+    },
+    {
+      "map": "zermatt",
+      "mode": "city",
+      "drawCalls": 27,
+      "triangles": 11098,
+      "fpsSample": 52.9
+    },
+    {
+      "map": "zermatt",
+      "mode": "buildings",
+      "drawCalls": 524,
+      "triangles": 6314,
+      "fpsSample": 60
+    },
+    {
+      "map": "zermatt",
+      "mode": "board",
+      "drawCalls": 140,
+      "triangles": 44428,
+      "fpsSample": 49.5
+    },
+    {
+      "map": "santorini",
+      "mode": "city",
+      "drawCalls": 25,
+      "triangles": 15380,
+      "fpsSample": 54.6
+    },
+    {
+      "map": "santorini",
+      "mode": "buildings",
+      "drawCalls": 272,
+      "triangles": 4658,
+      "fpsSample": 60
+    },
+    {
+      "map": "santorini",
+      "mode": "board",
+      "drawCalls": 138,
+      "triangles": 42182,
+      "fpsSample": 50
+    },
+    {
+      "map": "rio",
+      "mode": "city",
+      "drawCalls": 26,
+      "triangles": 25104,
+      "fpsSample": 54.9
+    },
+    {
+      "map": "rio",
+      "mode": "buildings",
+      "drawCalls": 368,
+      "triangles": 4442,
+      "fpsSample": 60
+    },
+    {
+      "map": "rio",
+      "mode": "board",
+      "drawCalls": 140,
+      "triangles": 51522,
+      "fpsSample": 49.8
+    },
+    {
+      "map": "venice",
+      "mode": "city",
+      "drawCalls": 28,
+      "triangles": 15510,
+      "fpsSample": 54.4
+    },
+    {
+      "map": "venice",
+      "mode": "buildings",
+      "drawCalls": 428,
+      "triangles": 5162,
+      "fpsSample": 60
+    },
+    {
+      "map": "venice",
+      "mode": "board",
+      "drawCalls": 140,
+      "triangles": 44808,
+      "fpsSample": 48.6
+    },
+    {
+      "map": "sydney",
+      "mode": "city",
+      "drawCalls": 27,
+      "triangles": 25650,
+      "fpsSample": 54.3
+    },
+    {
+      "map": "sydney",
+      "mode": "buildings",
+      "drawCalls": 406,
+      "triangles": 4898,
+      "fpsSample": 60
+    },
+    {
+      "map": "sydney",
+      "mode": "board",
+      "drawCalls": 140,
+      "triangles": 55716,
+      "fpsSample": 49.8
+    }
+  ],
+  "avatarPresets": 24,
+  "poses": 5,
+  "errors": [],
+  "note": "Technical rendering/camera check only; visual review and target-device FPS are separate"
+}

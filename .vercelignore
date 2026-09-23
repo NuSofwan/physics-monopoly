@@ -2,7 +2,10 @@ docs/
 output/
 tmp/
 .local/
-assets/
+# Exclude archived art and local build output; keep client/public/assets.
+assets/legacy/
+client/dist/
+client/node_modules/
 server/src/pdf/
 *.log
 .chrome-profile/

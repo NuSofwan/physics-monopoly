@@ -5,7 +5,7 @@
 :root {
   color-scheme: light;
   font-family: Inter, "Noto Sans Thai", system-ui, sans-serif;
-  background: #101827;
+  background: #081629;
 }
 * {
   box-sizing: border-box;
@@ -15,7 +15,7 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  color: #101827;
+  color: #13243a;
   overflow-x: hidden;
 }
 
@@ -28,16 +28,134 @@ select {
 .game-shell {
   min-height: 100vh;
   background:
-    linear-gradient(135deg, rgba(16, 24, 39, 0.92) 0%, rgba(23, 35, 58, 0.84) 56%, rgba(36, 49, 72, 0.9) 100%),
-    #101827;
+    radial-gradient(circle at 8% 5%, rgba(35, 128, 167, .22), transparent 30%),
+    radial-gradient(circle at 90% 90%, rgba(226, 158, 75, .12), transparent 36%),
+    linear-gradient(140deg, #081629, #102a42 55%, #081a2e);
+}
+
+.game-lobby {
+  background:
+    linear-gradient(135deg, rgba(5, 17, 34, .85), rgba(9, 35, 57, .86)),
+    url('/assets/art/science_city_hero.webp') center / cover fixed;
 }
 
 .panel {
-  border: 1px solid rgba(16, 24, 39, 0.1);
-  background: rgba(248, 251, 255, 0.94);
-  box-shadow: 0 18px 48px rgba(5, 13, 30, 0.2);
-  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, .78);
+  background: rgba(248, 251, 253, .97);
+  box-shadow: 0 20px 54px rgba(3, 13, 30, .25), 0 2px 6px rgba(5, 20, 36, .08);
+  backdrop-filter: blur(16px);
 }
+
+.game-shell button {
+  transition: transform .18s ease, box-shadow .18s ease, background-color .18s ease, border-color .18s ease;
+}
+.game-shell button:not(:disabled):hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(8, 30, 50, .13);
+}
+.game-shell button:active { transform: translateY(0); }
+.game-shell input:not([type="checkbox"]),
+.game-shell select,
+.question-card input:not([type="checkbox"]),
+.question-card select {
+  min-height: 44px;
+  border: 1px solid #cbd7e1;
+  border-radius: 10px;
+  background: #fff;
+  color: #17314c;
+  box-shadow: inset 0 1px 2px rgba(13, 39, 62, .04);
+}
+.game-shell input:focus,
+.game-shell select:focus { border-color: #2f91ad; }
+
+.lobby-main, .lobby-side { align-self: start; }
+.lobby-hero {
+  min-height: 280px;
+  background:
+    linear-gradient(180deg, rgba(8, 26, 47, .02) 15%, rgba(4, 19, 40, .95) 100%),
+    url('/assets/art/science_city_hero.webp') center 38% / cover;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.15);
+}
+.avatar-picker { scrollbar-color: #93b8c6 #eef4f6; scrollbar-width: thin; }
+.avatar-option { min-height: 44px; }
+.avatar-option.is-selected { box-shadow: inset 0 0 0 1px #278bb0, 0 4px 12px rgba(21, 111, 146, .16); }
+.game-primary {
+  background: linear-gradient(135deg, #e78a4d, #ce5d47);
+  box-shadow: 0 8px 19px rgba(206, 93, 71, .27);
+}
+.game-primary:not(:disabled):hover { background: linear-gradient(135deg, #ec9b59, #d16a51); }
+.game-secondary { background: #e9f4f6; border: 1px solid #b7d8df; }
+.lobby-side { background: linear-gradient(180deg, #fffdf8, #edf5f7); }
+.lobby-empty { border: 1px solid #d7e5e8; background: #f7fbfc; }
+.feature-row {
+  display: flex;
+  align-items: center;
+  gap: .8rem;
+  padding: .9rem 1rem;
+  border: 1px solid #dce9ec;
+  border-radius: 11px;
+  background: white;
+  font-size: .9rem;
+  font-weight: 700;
+}
+.feature-row svg { flex: none; color: #147c9d; }
+
+.game-topbar {
+  border: 1px solid rgba(132, 187, 203, .3);
+  background: linear-gradient(100deg, rgba(15, 43, 67, .98), rgba(17, 62, 84, .96));
+  box-shadow: 0 16px 36px rgba(1, 10, 24, .22);
+}
+.game-mark { color: #092339; background: linear-gradient(145deg, #f4cd76, #e79b4e); }
+.game-topbar-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  min-height: 34px;
+  padding: .35rem .7rem;
+  border: 1px solid rgba(154, 206, 218, .25);
+  border-radius: 999px;
+  background: rgba(244, 250, 251, .1);
+  color: #e7f8fa;
+}
+.game-phase-pill { color: #f8d58d; border-color: rgba(245, 195, 105, .35); }
+.game-toolbar {
+  border: 1px solid rgba(215, 232, 236, .88);
+  background: rgba(246, 251, 252, .96);
+  box-shadow: 0 8px 24px rgba(2, 18, 36, .13);
+}
+.game-toolbar label { display: inline-flex; align-items: center; gap: .45rem; font-size: .82rem; font-weight: 750; }
+.game-toolbar select { font-size: .82rem; }
+.turn-panel { border-top: 4px solid #e7a95c; }
+.player-card { position: relative; overflow: hidden; }
+.player-card::before { content: ''; position: absolute; inset: 0 auto 0 0; width: 4px; background: #9dc7d2; }
+.player-card.is-active { border-color: #e9bb67; box-shadow: 0 0 0 2px #e9bb67, 0 14px 35px rgba(5, 17, 33, .22); }
+.player-card.is-active::before { background: #dc8d42; }
+.player-symbol { background: linear-gradient(145deg, #174c6b, #112a46); box-shadow: inset 0 1px rgba(255,255,255,.2); }
+.player-stat { display: flex; flex-direction: column; gap: .15rem; background: #eef5f7; color: #153651; font-size: .8rem; }
+.player-stat small { font-size: .65rem; font-weight: 700; color: #567383; }
+
+.question-backdrop { background: rgba(2, 12, 26, .78); backdrop-filter: blur(6px); }
+.question-card { border-top: 5px solid #e5a554; }
+.question-timer-track { height: 7px; overflow: hidden; border-radius: 999px; background: #dfe9ea; }
+.question-timer-track div { height: 100%; border-radius: inherit; background: linear-gradient(90deg, #2d9caf, #e6af55); transition: width .25s linear; }
+.question-prompt { border: 1px solid #d6e7eb; background: linear-gradient(145deg, #eff8fa, #f7faf8); }
+.answer-option { min-height: 70px; }
+.answer-option:not(:disabled):hover { border-color: #2b9ab1; background: #f4fafb; }
+.answer-letter { background: #e4eff1; color: #205876; font-weight: 900; }
+.answer-option:disabled { cursor: default; }
+.results-card { border-top: 5px solid #e5a554; }
+
+.asset-lab {
+  color: #e8f2f6;
+  background: radial-gradient(circle at 83% 3%, rgba(42,113,139,.35), transparent 34%), linear-gradient(140deg, #07182b, #102b3c 64%, #081b2b);
+}
+.asset-lab > a { color: #eac581; }
+.asset-lab h1 { color: #fff; letter-spacing: -.035em; }
+.asset-lab p { color: #bdd2dc; }
+.asset-lab select, .asset-lab button { color: #eaf5f7; border-radius: 10px; border: 1px solid #426274; background: #173c4f; }
+.asset-lab select:hover, .asset-lab button:hover { border-color: #dbb97a; }
+.asset-lab button { box-shadow: 0 5px 15px rgba(1, 11, 21, .18); }
+.asset-lab select option { color: #eaf5f7; background: #173c4f; }
 
 :focus-visible {
   outline: 3px solid #f8c24a;
@@ -59,8 +177,11 @@ select {
 .board-frame {
   aspect-ratio: 1672 / 941;
   min-height: 260px;
-  border-radius: 8px;
-  background: #081424;
+  overflow: hidden;
+  border: 2px solid rgba(154, 197, 205, .6);
+  border-radius: 18px;
+  background: #0b2638;
+  box-shadow: 0 22px 55px rgba(2, 11, 24, .3), inset 0 0 0 1px rgba(255,255,255,.2);
 }
 
 .board-frame canvas {
