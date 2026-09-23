@@ -1,0 +1,8 @@
+docs/
+output/
+tmp/
+.local/
+assets/
+server/src/pdf/
+*.log
+.chrome-profile/
