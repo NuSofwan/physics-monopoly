@@ -64,24 +64,25 @@ export function QuestionModal({ pending, answerResult, isMine, revealDeadline, r
   }, [answerResult]);
 
   return (
-    <div role="dialog" aria-modal="true" aria-labelledby="question-title" className="fixed inset-0 z-50 grid place-items-center overflow-y-auto bg-ink/68 p-4">
+    <div role="dialog" aria-modal="true" aria-labelledby="question-title" className="question-backdrop fixed inset-0 z-50 grid place-items-center overflow-y-auto p-4">
       <motion.div
         ref={panel}
         tabIndex={-1}
         initial={{ opacity: 0, y: 16, scale: 0.98 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
-        className="panel max-h-[90dvh] w-full max-w-2xl overflow-y-auto rounded-lg p-5"
+        className="panel question-card max-h-[90dvh] w-full max-w-2xl overflow-y-auto rounded-2xl p-5 sm:p-7"
       >
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className="text-xs font-black uppercase tracking-wide text-coral">{labelForReason(pending.reason)}</p>
-            <h2 id="question-title" className="mt-1 text-xl font-black text-ink">โจทย์ฟิสิกส์</h2>
+            <h2 id="question-title" className="mt-1 text-2xl font-black text-ink">โจทย์ฟิสิกส์</h2>
           </div>
           <div className="grid h-16 w-16 place-items-center rounded-full border-8 border-mint bg-white text-lg font-black" style={{ borderColor: `rgba(52, 211, 153, ${0.25 + progress * 0.75})` }}>
             <span aria-label={revealDeadline ? `อ่านเฉลยอีก ${secondsLeft} วินาที` : `เหลือ ${secondsLeft} วินาที`}>{secondsLeft}</span>
           </div>
         </div>
-        <p className="mt-4 text-lg leading-8 text-slate-800">
+        <div className="question-timer-track mt-5"><div style={{width:`${progress*100}%`}}/></div>
+        <p className="question-prompt mt-5 rounded-xl p-5 text-lg leading-8 text-slate-800">
           <EquationText text={pending.question.prompt} />
         </p>
         {pending.group ? <div className="mt-3 space-y-2 rounded bg-sky-50 p-3"><p className="font-bold">{pending.repeated ? "รอบทบทวน · แยกผลจากข้อใหม่" : "โจทย์กลุ่ม · ทุกคนตอบบนเครื่องตนเอง"} · {pending.stage === "retry" ? `ช่วงลองใหม่ ${20*(pending.timeMultiplier??1)} วินาที` : pending.stage === "reveal" ? "อ่านวิธีทำ" : "คำตอบครั้งแรก"}</p>
@@ -101,7 +102,7 @@ export function QuestionModal({ pending, answerResult, isMine, revealDeadline, r
                 key={choice}
                 disabled={!canSubmit || done || selected !== null || secondsLeft === 0}
                 onClick={() => choose(index)}
-                className={`focus-ring rounded-lg border px-4 py-3 text-left font-bold transition ${
+                className={`focus-ring answer-option flex items-center gap-3 rounded-xl border px-4 py-3 text-left font-bold transition ${
                   done && isCorrect
                     ? "border-mint bg-mint/20"
                     : done && isSelected
@@ -109,7 +110,7 @@ export function QuestionModal({ pending, answerResult, isMine, revealDeadline, r
                       : "border-slate-200 bg-white hover:border-gold"
                 }`}
               >
-                <EquationText text={choice} />
+                <span aria-hidden="true" className="answer-letter grid h-8 w-8 shrink-0 place-items-center rounded-lg">{String.fromCharCode(65+index)}</span><span><EquationText text={choice} /></span>
               </button>
             );
           })}

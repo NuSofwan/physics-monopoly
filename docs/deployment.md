@@ -1,6 +1,6 @@
 # Deployment / operations
 
-สถานะ: ทดสอบใน Windows local เท่านั้น ยังไม่มี staging, production domain, real OIDC หรือ classroom pilot; Dockerfile เป็น deployment scaffold ที่ยังไม่ได้ build/run เพราะเครื่องนี้ไม่มี Docker CLI
+สถานะ 2026-09-23: client เผยแพร่บน Vercel Production ที่ `https://physics-monopoly.vercel.app` แล้ว ตรวจหน้าเริ่มเกม, ภาพใหม่, ห้องตรวจโมเดล 3 มิติ และการสร้างห้องเกมผ่านเบราว์เซอร์จริงได้สำเร็จ ยังไม่ได้ตรวจเกมเต็มรอบ, real OIDC, classroom pilot หรืออุปกรณ์มือถือจริง; Dockerfile เป็น deployment scaffold ที่ยังไม่ได้ build/run เพราะเครื่องนี้ไม่มี Docker CLI
 
 ## Render + Vercel (current free-tier deploy)
 
@@ -16,6 +16,8 @@ This repo's actual deploy target is Render (server, `render.yaml`) + Vercel (cli
 **Vercel (client, `vercel.json`):**
 
 - In Project Settings > Environment Variables, set `VITE_SERVER_URL=wss://<render-service>.onrender.com` and `VITE_API_URL=https://<render-service>.onrender.com` before building. Vite inlines `import.meta.env.*` at build time, so these must be configured in Vercel's dashboard, not only in `.env.example`/local `.env` files — `vercel.json`'s `buildCommand` does not inject them.
+- Current Vercel Production has `VITE_SERVER_URL` configured as a Secret; its value cannot be pulled locally by the CLI. The browser smoke test created and left a temporary room successfully on 2026-09-23.
+- `.vercelignore` excludes the root `assets/legacy` archive and local `client/dist` output while preserving `client/public/assets`. The opening and legacy 2D board artwork served from `/assets/art/science_city_hero.webp` is a project-generated WebP; the earlier unverified PNG is not in the public build.
 
 See `.env.example` for the corresponding local-dev defaults.
 

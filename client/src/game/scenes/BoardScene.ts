@@ -65,8 +65,8 @@ export class BoardScene extends Phaser.Scene {
   }
 
   preload(): void {
-    // Physics-city night backdrop (also used on the lobby). Served from /public.
-    this.load.image("citybg", "/assets/art/physics_city_backdrop.png");
+    // Project-owned physics-city backdrop (also used on the lobby).
+    this.load.image("citybg", "/assets/art/science_city_hero.webp");
   }
 
   create(): void {

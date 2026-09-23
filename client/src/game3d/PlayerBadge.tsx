@@ -1,5 +1,6 @@
 import { useEffect,useMemo } from "react";
 import { CanvasTexture } from "three";
+import { OVERLAY_LAYER } from "./Atmosphere";
 export function PlayerBadge({name,slot}:{name:string;slot:number}):JSX.Element {
   const texture=useMemo(()=>{
     const canvas=document.createElement("canvas");canvas.width=512;canvas.height=96;
@@ -10,5 +11,5 @@ export function PlayerBadge({name,slot}:{name:string;slot:number}):JSX.Element {
     return new CanvasTexture(canvas);
   },[name,slot]);
   useEffect(()=>()=>texture.dispose(),[texture]);
-  return <sprite position={[0,1.52,0]} scale={[1.55,.29,1]}><spriteMaterial map={texture} transparent depthTest={false}/></sprite>;
+  return <sprite layers={OVERLAY_LAYER} position={[0,1.52,0]} scale={[1.55,.29,1]}><spriteMaterial map={texture} transparent depthTest={false}/></sprite>;
 }
