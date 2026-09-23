@@ -1,0 +1,44 @@
+{
+  "passed": true,
+  "mode": "SDK load (not a substitute for a concurrent real-browser room)",
+  "assignmentId": "d47796a1-3621-4349-ab6c-7c613f483b40",
+  "startedAt": "2026-09-22T19:58:00.010Z",
+  "os": "Windows_NT 10.0.26200",
+  "cpu": "AMD Ryzen AI 7 350 w/ Radeon 860M",
+  "logicalCpus": 16,
+  "ramBytes": 33598853120,
+  "node": "v24.12.0",
+  "rooms": 15,
+  "clients": 60,
+  "errors": [],
+  "p95AnswerReceiptMs": 138.43900000001304,
+  "samples": 3064,
+  "activeDurationSeconds": 603.846,
+  "commandLatency": {
+    "start": {
+      "samples": 15,
+      "p95Ms": 224.23909999999978
+    },
+    "roll": {
+      "samples": 615,
+      "p95Ms": 76.05320000002393
+    },
+    "buy": {
+      "samples": 189,
+      "p95Ms": 145.47520000000077
+    },
+    "upgrade": {
+      "samples": 27,
+      "p95Ms": 155.2207000000053
+    },
+    "hint": {
+      "samples": 613,
+      "p95Ms": 144.03549999999814
+    },
+    "reflection": {
+      "samples": 611,
+      "p95Ms": 59.09370000002673
+    }
+  },
+  "elapsedSeconds": 605.963
+}

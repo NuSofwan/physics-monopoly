@@ -1,0 +1,9 @@
+{
+  "passed": true,
+  "assignmentId": "807ece52-c38f-4439-b159-9f353b9f196d",
+  "errors": [],
+  "realServerSteps": 36,
+  "seconds": 49.314,
+  "note": "Real solo classroom room and UI intents; no injected dice/money/snapshot. Silent browser recording, not a full-game acceptance substitute.",
+  "video": "one-lap.webm"
+}

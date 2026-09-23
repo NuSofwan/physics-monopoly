@@ -1,0 +1,14 @@
+{
+  "passed": false,
+  "cases": [
+    {
+      "type": "pdf",
+      "versionId": "b8399342-88a5-4029-b72d-66934ef86a1d",
+      "result": "correct",
+      "browser": "Edge",
+      "privateSourceLoaded": false
+    }
+  ],
+  "errors": [],
+  "failure": "TimeoutError: locator.selectOption: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('dialog').getByLabel('หน่วย', { exact: true })\u001b[22m\n"
+}

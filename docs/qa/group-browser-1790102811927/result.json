@@ -1,0 +1,38 @@
+{
+  "passed": true,
+  "assignmentId": "5503f159-5908-462b-aa81-abd9c86cb14f",
+  "errors": [],
+  "persisted": [
+    {
+      "nickname": "Group Student 1",
+      "xp": 40,
+      "status": "completed"
+    },
+    {
+      "nickname": "Group Student 2",
+      "xp": 60,
+      "status": "completed"
+    },
+    {
+      "nickname": "Group Student 3",
+      "xp": 100,
+      "status": "completed"
+    },
+    {
+      "nickname": "Group Student 4",
+      "xp": 100,
+      "status": "completed"
+    }
+  ],
+  "elapsedSeconds": 892,
+  "fullGame": {
+    "results": [
+      "นักพัฒนาเมือง: Group Student 1",
+      "นักพัฒนาเมือง: Group Student 1",
+      "นักพัฒนาเมือง: Group Student 1",
+      "นักพัฒนาเมือง: Group Student 1"
+    ],
+    "actualElapsedSeconds": 903,
+    "configuredMinutes": 15
+  }
+}

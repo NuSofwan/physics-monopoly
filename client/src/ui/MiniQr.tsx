@@ -1,23 +1,32 @@
+import { useEffect, useState } from "react";
+import { toDataURL } from "qrcode";
+
 export function MiniQr({ value }: { value: string }): JSX.Element {
-  const bits = makeBits(value || "PHYSICS");
-  return (
-    <div className="grid h-28 w-28 grid-cols-9 gap-0.5 rounded-lg bg-white p-2 shadow-inner" aria-label="room code visual share pattern">
-      {bits.map((bit, index) => (
-        <span key={index} className={bit ? "rounded-[2px] bg-ink" : "rounded-[2px] bg-slate-100"} />
-      ))}
-    </div>
-  );
-}
+  const [dataUrl, setDataUrl] = useState<string | null>(null);
+  const [error, setError] = useState(false);
 
-function makeBits(value: string): boolean[] {
-  let seed = 17;
-  for (const char of value) seed = (seed * 31 + char.charCodeAt(0)) % 9973;
-  return Array.from({ length: 81 }, (_, index) => {
-    const row = Math.floor(index / 9);
-    const col = index % 9;
-    const finder = (row < 3 && col < 3) || (row < 3 && col > 5) || (row > 5 && col < 3);
-    if (finder) return row % 2 === 0 || col % 2 === 0;
-    return ((seed + index * 13 + row * col * 7) % 5) < 2;
-  });
-}
+  useEffect(() => {
+    let active = true;
+    setDataUrl(null);
+    setError(false);
+    void toDataURL(value, {
+      errorCorrectionLevel: "M",
+      margin: 1,
+      width: 256,
+      color: { dark: "#0b1224", light: "#ffffff" },
+    })
+      .then((nextDataUrl) => {
+        if (active) setDataUrl(nextDataUrl);
+      })
+      .catch(() => {
+        if (active) setError(true);
+      });
+    return () => {
+      active = false;
+    };
+  }, [value]);
 
+  if (error) return <p className="grid h-28 w-28 place-items-center rounded-lg bg-rose-50 p-2 text-center text-xs font-bold text-rose-700">สร้าง QR ไม่สำเร็จ</p>;
+  if (!dataUrl) return <div className="h-28 w-28 animate-pulse rounded-lg bg-slate-100" aria-label="กำลังสร้าง QR" />;
+  return <img className="h-28 w-28 rounded-lg bg-white p-2 shadow-inner" src={dataUrl} alt="QR code สำหรับเปิดลิงก์ห้อง" />;
+}

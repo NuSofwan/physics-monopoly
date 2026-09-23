@@ -1,7 +1,5 @@
 ﻿import { useMemo, useState } from "react";
-import { Gavel } from "lucide-react";
 import type { GameState } from "@physics-monopoly/shared";
-import { sendAuctionBid, sendAuctionPass } from "../net/colyseus";
 
 interface Props {
   state: GameState;
@@ -9,6 +7,10 @@ interface Props {
 }
 
 export function AuctionModal({ state, playerId }: Props): JSX.Element | null {
+  void state;
+  void playerId;
+  return null;
+  /*
   const auction = state.pendingAuction;
   const [bid, setBid] = useState(0);
   const tile = auction ? state.tiles[auction.tileIndex] : null;
@@ -42,5 +44,5 @@ export function AuctionModal({ state, playerId }: Props): JSX.Element | null {
         </div>
       </div>
     </div>
-  );
+  ); */
 }

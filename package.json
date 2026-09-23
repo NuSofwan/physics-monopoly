@@ -3,24 +3,63 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "engines": {
+    "node": "24.x"
+  },
   "workspaces": [
     "client",
     "server",
     "shared"
   ],
   "scripts": {
-    "dev": "concurrently -n server,client -c cyan,magenta \"npm run dev -w server\" \"npm run dev -w client\"",
+    "dev": "concurrently -k -n server,client,worker -c cyan,magenta,yellow \"npm run dev -w server\" \"npm run dev -w client\" \"tsx scripts/devWorker.ts\"",
+    "dev:core": "concurrently -k -n server,client -c cyan,magenta \"npm run dev -w server\" \"npm run dev -w client\"",
     "build": "npm run build -w shared && npm run build -w server && npm run build -w client",
     "check": "npm run build -w shared && npm run build -w server && npm run build -w client",
     "test": "vitest run",
     "validate:questions": "tsx scripts/validateQuestions.ts",
-    "audit:questions": "npm run validate:questions"
+    "audit:questions": "npm run validate:questions",
+    "smoke:phase1": "tsx scripts/phase1Smoke.ts",
+    "smoke:regression": "tsx scripts/reviewRegression.ts",
+    "test:qr": "tsx scripts/qrRoundTrip.ts",
+    "test:browser": "tsx scripts/browserFullGame.ts",
+    "setup:local": "tsx scripts/localDatabase.ts --setup",
+    "dev:db": "tsx scripts/localDatabase.ts",
+    "test:teacher": "tsx scripts/teacherIntegration.ts",
+    "test:grades": "tsx scripts/gradeIsolation.ts",
+    "test:teacher:browser": "tsx scripts/browserTeacher.ts",
+    "test:assets:browser": "tsx scripts/browserCatalog.ts",
+    "test:recovery": "tsx scripts/restartRecovery.ts",
+    "test:privacy": "tsx scripts/privacyIntegration.ts",
+    "test:network": "tsx scripts/browserNetwork.ts",
+    "test:accessibility": "tsx scripts/browserAccessibility.ts",
+    "test:walkthrough": "tsx scripts/browserWalkthrough.ts",
+    "test:soak": "tsx scripts/browserSoak.ts",
+    "test:load": "tsx scripts/loadClassroom.ts",
+    "assets:manifest": "tsx scripts/assetManifest.ts",
+    "assets:check": "tsx scripts/assetManifest.ts --check",
+    "test:backup": "tsx scripts/backupRestore.ts",
+    "test:pdf": "tsx scripts/pdfIntegration.ts",
+    "test:pdf:boundaries": "tsx scripts/pdfBoundaryIntegration.ts",
+    "test:import:browser": "tsx scripts/browserImportedQuestions.ts",
+    "test:group:browser": "tsx scripts/browserGroupLearning.ts",
+    "dev:worker": "tsx server/src/worker/index.ts"
+  },
+  "overrides": {
+    "vite": { "esbuild": "^0.28.1" }
   },
   "devDependencies": {
+    "embedded-postgres": "18.4.0-beta.17",
+    "@colyseus/sdk": "^0.17.43",
     "@types/node": "^24.0.0",
+    "@types/pngjs": "^6.0.5",
+    "@types/three": "^0.169.0",
     "concurrently": "^9.1.2",
+    "jsqr": "^1.4.0",
+    "pngjs": "^7.0.0",
     "tsx": "^4.19.2",
     "typescript": "^5.8.3",
-    "vitest": "^3.0.9"
+    "vitest": "^4.1.11",
+    "playwright": "^1.58.0"
   }
 }

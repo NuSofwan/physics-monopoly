@@ -1,0 +1,15 @@
+import { it,expect } from "vitest";
+import { validateProductionConfig } from "../server/src/productionConfig";
+import { resolve } from "node:path";
+const env={NODE_ENV:"production",DATABASE_URL:"postgresql://user:password@db/physics",APP_ORIGIN:"https://game.example",API_ORIGIN:"https://game.example",ALLOWED_ORIGINS:"https://game.example",OIDC_ISSUER:"https://identity.example",OIDC_CLIENT_ID:"client",TEACHER_ALLOWED_SUBJECTS:"teacher",PRIVATE_STORAGE_PATH:resolve(".local/uploads")};
+it("fails closed when production configuration is missing",()=>expect(()=>validateProductionConfig({NODE_ENV:"production"})).toThrow(/missing/));
+it.each([{DEV_TEACHER_AUTH:"true"},{APP_ORIGIN:"http://game.example"},{ALLOWED_ORIGINS:"*"},{PRIVATE_STORAGE_PATH:"relative"}])("rejects insecure production override %j",override=>expect(()=>validateProductionConfig({...env,...override})).toThrow());
+it("accepts explicit secure production configuration",()=>expect(()=>validateProductionConfig(env)).not.toThrow());
+it("does not require external services for local-only setup",()=>expect(()=>validateProductionConfig({NODE_ENV:"development"})).not.toThrow());
+const freePlay={NODE_ENV:"production",FREE_PLAY_MODE:"true",APP_ORIGIN:"https://game.example",API_ORIGIN:"https://game.example",ALLOWED_ORIGINS:"https://game.example"};
+it("accepts explicit free-play production mode with no database or OIDC configured",()=>expect(()=>validateProductionConfig(freePlay)).not.toThrow());
+it("still fails closed when free-play production mode is missing its own required origins",()=>expect(()=>validateProductionConfig({NODE_ENV:"production",FREE_PLAY_MODE:"true"})).toThrow(/missing/));
+it("accepts free-play production mode with only the CORS allowlist configured",()=>expect(()=>validateProductionConfig({NODE_ENV:"production",FREE_PLAY_MODE:"true",ALLOWED_ORIGINS:"https://game.example"})).not.toThrow());
+it("rejects a free-play APP_ORIGIN that is set but not allowed or not HTTPS",()=>{expect(()=>validateProductionConfig({...freePlay,APP_ORIGIN:"https://other.example"})).toThrow(/APP_ORIGIN/);expect(()=>validateProductionConfig({...freePlay,APP_ORIGIN:"http://game.example",ALLOWED_ORIGINS:"https://game.example,http://game.example"})).toThrow();});
+it("rejects free-play mode combined with a configured database",()=>expect(()=>validateProductionConfig({...freePlay,DATABASE_URL:env.DATABASE_URL})).toThrow(/FREE_PLAY_MODE/));
+it("still enforces HTTPS and demo-auth bans in free-play production mode",()=>expect(()=>validateProductionConfig({...freePlay,DEV_TEACHER_AUTH:"true"})).toThrow());

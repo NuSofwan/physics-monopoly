@@ -1,0 +1,38 @@
+{
+  "passed": false,
+  "assignmentId": "6823e71a-d44b-4c72-a722-03b724fae838",
+  "checks": [
+    {
+      "label": "mobile cosmetics",
+      "width": 390,
+      "scroll": 390,
+      "overflow": []
+    },
+    {
+      "label": "lobby 390",
+      "width": 390,
+      "scroll": 390,
+      "overflow": []
+    },
+    {
+      "label": "lobby 1024",
+      "width": 1024,
+      "scroll": 1024,
+      "overflow": []
+    },
+    {
+      "label": "lobby 1440",
+      "width": 1440,
+      "scroll": 1440,
+      "overflow": []
+    },
+    {
+      "label": "mobile 150% HTML board",
+      "width": 390,
+      "scroll": 390,
+      "overflow": []
+    }
+  ],
+  "errors": [],
+  "failure": "TimeoutError: page.waitForFunction: Timeout 30000ms exceeded."
+}

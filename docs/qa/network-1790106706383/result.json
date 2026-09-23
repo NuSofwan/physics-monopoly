@@ -1,0 +1,15 @@
+{
+  "passed": true,
+  "assignmentId": "b0101046-d81e-499d-890f-f6ebe02b41f2",
+  "transport": "Real WebSocket server, delayed forwarding 100–150 ms each direction (200–300 ms added RTT)",
+  "errors": [],
+  "offlineSeconds": [
+    30,
+    125
+  ],
+  "sameIdentity": true,
+  "hostTransfer": true,
+  "teacherPauseResume": true,
+  "pauseSeconds": 60,
+  "backgroundLifecycleFrozenSeconds": 20
+}

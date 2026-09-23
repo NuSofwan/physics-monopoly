@@ -1,0 +1,76 @@
+{
+  "passed": true,
+  "assignmentId": "9471aaa7-72d3-4025-abbc-4836cecdda80",
+  "checks": [
+    {
+      "label": "mobile cosmetics",
+      "width": 390,
+      "scroll": 390,
+      "overflow": []
+    },
+    {
+      "label": "lobby 390",
+      "width": 390,
+      "scroll": 390,
+      "overflow": []
+    },
+    {
+      "label": "lobby 1024",
+      "width": 1024,
+      "scroll": 1024,
+      "overflow": []
+    },
+    {
+      "label": "lobby 1440",
+      "width": 1440,
+      "scroll": 1440,
+      "overflow": []
+    },
+    {
+      "label": "mobile 150% HTML board",
+      "width": 390,
+      "scroll": 390,
+      "overflow": []
+    },
+    {
+      "label": "playing 0",
+      "width": 390,
+      "scroll": 390,
+      "overflow": []
+    },
+    {
+      "label": "playing 1",
+      "width": 1024,
+      "scroll": 1024,
+      "overflow": []
+    },
+    {
+      "label": "playing 2",
+      "width": 1440,
+      "scroll": 1440,
+      "overflow": []
+    },
+    {
+      "label": "mobile question",
+      "width": 390,
+      "scroll": 390,
+      "overflow": []
+    },
+    {
+      "label": "mobile results",
+      "width": 390,
+      "scroll": 390,
+      "overflow": []
+    },
+    {
+      "label": "320px results",
+      "width": 320,
+      "scroll": 320,
+      "overflow": []
+    }
+  ],
+  "errors": [],
+  "keyboard": true,
+  "actualCsvDownload": true,
+  "note": "Emulated viewports and DOM keyboard checks, not physical-device or screen-reader certification"
+}

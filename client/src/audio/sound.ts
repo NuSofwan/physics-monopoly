@@ -1,18 +1,12 @@
-import { Howl } from "howler";
+let muted = false;
+let audioContext: AudioContext | null = null;
 
-const silent = "data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABAAZGF0YQAAAAA=";
+export function setMuted(value: boolean): void { muted = value; }
 
-const sprites = {
-  dice: new Howl({ src: [silent], volume: 0.2 }),
-  step: new Howl({ src: [silent], volume: 0.12 }),
-  good: new Howl({ src: [silent], volume: 0.16 }),
-  bad: new Howl({ src: [silent], volume: 0.16 }),
-};
-
-export function playSound(name: keyof typeof sprites): void {
-  sprites[name].play();
-  if (typeof AudioContext !== "undefined") {
-    const context = new AudioContext();
+export function playSound(name: "dice" | "step" | "good" | "bad"): void {
+  if (!muted && typeof AudioContext !== "undefined") {
+    const context = audioContext ??= new AudioContext();
+    if (context.state === "suspended") void context.resume().catch(() => undefined);
     const oscillator = context.createOscillator();
     const gain = context.createGain();
     oscillator.type = name === "bad" ? "sawtooth" : "sine";
@@ -21,5 +15,6 @@ export function playSound(name: keyof typeof sprites): void {
     oscillator.connect(gain).connect(context.destination);
     oscillator.start();
     oscillator.stop(context.currentTime + 0.08);
+    oscillator.onended = () => { oscillator.disconnect(); gain.disconnect(); };
   }
 }

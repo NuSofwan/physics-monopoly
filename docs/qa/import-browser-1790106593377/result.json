@@ -1,0 +1,20 @@
+{
+  "passed": true,
+  "cases": [
+    {
+      "type": "pdf",
+      "versionId": "fdbe7829-bf80-4b6f-b596-ab9c47a53985",
+      "result": "correct",
+      "browser": "Edge",
+      "privateSourceRequests": 0
+    },
+    {
+      "type": "numeric",
+      "versionId": "c55dd5c1-8547-4061-bc9d-88eef090a90f",
+      "result": "correct",
+      "browser": "Edge",
+      "privateSourceRequests": 0
+    }
+  ],
+  "errors": []
+}

@@ -1,0 +1,7 @@
+{
+  "passed": false,
+  "assignmentId": "478716f3-4a17-4800-99f6-0cfd56defd4d",
+  "checks": [],
+  "errors": [],
+  "failure": "TimeoutError: locator.selectOption: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByLabel('สีเสื้อ', { exact: true })\u001b[22m\n"
+}

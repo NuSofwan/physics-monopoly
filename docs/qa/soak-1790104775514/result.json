@@ -1,0 +1,499 @@
+{
+  "passed": true,
+  "assignmentId": "fe50df44-65af-4136-af44-a33599583ac0",
+  "requestedMinutes": 60,
+  "method": "One real 40-minute solo class game followed by result view; CDP forced GC once/minute to sample retained browser heap. Not server RSS or physical Android.",
+  "errors": [],
+  "samples": [
+    {
+      "seconds": 0,
+      "heap": 5812828,
+      "nodes": 428,
+      "listeners": 168,
+      "documents": 1,
+      "finished": false
+    },
+    {
+      "seconds": 60,
+      "heap": 11613664,
+      "nodes": 494,
+      "listeners": 191,
+      "documents": 1,
+      "finished": false
+    },
+    {
+      "seconds": 120,
+      "heap": 12025792,
+      "nodes": 527,
+      "listeners": 191,
+      "documents": 1,
+      "finished": false
+    },
+    {
+      "seconds": 180,
+      "heap": 12317080,
+      "nodes": 531,
+      "listeners": 191,
+      "documents": 1,
+      "finished": false
+    },
+    {
+      "seconds": 240,
+      "heap": 12422356,
+      "nodes": 539,
+      "listeners": 191,
+      "documents": 1,
+      "finished": false
+    },
+    {
+      "seconds": 300,
+      "heap": 12097456,
+      "nodes": 545,
+      "listeners": 191,
+      "documents": 1,
+      "finished": false
+    },
+    {
+      "seconds": 360,
+      "heap": 12331296,
+      "nodes": 545,
+      "listeners": 191,
+      "documents": 1,
+      "finished": false
+    },
+    {
+      "seconds": 420,
+      "heap": 12455372,
+      "nodes": 545,
+      "listeners": 191,
+      "documents": 1,
+      "finished": false
+    },
+    {
+      "seconds": 481,
+      "heap": 12509800,
+      "nodes": 545,
+      "listeners": 191,
+      "documents": 1,
+      "finished": false
+    },
+    {
+      "seconds": 541,
+      "heap": 12623580,
+      "nodes": 545,
+      "listeners": 191,
+      "documents": 1,
+      "finished": false
+    },
+    {
+      "seconds": 601,
+      "heap": 12697948,
+      "nodes": 545,
+      "listeners": 191,
+      "documents": 1,
+      "finished": false
+    },
+    {
+      "seconds": 661,
+      "heap": 13052436,
+      "nodes": 500,
+      "listeners": 185,
+      "documents": 1,
+      "finished": false
+    },
+    {
+      "seconds": 721,
+      "heap": 12768216,
+      "nodes": 500,
+      "listeners": 185,
+      "documents": 1,
+      "finished": false
+    },
+    {
+      "seconds": 781,
+      "heap": 13187180,
+      "nodes": 500,
+      "listeners": 185,
+      "documents": 1,
+      "finished": false
+    },
+    {
+      "seconds": 841,
+      "heap": 13343096,
+      "nodes": 500,
+      "listeners": 185,
+      "documents": 1,
+      "finished": false
+    },
+    {
+      "seconds": 901,
+      "heap": 13117832,
+      "nodes": 500,
+      "listeners": 185,
+      "documents": 1,
+      "finished": false
+    },
+    {
+      "seconds": 961,
+      "heap": 13120316,
+      "nodes": 500,
+      "listeners": 185,
+      "documents": 1,
+      "finished": false
+    },
+    {
+      "seconds": 1021,
+      "heap": 13573848,
+      "nodes": 500,
+      "listeners": 185,
+      "documents": 1,
+      "finished": false
+    },
+    {
+      "seconds": 1081,
+      "heap": 13211064,
+      "nodes": 500,
+      "listeners": 185,
+      "documents": 1,
+      "finished": false
+    },
+    {
+      "seconds": 1141,
+      "heap": 13242676,
+      "nodes": 500,
+      "listeners": 185,
+      "documents": 1,
+      "finished": false
+    },
+    {
+      "seconds": 1201,
+      "heap": 13681176,
+      "nodes": 500,
+      "listeners": 185,
+      "documents": 1,
+      "finished": false
+    },
+    {
+      "seconds": 1261,
+      "heap": 13210152,
+      "nodes": 500,
+      "listeners": 185,
+      "documents": 1,
+      "finished": false
+    },
+    {
+      "seconds": 1321,
+      "heap": 13289844,
+      "nodes": 500,
+      "listeners": 186,
+      "documents": 1,
+      "finished": false
+    },
+    {
+      "seconds": 1381,
+      "heap": 13661428,
+      "nodes": 500,
+      "listeners": 186,
+      "documents": 1,
+      "finished": false
+    },
+    {
+      "seconds": 1441,
+      "heap": 13309832,
+      "nodes": 500,
+      "listeners": 186,
+      "documents": 1,
+      "finished": false
+    },
+    {
+      "seconds": 1501,
+      "heap": 13724280,
+      "nodes": 500,
+      "listeners": 185,
+      "documents": 1,
+      "finished": false
+    },
+    {
+      "seconds": 1561,
+      "heap": 13762300,
+      "nodes": 500,
+      "listeners": 185,
+      "documents": 1,
+      "finished": false
+    },
+    {
+      "seconds": 1621,
+      "heap": 13439852,
+      "nodes": 500,
+      "listeners": 185,
+      "documents": 1,
+      "finished": false
+    },
+    {
+      "seconds": 1681,
+      "heap": 13889248,
+      "nodes": 500,
+      "listeners": 185,
+      "documents": 1,
+      "finished": false
+    },
+    {
+      "seconds": 1742,
+      "heap": 13570644,
+      "nodes": 500,
+      "listeners": 185,
+      "documents": 1,
+      "finished": false
+    },
+    {
+      "seconds": 1802,
+      "heap": 13561544,
+      "nodes": 500,
+      "listeners": 185,
+      "documents": 1,
+      "finished": false
+    },
+    {
+      "seconds": 1862,
+      "heap": 13575732,
+      "nodes": 500,
+      "listeners": 185,
+      "documents": 1,
+      "finished": false
+    },
+    {
+      "seconds": 1922,
+      "heap": 13995172,
+      "nodes": 500,
+      "listeners": 185,
+      "documents": 1,
+      "finished": false
+    },
+    {
+      "seconds": 1982,
+      "heap": 13657044,
+      "nodes": 500,
+      "listeners": 185,
+      "documents": 1,
+      "finished": false
+    },
+    {
+      "seconds": 2042,
+      "heap": 13766052,
+      "nodes": 500,
+      "listeners": 185,
+      "documents": 1,
+      "finished": false
+    },
+    {
+      "seconds": 2102,
+      "heap": 13839284,
+      "nodes": 500,
+      "listeners": 185,
+      "documents": 1,
+      "finished": false
+    },
+    {
+      "seconds": 2162,
+      "heap": 13872948,
+      "nodes": 500,
+      "listeners": 185,
+      "documents": 1,
+      "finished": false
+    },
+    {
+      "seconds": 2222,
+      "heap": 13876352,
+      "nodes": 500,
+      "listeners": 185,
+      "documents": 1,
+      "finished": false
+    },
+    {
+      "seconds": 2282,
+      "heap": 13905500,
+      "nodes": 500,
+      "listeners": 185,
+      "documents": 1,
+      "finished": false
+    },
+    {
+      "seconds": 2342,
+      "heap": 13904708,
+      "nodes": 500,
+      "listeners": 185,
+      "documents": 1,
+      "finished": false
+    },
+    {
+      "seconds": 2402,
+      "heap": 14042160,
+      "nodes": 769,
+      "listeners": 196,
+      "documents": 1,
+      "finished": true
+    },
+    {
+      "seconds": 2462,
+      "heap": 14101384,
+      "nodes": 769,
+      "listeners": 196,
+      "documents": 1,
+      "finished": true
+    },
+    {
+      "seconds": 2522,
+      "heap": 14133164,
+      "nodes": 769,
+      "listeners": 196,
+      "documents": 1,
+      "finished": true
+    },
+    {
+      "seconds": 2582,
+      "heap": 14157316,
+      "nodes": 769,
+      "listeners": 196,
+      "documents": 1,
+      "finished": true
+    },
+    {
+      "seconds": 2642,
+      "heap": 14158260,
+      "nodes": 769,
+      "listeners": 196,
+      "documents": 1,
+      "finished": true
+    },
+    {
+      "seconds": 2702,
+      "heap": 14167472,
+      "nodes": 769,
+      "listeners": 196,
+      "documents": 1,
+      "finished": true
+    },
+    {
+      "seconds": 2762,
+      "heap": 14179060,
+      "nodes": 769,
+      "listeners": 196,
+      "documents": 1,
+      "finished": true
+    },
+    {
+      "seconds": 2822,
+      "heap": 14173892,
+      "nodes": 769,
+      "listeners": 196,
+      "documents": 1,
+      "finished": true
+    },
+    {
+      "seconds": 2883,
+      "heap": 14175152,
+      "nodes": 769,
+      "listeners": 196,
+      "documents": 1,
+      "finished": true
+    },
+    {
+      "seconds": 2943,
+      "heap": 14330420,
+      "nodes": 769,
+      "listeners": 196,
+      "documents": 1,
+      "finished": true
+    },
+    {
+      "seconds": 3003,
+      "heap": 14343672,
+      "nodes": 769,
+      "listeners": 196,
+      "documents": 1,
+      "finished": true
+    },
+    {
+      "seconds": 3063,
+      "heap": 14343804,
+      "nodes": 769,
+      "listeners": 196,
+      "documents": 1,
+      "finished": true
+    },
+    {
+      "seconds": 3123,
+      "heap": 14333712,
+      "nodes": 769,
+      "listeners": 196,
+      "documents": 1,
+      "finished": true
+    },
+    {
+      "seconds": 3183,
+      "heap": 14334920,
+      "nodes": 769,
+      "listeners": 196,
+      "documents": 1,
+      "finished": true
+    },
+    {
+      "seconds": 3243,
+      "heap": 14359072,
+      "nodes": 769,
+      "listeners": 196,
+      "documents": 1,
+      "finished": true
+    },
+    {
+      "seconds": 3303,
+      "heap": 14359688,
+      "nodes": 769,
+      "listeners": 196,
+      "documents": 1,
+      "finished": true
+    },
+    {
+      "seconds": 3363,
+      "heap": 14349472,
+      "nodes": 769,
+      "listeners": 196,
+      "documents": 1,
+      "finished": true
+    },
+    {
+      "seconds": 3423,
+      "heap": 14366192,
+      "nodes": 769,
+      "listeners": 196,
+      "documents": 1,
+      "finished": true
+    },
+    {
+      "seconds": 3483,
+      "heap": 14355524,
+      "nodes": 769,
+      "listeners": 196,
+      "documents": 1,
+      "finished": true
+    },
+    {
+      "seconds": 3543,
+      "heap": 14369644,
+      "nodes": 769,
+      "listeners": 196,
+      "documents": 1,
+      "finished": true
+    },
+    {
+      "seconds": 3600,
+      "heap": 14365396,
+      "nodes": 769,
+      "listeners": 196,
+      "documents": 1,
+      "finished": true
+    }
+  ],
+  "oneHourGate": true,
+  "retainedHeapGrowthBytes": 1746064
+}

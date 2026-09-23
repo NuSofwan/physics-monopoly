@@ -1,0 +1,11 @@
+{
+  "passed": true,
+  "deletedOnlyOwnSyntheticFixture": "3704f4d5-3016-47c0-9802-4c010b4882f1",
+  "deletedOnlyOwnSyntheticActivity": "a7701f18-8931-4299-ace2-2ceded5adc15",
+  "privateFileRemoved": true,
+  "acl": true,
+  "confirmationRequired": true,
+  "liveSeatProtected": true,
+  "publishedVersionPurge": true,
+  "immutabilityOutsidePurge": true
+}

@@ -1,0 +1,28 @@
+{
+  "passed": true,
+  "checks": [
+    {
+      "grade": 2,
+      "activityId": "d204d111-2f4a-4915-b4ca-8ba483c6037a",
+      "versionId": "dce2be7d-6e00-4f9d-afe9-85d7c0ab3e37",
+      "roomCode": "R57W3F",
+      "oneOwnObjectiveRow": true
+    },
+    {
+      "grade": 4,
+      "activityId": "ae116c12-7e75-4090-90c3-0f833dcf3451",
+      "versionId": "da38e2a3-fdd2-414a-8ecc-12b7950d9252",
+      "roomCode": "9RMDAZ",
+      "oneOwnObjectiveRow": true
+    },
+    {
+      "grade": 5,
+      "activityId": "597eaeba-019b-4cfb-9c88-f30b579ef383",
+      "versionId": "98246d57-8e90-4956-a6c7-94a5bde6330f",
+      "roomCode": "C25QPH",
+      "oneOwnObjectiveRow": true
+    }
+  ],
+  "m2Source": "Real six-page PDF with 30 reviewed questions",
+  "note": "Synthetic questions and students, not a curriculum endorsement"
+}

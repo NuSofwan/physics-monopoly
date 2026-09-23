@@ -1,0 +1,895 @@
+{
+  "schemaVersion": 1,
+  "toolchain": {
+    "three": "0.169",
+    "renderer": "React Three Fiber 8",
+    "format": "original editable procedural TSX (not GLB)"
+  },
+  "license": "Project-owned source; see assets/LICENSES.md",
+  "units": {
+    "up": "Y",
+    "tilePitch": 1.75,
+    "feetY": 0
+  },
+  "sources": [
+    {
+      "path": "client/src/game3d/CityKit.tsx",
+      "sha256": "0a1801e693c785ba9c79d844b2a5c6f7a51d5e2b42e49ef1028be62b80109a33",
+      "bytes": 18006
+    },
+    {
+      "path": "client/src/game3d/AvatarFigure.tsx",
+      "sha256": "41e6710d36795093b8f180c41003b68586a7aa8956875e53044ca14113b87622",
+      "bytes": 8159
+    },
+    {
+      "path": "client/src/game3d/diceGeometry.ts",
+      "sha256": "e53234ef0d0fddbf59cc66e03a0b918c4c5d47ab84ac9e46ff48a5de7f2c762f",
+      "bytes": 1534
+    },
+    {
+      "path": "client/src/game3d/Board3D.tsx",
+      "sha256": "ea1fbee3e07064dc1da80510b32bb6cff11ba0e5efde8bc821567374619e1108",
+      "bytes": 17393
+    },
+    {
+      "path": "shared/src/locations.ts",
+      "sha256": "be938844b8074cad189c1083dc3508c6231e8a27f8dc3ab5d9d4f0d1908413f9",
+      "bytes": 4140
+    },
+    {
+      "path": "shared/src/avatars.ts",
+      "sha256": "ac45aed205054ea8606c1739f58980558fdd72d1e1015a530e911e34a88bcdf7",
+      "bytes": 3963
+    },
+    {
+      "path": "shared/src/appearance.ts",
+      "sha256": "95d93f294271ae0b5adc10bc869ed0c43b0a501deaee79d830417d70b0d64698",
+      "bytes": 1119
+    }
+  ],
+  "assets": [
+    {
+      "id": "city:bangkok",
+      "path": "client/src/game3d/CityKit.tsx",
+      "selector": "bangkok",
+      "kind": "city-kit",
+      "levels": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "variants": 2,
+      "clips": [],
+      "textures": [],
+      "triangles": {
+        "environment": 1076,
+        "buildings": [
+          [
+            60,
+            36
+          ],
+          [
+            180,
+            204
+          ],
+          [
+            252,
+            252
+          ],
+          [
+            180,
+            204
+          ]
+        ]
+      },
+      "readiness": "review_required"
+    },
+    {
+      "id": "city:tokyo",
+      "path": "client/src/game3d/CityKit.tsx",
+      "selector": "tokyo",
+      "kind": "city-kit",
+      "levels": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "variants": 2,
+      "clips": [],
+      "textures": [],
+      "triangles": {
+        "environment": 1924,
+        "buildings": [
+          [
+            60,
+            36
+          ],
+          [
+            84,
+            108
+          ],
+          [
+            120,
+            144
+          ],
+          [
+            240,
+            264
+          ]
+        ]
+      },
+      "readiness": "review_required"
+    },
+    {
+      "id": "city:new-york",
+      "path": "client/src/game3d/CityKit.tsx",
+      "selector": "new-york",
+      "kind": "city-kit",
+      "levels": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "variants": 2,
+      "clips": [],
+      "textures": [],
+      "triangles": {
+        "environment": 1612,
+        "buildings": [
+          [
+            60,
+            36
+          ],
+          [
+            108,
+            132
+          ],
+          [
+            144,
+            168
+          ],
+          [
+            216,
+            240
+          ]
+        ]
+      },
+      "readiness": "review_required"
+    },
+    {
+      "id": "city:singapore",
+      "path": "client/src/game3d/CityKit.tsx",
+      "selector": "singapore",
+      "kind": "city-kit",
+      "levels": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "variants": 2,
+      "clips": [],
+      "textures": [],
+      "triangles": {
+        "environment": 2300,
+        "buildings": [
+          [
+            60,
+            36
+          ],
+          [
+            96,
+            120
+          ],
+          [
+            144,
+            168
+          ],
+          [
+            252,
+            276
+          ]
+        ]
+      },
+      "readiness": "review_required"
+    },
+    {
+      "id": "city:paris",
+      "path": "client/src/game3d/CityKit.tsx",
+      "selector": "paris",
+      "kind": "city-kit",
+      "levels": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "variants": 2,
+      "clips": [],
+      "textures": [],
+      "triangles": {
+        "environment": 2356,
+        "buildings": [
+          [
+            60,
+            36
+          ],
+          [
+            244,
+            244
+          ],
+          [
+            376,
+            352
+          ],
+          [
+            508,
+            460
+          ]
+        ]
+      },
+      "readiness": "review_required"
+    },
+    {
+      "id": "city:kyoto",
+      "path": "client/src/game3d/CityKit.tsx",
+      "selector": "kyoto",
+      "kind": "city-kit",
+      "levels": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "variants": 2,
+      "clips": [],
+      "textures": [],
+      "triangles": {
+        "environment": 3396,
+        "buildings": [
+          [
+            60,
+            36
+          ],
+          [
+            216,
+            240
+          ],
+          [
+            324,
+            348
+          ],
+          [
+            432,
+            456
+          ]
+        ]
+      },
+      "readiness": "review_required"
+    },
+    {
+      "id": "city:cairo-giza",
+      "path": "client/src/game3d/CityKit.tsx",
+      "selector": "cairo-giza",
+      "kind": "city-kit",
+      "levels": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "variants": 2,
+      "clips": [],
+      "textures": [],
+      "triangles": {
+        "environment": 1208,
+        "buildings": [
+          [
+            60,
+            36
+          ],
+          [
+            216,
+            240
+          ],
+          [
+            240,
+            264
+          ],
+          [
+            264,
+            288
+          ]
+        ]
+      },
+      "readiness": "review_required"
+    },
+    {
+      "id": "city:zermatt",
+      "path": "client/src/game3d/CityKit.tsx",
+      "selector": "zermatt",
+      "kind": "city-kit",
+      "levels": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "variants": 2,
+      "clips": [],
+      "textures": [],
+      "triangles": {
+        "environment": 1004,
+        "buildings": [
+          [
+            60,
+            36
+          ],
+          [
+            228,
+            228
+          ],
+          [
+            336,
+            312
+          ],
+          [
+            444,
+            396
+          ]
+        ]
+      },
+      "readiness": "review_required"
+    },
+    {
+      "id": "city:santorini",
+      "path": "client/src/game3d/CityKit.tsx",
+      "selector": "santorini",
+      "kind": "city-kit",
+      "levels": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "variants": 2,
+      "clips": [],
+      "textures": [],
+      "triangles": {
+        "environment": 2206,
+        "buildings": [
+          [
+            60,
+            36
+          ],
+          [
+            336,
+            360
+          ],
+          [
+            384,
+            408
+          ],
+          [
+            432,
+            456
+          ]
+        ]
+      },
+      "readiness": "review_required"
+    },
+    {
+      "id": "city:rio",
+      "path": "client/src/game3d/CityKit.tsx",
+      "selector": "rio",
+      "kind": "city-kit",
+      "levels": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "variants": 2,
+      "clips": [],
+      "textures": [],
+      "triangles": {
+        "environment": 1202,
+        "buildings": [
+          [
+            60,
+            36
+          ],
+          [
+            168,
+            168
+          ],
+          [
+            264,
+            240
+          ],
+          [
+            372,
+            324
+          ]
+        ]
+      },
+      "readiness": "review_required"
+    },
+    {
+      "id": "city:venice",
+      "path": "client/src/game3d/CityKit.tsx",
+      "selector": "venice",
+      "kind": "city-kit",
+      "levels": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "variants": 2,
+      "clips": [],
+      "textures": [],
+      "triangles": {
+        "environment": 1856,
+        "buildings": [
+          [
+            60,
+            36
+          ],
+          [
+            192,
+            192
+          ],
+          [
+            324,
+            300
+          ],
+          [
+            456,
+            408
+          ]
+        ]
+      },
+      "readiness": "review_required"
+    },
+    {
+      "id": "city:sydney",
+      "path": "client/src/game3d/CityKit.tsx",
+      "selector": "sydney",
+      "kind": "city-kit",
+      "levels": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "variants": 2,
+      "clips": [],
+      "textures": [],
+      "triangles": {
+        "environment": 1292,
+        "buildings": [
+          [
+            60,
+            36
+          ],
+          [
+            168,
+            168
+          ],
+          [
+            264,
+            240
+          ],
+          [
+            420,
+            372
+          ]
+        ]
+      },
+      "readiness": "review_required"
+    },
+    {
+      "id": "avatar:girl",
+      "path": "client/src/game3d/AvatarFigure.tsx",
+      "selector": "girl",
+      "kind": "avatar",
+      "clips": [
+        "idle",
+        "walk",
+        "think",
+        "celebrate",
+        "wave"
+      ],
+      "textures": [],
+      "triangles": 1688,
+      "readiness": "review_required"
+    },
+    {
+      "id": "avatar:boy",
+      "path": "client/src/game3d/AvatarFigure.tsx",
+      "selector": "boy",
+      "kind": "avatar",
+      "clips": [
+        "idle",
+        "walk",
+        "think",
+        "celebrate",
+        "wave"
+      ],
+      "textures": [],
+      "triangles": 1340,
+      "readiness": "review_required"
+    },
+    {
+      "id": "avatar:scientist",
+      "path": "client/src/game3d/AvatarFigure.tsx",
+      "selector": "scientist",
+      "kind": "avatar",
+      "clips": [
+        "idle",
+        "walk",
+        "think",
+        "celebrate",
+        "wave"
+      ],
+      "textures": [],
+      "triangles": 1750,
+      "readiness": "review_required"
+    },
+    {
+      "id": "avatar:scientist-young",
+      "path": "client/src/game3d/AvatarFigure.tsx",
+      "selector": "scientist-young",
+      "kind": "avatar",
+      "clips": [
+        "idle",
+        "walk",
+        "think",
+        "celebrate",
+        "wave"
+      ],
+      "textures": [],
+      "triangles": 1706,
+      "readiness": "review_required"
+    },
+    {
+      "id": "avatar:engineer",
+      "path": "client/src/game3d/AvatarFigure.tsx",
+      "selector": "engineer",
+      "kind": "avatar",
+      "clips": [
+        "idle",
+        "walk",
+        "think",
+        "celebrate",
+        "wave"
+      ],
+      "textures": [],
+      "triangles": 1712,
+      "readiness": "review_required"
+    },
+    {
+      "id": "avatar:engineer-wheelchair",
+      "path": "client/src/game3d/AvatarFigure.tsx",
+      "selector": "engineer-wheelchair",
+      "kind": "avatar",
+      "clips": [
+        "idle",
+        "walk",
+        "think",
+        "celebrate",
+        "wave"
+      ],
+      "textures": [],
+      "triangles": 2116,
+      "readiness": "review_required"
+    },
+    {
+      "id": "avatar:astro",
+      "path": "client/src/game3d/AvatarFigure.tsx",
+      "selector": "astro",
+      "kind": "avatar",
+      "clips": [
+        "idle",
+        "walk",
+        "think",
+        "celebrate",
+        "wave"
+      ],
+      "textures": [],
+      "triangles": 1872,
+      "readiness": "review_required"
+    },
+    {
+      "id": "avatar:astronaut-senior",
+      "path": "client/src/game3d/AvatarFigure.tsx",
+      "selector": "astronaut-senior",
+      "kind": "avatar",
+      "clips": [
+        "idle",
+        "walk",
+        "think",
+        "celebrate",
+        "wave"
+      ],
+      "textures": [],
+      "triangles": 2084,
+      "readiness": "review_required"
+    },
+    {
+      "id": "avatar:doctor",
+      "path": "client/src/game3d/AvatarFigure.tsx",
+      "selector": "doctor",
+      "kind": "avatar",
+      "clips": [
+        "idle",
+        "walk",
+        "think",
+        "celebrate",
+        "wave"
+      ],
+      "textures": [],
+      "triangles": 1460,
+      "readiness": "review_required"
+    },
+    {
+      "id": "avatar:nurse",
+      "path": "client/src/game3d/AvatarFigure.tsx",
+      "selector": "nurse",
+      "kind": "avatar",
+      "clips": [
+        "idle",
+        "walk",
+        "think",
+        "celebrate",
+        "wave"
+      ],
+      "textures": [],
+      "triangles": 2020,
+      "readiness": "review_required"
+    },
+    {
+      "id": "avatar:teacher",
+      "path": "client/src/game3d/AvatarFigure.tsx",
+      "selector": "teacher",
+      "kind": "avatar",
+      "clips": [
+        "idle",
+        "walk",
+        "think",
+        "celebrate",
+        "wave"
+      ],
+      "textures": [],
+      "triangles": 1700,
+      "readiness": "review_required"
+    },
+    {
+      "id": "avatar:teacher-senior",
+      "path": "client/src/game3d/AvatarFigure.tsx",
+      "selector": "teacher-senior",
+      "kind": "avatar",
+      "clips": [
+        "idle",
+        "walk",
+        "think",
+        "celebrate",
+        "wave"
+      ],
+      "textures": [],
+      "triangles": 1744,
+      "readiness": "review_required"
+    },
+    {
+      "id": "avatar:architect",
+      "path": "client/src/game3d/AvatarFigure.tsx",
+      "selector": "architect",
+      "kind": "avatar",
+      "clips": [
+        "idle",
+        "walk",
+        "think",
+        "celebrate",
+        "wave"
+      ],
+      "textures": [],
+      "triangles": 1688,
+      "readiness": "review_required"
+    },
+    {
+      "id": "avatar:architect-young",
+      "path": "client/src/game3d/AvatarFigure.tsx",
+      "selector": "architect-young",
+      "kind": "avatar",
+      "clips": [
+        "idle",
+        "walk",
+        "think",
+        "celebrate",
+        "wave"
+      ],
+      "textures": [],
+      "triangles": 1340,
+      "readiness": "review_required"
+    },
+    {
+      "id": "avatar:athlete",
+      "path": "client/src/game3d/AvatarFigure.tsx",
+      "selector": "athlete",
+      "kind": "avatar",
+      "clips": [
+        "idle",
+        "walk",
+        "think",
+        "celebrate",
+        "wave"
+      ],
+      "textures": [],
+      "triangles": 1520,
+      "readiness": "review_required"
+    },
+    {
+      "id": "avatar:athlete-wheelchair",
+      "path": "client/src/game3d/AvatarFigure.tsx",
+      "selector": "athlete-wheelchair",
+      "kind": "avatar",
+      "clips": [
+        "idle",
+        "walk",
+        "think",
+        "celebrate",
+        "wave"
+      ],
+      "textures": [],
+      "triangles": 2272,
+      "readiness": "review_required"
+    },
+    {
+      "id": "avatar:pilot",
+      "path": "client/src/game3d/AvatarFigure.tsx",
+      "selector": "pilot",
+      "kind": "avatar",
+      "clips": [
+        "idle",
+        "walk",
+        "think",
+        "celebrate",
+        "wave"
+      ],
+      "textures": [],
+      "triangles": 1736,
+      "readiness": "review_required"
+    },
+    {
+      "id": "avatar:pilot-senior",
+      "path": "client/src/game3d/AvatarFigure.tsx",
+      "selector": "pilot-senior",
+      "kind": "avatar",
+      "clips": [
+        "idle",
+        "walk",
+        "think",
+        "celebrate",
+        "wave"
+      ],
+      "textures": [],
+      "triangles": 1780,
+      "readiness": "review_required"
+    },
+    {
+      "id": "avatar:firefighter",
+      "path": "client/src/game3d/AvatarFigure.tsx",
+      "selector": "firefighter",
+      "kind": "avatar",
+      "clips": [
+        "idle",
+        "walk",
+        "think",
+        "celebrate",
+        "wave"
+      ],
+      "textures": [],
+      "triangles": 1724,
+      "readiness": "review_required"
+    },
+    {
+      "id": "avatar:firefighter-trainee",
+      "path": "client/src/game3d/AvatarFigure.tsx",
+      "selector": "firefighter-trainee",
+      "kind": "avatar",
+      "clips": [
+        "idle",
+        "walk",
+        "think",
+        "celebrate",
+        "wave"
+      ],
+      "textures": [],
+      "triangles": 1892,
+      "readiness": "review_required"
+    },
+    {
+      "id": "avatar:artist",
+      "path": "client/src/game3d/AvatarFigure.tsx",
+      "selector": "artist",
+      "kind": "avatar",
+      "clips": [
+        "idle",
+        "walk",
+        "think",
+        "celebrate",
+        "wave"
+      ],
+      "textures": [],
+      "triangles": 1480,
+      "readiness": "review_required"
+    },
+    {
+      "id": "avatar:musician",
+      "path": "client/src/game3d/AvatarFigure.tsx",
+      "selector": "musician",
+      "kind": "avatar",
+      "clips": [
+        "idle",
+        "walk",
+        "think",
+        "celebrate",
+        "wave"
+      ],
+      "textures": [],
+      "triangles": 2040,
+      "readiness": "review_required"
+    },
+    {
+      "id": "avatar:explorer",
+      "path": "client/src/game3d/AvatarFigure.tsx",
+      "selector": "explorer",
+      "kind": "avatar",
+      "clips": [
+        "idle",
+        "walk",
+        "think",
+        "celebrate",
+        "wave"
+      ],
+      "textures": [],
+      "triangles": 1724,
+      "readiness": "review_required"
+    },
+    {
+      "id": "avatar:naturalist",
+      "path": "client/src/game3d/AvatarFigure.tsx",
+      "selector": "naturalist",
+      "kind": "avatar",
+      "clips": [
+        "idle",
+        "walk",
+        "think",
+        "celebrate",
+        "wave"
+      ],
+      "textures": [],
+      "triangles": 2104,
+      "readiness": "review_required"
+    },
+    {
+      "id": "dice:pair",
+      "path": "client/src/game3d/diceGeometry.ts",
+      "selector": "diceOrientations",
+      "kind": "dice",
+      "clips": [
+        "roll"
+      ],
+      "textures": [],
+      "triangles": 528,
+      "readiness": "review_required"
+    }
+  ],
+  "fallback": "client/src/game2d/AccessibleBoard.tsx",
+  "review": "Technical rendering verified separately from final artwork approval and physical-device performance"
+}

@@ -5,6 +5,7 @@ dist/
 .env.local
 *.log
 coverage/
+.local/
 client/dist/
 server/dist/
 shared/dist/
@@ -17,3 +18,15 @@ server-dev.log
 .claude/launch.json
 
 .vercel
+
+# Generated internal QA artifacts (may embed locally licensed fonts)
+output/
+tmp/
+docs/qa/**/*.png
+docs/qa/**/*.webm
+docs/qa/**/*.jpg
+docs/qa/**/*.jpeg
+docs/qa/**/*.pdf
+docs/qa/**/*.csv
+!docs/qa/**/*.md
+!docs/qa/**/result.json

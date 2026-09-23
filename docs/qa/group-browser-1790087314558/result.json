@@ -1,0 +1,29 @@
+{
+  "passed": false,
+  "assignmentId": "e55b0808-3e74-4fc2-8012-1e429bff0927",
+  "errors": [],
+  "persisted": [
+    {
+      "nickname": "Group Student 1",
+      "xp": 40,
+      "status": "completed"
+    },
+    {
+      "nickname": "Group Student 2",
+      "xp": 60,
+      "status": "completed"
+    },
+    {
+      "nickname": "Group Student 3",
+      "xp": 100,
+      "status": "completed"
+    },
+    {
+      "nickname": "Group Student 4",
+      "xp": 100,
+      "status": "completed"
+    }
+  ],
+  "elapsedSeconds": 892,
+  "failure": "TimeoutError: locator.waitFor: Timeout 3000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: 'Play again', exact: true }) to be visible\u001b[22m\n"
+}

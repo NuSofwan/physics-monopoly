@@ -9,13 +9,23 @@
     "start": "tsx src/index.ts"
   },
   "dependencies": {
-    "@colyseus/ws-transport": "^0.16.4",
-    "colyseus": "^0.16.4",
+    "pdfjs-dist": "^6.3.289",
+    "@napi-rs/canvas": "^1.0.9",
+    "tesseract.js": "^7.0.0",
+    "@tesseract.js-data/tha": "^1.0.0",
+    "@tesseract.js-data/eng": "^1.0.0",
+    "multer": "^2.4.0",
+    "pg": "^8.23.0",
+    "openid-client": "^6.8.8",
+    "@colyseus/ws-transport": "^0.17.13",
+    "@colyseus/core": "^0.17.51",
     "cors": "^2.8.5",
     "express": "^4.19.2",
     "tsx": "^4.19.2"
   },
   "devDependencies": {
+    "@types/multer": "^2.0.0",
+    "@types/pg": "^8.15.6",
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21"
   }

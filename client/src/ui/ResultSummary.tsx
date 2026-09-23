@@ -1,5 +1,6 @@
 ﻿import { Award, Target } from "lucide-react";
 import { calculateNetWorth, exportTopicReport, physicsMvp, type GameState } from "@physics-monopoly/shared";
+import { PersonalResults } from "./PersonalResults";
 
 const topicLabels: Record<string, string> = {
   mechanics: "Mechanics",
@@ -11,6 +12,7 @@ const topicLabels: Record<string, string> = {
 };
 
 export function ResultSummary({ state }: { state: GameState }): JSX.Element {
+  if (state.classroomMode) return <ClassroomResults state={state} />;
   const mvp = physicsMvp(state);
   const ranked = [...state.players].sort((a, b) => calculateNetWorth(state, b.id) - calculateNetWorth(state, a.id));
   return (
@@ -38,4 +40,15 @@ export function ResultSummary({ state }: { state: GameState }): JSX.Element {
       <p className="inline-flex items-center gap-2 rounded-lg bg-white px-3 py-2 text-sm text-slate-600"><Target className="h-4 w-4" /> Use the topic report to pick the next review set.</p>
     </div>
   );
+}
+
+function ClassroomResults({ state }: { state: GameState }): JSX.Element {
+  const rows = state.players.map((player) => {
+    const stats = Object.values(player.stats);
+    const total = stats.reduce((sum, item) => sum + item.total, 0), correct = stats.reduce((sum, item) => sum + item.correct, 0);
+    return { player, total, correct, ratio: total ? correct / total : 0, worth: player.money + (player.invested ?? 0) - (player.supportDebt ?? 0) };
+  });
+  const best = Math.max(...rows.filter((row) => row.total >= 5).map((row) => row.ratio));
+  const thinkers = rows.filter((row) => row.total >= 5 && row.ratio === best);
+  return <div className="space-y-4"><p className="rounded bg-mint/20 p-4">นักคิดฟิสิกส์: {thinkers.length ? thinkers.map((row) => row.player.name).join(" / ") : "ข้อมูลยังน้อย — ต้องตอบข้อใหม่อย่างน้อย 5 ข้อ"}</p><div className="grid gap-3 sm:grid-cols-2">{rows.map(({ player,total,correct,worth }) => <article key={player.id} className="rounded bg-white p-4"><h3 className="font-bold">{player.name}</h3><p>ทรัพย์สินสุทธิ {worth.toLocaleString("th-TH")} เหรียญ · XP {player.xp}</p><p>หนี้ช่วยเหลือ {(player.supportDebt ?? 0).toLocaleString("th-TH")} เหรียญ</p><p>ถูกครั้งแรกในข้อใหม่ {correct}/{total} {total < 5 ? "· ข้อมูลยังน้อย" : ""}</p></article>)}</div><p>คะแนนเกมไม่ใช่ผลสอบโดยอัตโนมัติ ไม่รวม XP กับเงินเป็นคะแนนเดียว และไม่นับการเห็นข้อซ้ำเป็นผลก่อน/หลังเรียน</p><PersonalResults roomCode={state.roomCode}/></div>;
 }

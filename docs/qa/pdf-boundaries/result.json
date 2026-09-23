@@ -1,0 +1,28 @@
+{
+  "passed": true,
+  "setId": "203358e2-40c0-444a-917a-fcfad3c1cddc",
+  "checks": [
+    {
+      "filename": "password-protected.pdf",
+      "status": "failed",
+      "pages": 0,
+      "milliseconds": 4161
+    },
+    {
+      "filename": "malformed.pdf",
+      "status": "failed",
+      "pages": 0,
+      "milliseconds": 3589
+    },
+    {
+      "versionId": "dce2be7d-6e00-4f9d-afe9-85d7c0ab3e37",
+      "approvedQuestions": 30
+    },
+    {
+      "filename": "thai-30.pdf",
+      "status": "review",
+      "pages": 6,
+      "milliseconds": 5081
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+name: Verify source and distribution
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  contracts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run test
+      - run: npm run check
+      - run: npm run audit:questions
+      - run: npm run assets:check
+      - run: npm audit --audit-level=high
+      - name: Reject accidentally tracked private artifacts
+        shell: bash
+        run: |
+          if git ls-files | grep -E '(^|/)(\.env$|\.local/|node_modules/)|(^output/pdf/)|(^docs/qa/.+\.pdf$)'; then
+            echo 'Private runtime artifacts must not be committed.'
+            exit 1
+          fi
+# Real browser/PDF/database/restart/load acceptance is separate. This workflow
+# neither enables demo auth remotely nor claims a staging/classroom pilot.

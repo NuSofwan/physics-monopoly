@@ -141,7 +141,7 @@ export function sellProperty(state: GameState, playerId: string, tileIndex: numb
   player.money += refund;
   tile.ownerId = null;
   tile.level = 0;
-  state.log.unshift(`${player.name} ??? ${tile.name} ????????? ??? ?${refund.toLocaleString("th-TH")}`);
+  state.log.unshift(`${player.name} ขาย ${tile.name} สำเร็จ ได้รับ ฿${refund.toLocaleString("th-TH")}`);
   return true;
 }
 

@@ -3,7 +3,7 @@ import Phaser from "phaser";
 import type { GameState } from "@physics-monopoly/shared";
 import type { MoveEvent } from "../store/gameStore";
 import { playSound } from "../audio/sound";
-import { BoardScene } from "./scenes/BoardScene";
+import { BOARD_HEIGHT, BOARD_WIDTH, BoardScene } from "./scenes/BoardScene";
 
 interface Props {
   state: GameState;
@@ -21,10 +21,10 @@ export function PhaserGame({ state, moveEvent }: Props): JSX.Element {
     const scene = new BoardScene();
     sceneRef.current = scene;
     gameRef.current = new Phaser.Game({
-      type: Phaser.AUTO,
+      type: Phaser.CANVAS,
       parent: hostRef.current,
-      width: 760,
-      height: 760,
+      width: BOARD_WIDTH,
+      height: BOARD_HEIGHT,
       backgroundColor: "#0b1224",
       scene,
       scale: {
@@ -50,5 +50,5 @@ export function PhaserGame({ state, moveEvent }: Props): JSX.Element {
     lastMove.current = moveEvent.nonce;
   }, [moveEvent, state.players]);
 
-  return <div ref={hostRef} className="h-full min-h-[360px] w-full overflow-hidden rounded-lg border border-white/40 bg-panel shadow-game" />;
+  return <div ref={hostRef} className="board-frame w-full overflow-hidden border border-white/35 bg-panel shadow-game" />;
 }

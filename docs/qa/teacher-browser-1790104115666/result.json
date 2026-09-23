@@ -1,0 +1,5 @@
+{
+  "status": "failed",
+  "errors": [],
+  "failure": "Error: locator.waitFor: Error: strict mode violation: getByText('Browser QA 1790104117193 ข้อ 1: แรง 1 N กับ 2 N ทิศเดียวกันรวมเท่าไร', { exact: true }) resolved to 2 elements:\n    1) <label class=\"flex gap-3 border-b p-2\">…</label> aka locator('label').filter({ hasText: 'Browser QA 1790104117193 ข้อ' })\n    2) <span>Browser QA 1790104117193 ข้อ 1: แรง 1 N กับ 2 N ท…</span> aka locator('span').filter({ hasText: 'Browser QA 1790104117193 ข้อ' })\n\nCall log:\n\u001b[2m  - waiting for getByText('Browser QA 1790104117193 ข้อ 1: แรง 1 N กับ 2 N ทิศเดียวกันรวมเท่าไร', { exact: true }) to be visible\u001b[22m\n"
+}

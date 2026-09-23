@@ -1,0 +1,9 @@
+{
+  "passed": false,
+  "assignmentId": "a6dacdde-b591-4677-86ae-f23ab06e31c3",
+  "transport": "Real WebSocket server, delayed forwarding 100–150 ms each direction (200–300 ms added RTT)",
+  "errors": [
+    "protocols[0]: expected string, got object"
+  ],
+  "failure": "TimeoutError: locator.waitFor: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByText('Room code', { exact: true }) to be visible\u001b[22m\n"
+}

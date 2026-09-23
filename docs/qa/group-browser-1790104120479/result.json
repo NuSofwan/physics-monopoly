@@ -1,0 +1,27 @@
+{
+  "passed": true,
+  "assignmentId": "76ea4405-5b43-4095-a613-f9b0e0e1b253",
+  "errors": [],
+  "persisted": [
+    {
+      "nickname": "Group Student 1",
+      "xp": 40,
+      "status": "completed"
+    },
+    {
+      "nickname": "Group Student 2",
+      "xp": 60,
+      "status": "completed"
+    },
+    {
+      "nickname": "Group Student 3",
+      "xp": 100,
+      "status": "completed"
+    },
+    {
+      "nickname": "Group Student 4",
+      "xp": 100,
+      "status": "completed"
+    }
+  ]
+}

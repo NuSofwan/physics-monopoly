@@ -1,0 +1,40 @@
+{
+  "url": "http://localhost:5174",
+  "started": "2026-09-22T12:50:58.091Z",
+  "status": "passed",
+  "errors": [],
+  "roomCode": "RDZJBH",
+  "progress": [
+    {
+      "questions": 13,
+      "reveals": 30,
+      "actions": 39,
+      "finished": true
+    },
+    {
+      "questions": 14,
+      "reveals": 30,
+      "actions": 45,
+      "finished": true
+    },
+    {
+      "questions": 14,
+      "reveals": 30,
+      "actions": 39,
+      "finished": true
+    },
+    {
+      "questions": 14,
+      "reveals": 30,
+      "actions": 43,
+      "finished": true
+    }
+  ],
+  "elapsedSeconds": 809,
+  "results": [
+    "Winner: QA Player 1",
+    "Winner: QA Player 1",
+    "Winner: QA Player 1",
+    "Winner: QA Player 1"
+  ]
+}

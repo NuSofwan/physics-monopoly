@@ -1,0 +1,18 @@
+{
+  "passed": true,
+  "mode": "SDK load (not a substitute for a concurrent real-browser room)",
+  "assignmentId": "4f385683-c8c1-4d47-aeb4-9971c4518198",
+  "startedAt": "2026-09-22T18:36:21.116Z",
+  "os": "Windows_NT 10.0.26200",
+  "cpu": "AMD Ryzen AI 7 350 w/ Radeon 860M",
+  "logicalCpus": 16,
+  "ramBytes": 33598853120,
+  "node": "v24.12.0",
+  "rooms": 15,
+  "clients": 60,
+  "errors": [],
+  "p95AnswerReceiptMs": 126.21750000002794,
+  "samples": 6524,
+  "activeDurationSeconds": 1809.971,
+  "elapsedSeconds": 1810.954
+}

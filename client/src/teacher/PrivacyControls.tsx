@@ -1,0 +1,17 @@
+import { useEffect,useState } from "react";
+import { parseJsonResponse, genericServerErrorTh } from "./safeJson";
+import { apiUrl as api } from "../net/colyseus";
+type Item={id:string;title:string};
+export function PrivacyControls({assignments,sets,onChanged}:{assignments:Item[];sets:Item[];onChanged:()=>Promise<void>}):JSX.Element {
+  const [kind,setKind]=useState("assignments"),[selected,setSelected]=useState(""),[confirmation,setConfirmation]=useState(""),[notice,setNotice]=useState(""),[busy,setBusy]=useState(false);
+  const [policy,setPolicy]=useState<{notice:string;activities:Array<{id:string;title:string;review_after:string}>}|null>(null);
+  useEffect(()=>{const controller=new AbortController();void fetch(`${api}/api/teacher/privacy`,{credentials:"include",signal:controller.signal}).then(async response=>{if(response.ok)setPolicy(await response.json());}).catch(()=>{});return()=>controller.abort();},[assignments]);
+  const choices=kind==="assignments"?assignments:sets, item=choices.find(item=>item.id===selected);
+  async function remove():Promise<void>{
+    if(!item||confirmation!==item.title||busy)return;
+    if(!window.confirm(`ลบถาวร “${item.title}” จากระบบหลัก? ไม่สามารถย้อนกลับผ่านหน้านี้ได้`))return;
+    setBusy(true);setNotice("");
+    try{const response=await fetch(`${api}/api/teacher/${kind}/${item.id}`,{method:"DELETE",credentials:"include",headers:{"Content-Type":"application/json"},body:JSON.stringify({confirmation})});const body=await parseJsonResponse<{error?:string;notice?:string}>(response);if(!response.ok)throw new Error(body?.error??genericServerErrorTh);setNotice(body?.notice??"");setSelected("");setConfirmation("");await onChanged();}catch(error){setNotice(error instanceof Error?error.message:"ไม่สำเร็จ");}finally{setBusy(false);}
+  }
+  return <details className="rounded border border-rose-200 bg-white p-4"><summary>อายุข้อมูล การส่งออก และลบข้อมูล</summary><p className="my-3">{policy?.notice??"เก็บกิจกรรมเริ่มต้น 180 วัน ก่อนลบให้ส่งออก CSV จากรายงานครู การลบต้องยืนยันเอง ไม่ได้ลบอัตโนมัติ"}</p><p>ลบกิจกรรม: ชื่อเล่น/คำตอบ/รายงาน/snapshot โดยต้องให้ทุกคนออกจากห้องก่อน · ลบชุดโจทย์: ลบทุกรุ่น ต้นฉบับ PDF ภาพ crop และงานนำเข้า หลังลบกิจกรรมที่อ้างอิงทั้งหมดแล้ว</p><div className="my-3 flex flex-wrap gap-3"><label>ชนิดข้อมูล<select className="ml-2 rounded border p-2" value={kind} onChange={event=>{setKind(event.target.value);setSelected("");setConfirmation("");}}><option value="assignments">กิจกรรม</option><option value="question-sets">ชุดโจทย์และไฟล์</option></select></label><label>รายการที่จะลบ<select className="ml-2 rounded border p-2" value={selected} onChange={event=>{setSelected(event.target.value);setConfirmation("");}}><option value="">เลือกรายการ</option>{choices.map(item=><option key={item.id} value={item.id}>{item.title}</option>)}</select></label></div>{item?<label className="block">พิมพ์ชื่อ “{item.title}” เพื่อยืนยัน<input className="m-2 rounded border p-2" value={confirmation} onChange={event=>setConfirmation(event.target.value)}/></label>:null}<button className="rounded bg-rose-800 p-3 text-white disabled:opacity-40" disabled={busy||!item||confirmation!==item.title} onClick={()=>void remove()}>ลบข้อมูลที่เลือกอย่างถาวร</button>{notice?<p role="status" className="my-3">{notice}</p>:null}{policy?<details className="mt-3"><summary>วันที่ควรทบทวนอายุข้อมูลรายกิจกรรม</summary><ul>{policy.activities.map(item=><li key={item.id}>{item.title} · {new Date(item.review_after).toLocaleDateString("th-TH")}</li>)}</ul></details>:null}</details>;
+}

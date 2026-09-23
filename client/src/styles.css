@@ -1,4 +1,4 @@
-﻿@tailwind base;
+@tailwind base;
 @tailwind components;
 @tailwind utilities;
 
@@ -7,7 +7,6 @@
   font-family: Inter, "Noto Sans Thai", system-ui, sans-serif;
   background: #101827;
 }
-
 * {
   box-sizing: border-box;
 }
@@ -30,7 +29,6 @@ select {
   min-height: 100vh;
   background:
     linear-gradient(135deg, rgba(16, 24, 39, 0.92) 0%, rgba(23, 35, 58, 0.84) 56%, rgba(36, 49, 72, 0.9) 100%),
-    url("/assets/art/physics_city_backdrop.png") center / cover fixed,
     #101827;
 }
 
@@ -41,7 +39,7 @@ select {
   backdrop-filter: blur(14px);
 }
 
-.focus-ring:focus-visible {
+:focus-visible {
   outline: 3px solid #f8c24a;
   outline-offset: 2px;
 }
@@ -53,7 +51,20 @@ select {
   }
 
   .panel {
-    width: calc(100vw - 2rem);
-    max-width: calc(100vw - 2rem);
+    width: 100%;
+    max-width: 100%;
   }
+}
+
+.board-frame {
+  aspect-ratio: 1672 / 941;
+  min-height: 260px;
+  border-radius: 8px;
+  background: #081424;
+}
+
+.board-frame canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
 }
