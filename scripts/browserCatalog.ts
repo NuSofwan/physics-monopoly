@@ -3,6 +3,7 @@ import { mkdir, writeFile, readFile } from "node:fs/promises";
 import { createHash } from "node:crypto";
 import assert from "node:assert/strict";
 import { locations } from "../shared/src/locations";
+import { baseTiles } from "../shared/src/boardConfig";
 const directory = `docs/qa/catalog-${Date.now()}`;
 await mkdir(directory, { recursive: true });
 const browser = await chromium.launch({ channel: "msedge", headless: true });
@@ -18,7 +19,7 @@ try {
   await page.waitForFunction(() => Number(document.querySelector("canvas")?.dataset.triangles) > 0);
   for (const city of locations) {
     await page.getByRole("combobox", { name: "สถานที่", exact: true }).selectOption(city.id);
-    for (const mode of ["city","buildings","board"]) {
+    for (const mode of ["city","buildings","properties","board"]) {
       await page.getByRole("combobox", { name: "ชุดภาพ", exact: true }).selectOption(mode);
       await page.waitForTimeout(1200);
       await page.screenshot({ path: `${directory}/${city.id}-${mode}.png` });
@@ -44,9 +45,11 @@ try {
   await page.getByRole("button", { name: "รีเซ็ตกล้อง", exact: true }).click();
   await page.waitForFunction((value) => document.querySelector("canvas")?.dataset.cameraPosition === value, initial);
   assert.deepEqual(errors, []);
-  assert.equal(Object.keys(geometry).length,135,"12 environments, 96 building variants, 24 avatars, dice pair, board-static and tokens groups");
+  const propertyTiles = baseTiles.filter(tile=>tile.type==="property").map(tile=>tile.index);
+  for(const city of locations)for(const tileIndex of propertyTiles)assert.ok(geometry[`property:${city.id}:${tileIndex}`]>0,`${city.id} property ${tileIndex} missing`);
+  assert.equal(Object.keys(geometry).length,135+locations.length*propertyTiles.length,"environments, buildings, 14 property forms per city, avatars, dice and board groups");
   for(const [id,count] of Object.entries(geometry)){assert.ok(Number.isInteger(count)&&count>0,`${id} triangle measurement`);if(id.startsWith("avatar:"))assert.ok(count<=12000);}
-  const sourcePaths=["client/src/game3d/CityKit.tsx","client/src/game3d/AvatarFigure.tsx","client/src/game3d/Character.tsx","client/src/game3d/StaticBatch.tsx","client/src/game3d/Board3D.tsx","shared/src/avatars.ts","shared/src/appearance.ts"];
+  const sourcePaths=["client/src/game3d/CityKit.tsx","client/src/game3d/PropertyArchitecture.tsx","client/src/game3d/AvatarFigure.tsx","client/src/game3d/Character.tsx","client/src/game3d/StaticBatch.tsx","client/src/game3d/Board3D.tsx","shared/src/avatars.ts","shared/src/appearance.ts","shared/src/boardConfig.ts"];
   const sources=Object.fromEntries(await Promise.all(sourcePaths.map(async path=>[path,createHash("sha256").update((await readFile(path,"utf8")).replace(/\r\n/g,"\n")).digest("hex")])));
   await writeFile("assets/geometry-metrics.v1.json",JSON.stringify({schemaVersion:1,method:"Three.js visible mesh indexed/nonindexed triangle counts; hidden batch inputs excluded",sources,triangles:geometry},null,2)+"\n");
   await writeFile(`${directory}/result.json`, JSON.stringify({ passed: true, checks, avatarPresets: 24, poses: 5, errors, note: "Technical rendering/camera check only; visual review and target-device FPS are separate" }, null, 2));

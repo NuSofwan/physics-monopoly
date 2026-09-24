@@ -3,6 +3,7 @@ import { Quaternion, Shape, ShapeGeometry, Vector2, Vector3, type BufferGeometry
 import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeometry.js";
 import { facadeTextures, surfaceTexture, waterNormalTexture, type Facade, type Surface } from "./SurfaceTextures";
 import { useQuality } from "./RenderQuality";
+import { PropertyArchitecture } from "./PropertyArchitecture";
 type Position = [number,number,number];
 const bevelled = new Map<string, BufferGeometry>();
 const RIPPLE = new Vector2(.5, .5);
@@ -88,13 +89,14 @@ function Entrance({ timber, wall, width }: { timber: boolean; wall: string; widt
 function Balcony({ y, width, color }: { y: number; width: number; color: string }): JSX.Element {
   return <group><Box at={[0,y,.37]} size={[width,.045,.22]} color={color}/><Box at={[0,y+.12,.47]} size={[width,.035,.035]} color={color}/>{[-.4,-.2,0,.2,.4].filter(x=>Math.abs(x)<width/2).map(x=><Box key={x} at={[x,y+.06,.47]} size={[.025,.12,.025]} color={color}/>)}</group>;
 }
-export function LocalBuilding({ mapId, level, owned, variant = 0 }: { mapId?: string; level: number; owned: boolean; variant?: number }): JSX.Element {
+export function LocalBuilding({ mapId, level, owned, variant = 0, tileIndex }: { mapId?: string; level: number; owned: boolean; variant?: number; tileIndex?: number }): JSX.Element {
   const city = locationById(mapId), id = city.id, v = variant % 2, height = [.08,.62,1.15,1.85][Math.min(3,Math.max(0,level))]!;
   if (!owned || level === 0) return <group>
     <Box at={[0,.31,0]} size={[1.02,.08,.8]} color="#a7a397"/>
     <Box at={[0,.36,0]} size={[.94,.035,.72]} color={owned ? "#79946b" : "#aa9579"}/>
     {v ? <><Box at={[.3,.44,0]} size={[.04,.15,.61]} color="#e7dfcb"/><Box at={[-.3,.44,0]} size={[.04,.15,.61]} color="#e7dfcb"/><Box at={[0,.44,-.28]} size={[.62,.025,.035]} color="#e7dfcb"/></> : <><Cylinder at={[.25,.47,-.16]} radius={.085} height={.17} color="#587b4c"/><Box at={[-.16,.38,.1]} size={[.39,.04,.32]} color="#cdbca1"/></>}
   </group>;
+  if (tileIndex !== undefined) return <PropertyArchitecture mapId={id} tileIndex={tileIndex} level={level}/>;
   const timber = ["kyoto","zermatt"].includes(id) || (id === "bangkok" && level < 3);
   const modern = level === 3 && ["new-york","tokyo","singapore","sydney","bangkok"].includes(id);
   if (modern) return <ModernTower id={id} variant={v}/>;
@@ -176,6 +178,44 @@ function ModernTower({ id, variant }: { id: string; variant: number }): JSX.Elem
       : <group position={[shift,crown+.21,0]}><Cylinder at={[0,.02,0]} radius={.2} height={.03} color="#3a454c"/><Cylinder at={[0,.04,0]} radius={.16} height={.012} color="#ffd36b" emissive="#ffc94a" emissiveIntensity={1.4}/></group>}
   </group>;
 }
+/** Central skyline: brick walk-up, stepped deco tower with gold spire, tall glass tower and a garden-roofed block. */
+function NewYorkSkyline(): JSX.Element {
+  return <group>
+    <group position={[-2,0,-.7]}>
+      <Box at={[0,1.1,0]} size={[1,2.2,1.2]} color="#b8573f"/>
+      <GlassBlock at={[0,1.15,.02]} size={[.86,1.9,1.18]} facade="office"/>
+      <Box at={[0,2.24,0]} size={[1.06,.1,1.26]} color="#efe2c8"/>
+      <Cylinder at={[.22,2.5,-.2]} radius={.2} height={.34} color="#8a5c3c"/>
+      <Cone at={[.22,2.75,-.2]} radius={.24} height={.18} color="#5a4a3f" sides={12}/>
+      {[-1,1].flatMap(x=>[-1,1].map(z=><Cylinder key={`${x}${z}`} at={[.22+x*.12,2.3,-.2+z*.12]} radius={.02} height={.2} color="#3d3a38"/>))}
+    </group>
+    <group position={[-.7,0,.3]}>
+      <GlassBlock at={[0,1.3,0]} size={[.95,2.6,1.1]} facade="glass"/>
+      <Box at={[0,2.66,0]} size={[.8,.14,.92]} color="#e8dcc0"/>
+      <GlassBlock at={[0,2.95,0]} size={[.66,.46,.74]} facade="glass"/>
+      <Box at={[0,3.22,0]} size={[.52,.1,.6]} color="#e8dcc0"/>
+      <Cone at={[0,3.55,0]} radius={.3} height={.62} color="#d9dfe4" sides={8} metal/>
+      <Cylinder at={[0,4.05,0]} radius={.025} height={.5} color="#e3b447" metal/>
+      {[0,1,2,3].map(i=><Box key={i} at={[Math.cos(i*Math.PI/2)*.36,2.8,Math.sin(i*Math.PI/2)*.42]} size={[.1,.26,.1]} color="#e3b447" metalness={.8} roughness={.3}/>)}
+    </group>
+    <group position={[.7,0,-.7]}>
+      <GlassBlock at={[0,2.05,0]} size={[.95,4.1,1.1]} facade="glassTeal"/>
+      {[-1,1].flatMap(sx=>[-1,1].map(sz=><Box key={`${sx}${sz}`} at={[sx*.475,2.05,sz*.55]} size={[.06,4.12,.06]} color="#cfd6db" metalness={.6} roughness={.3}/>))}
+      <Box at={[0,4.16,0]} size={[.9,.08,1.05]} color="#e9eef0"/>
+      <Box at={[0,4.23,0]} size={[.84,.05,1]} color="#6fe2ff" emissive="#4fd4ff" emissiveIntensity={1.4}/>
+      <Cylinder at={[0,4.7,0]} radius={.03} height={.9} color="#e5e5e5"/>
+      <Cylinder at={[0,5.17,0]} radius={.05} height={.05} color="#ff5a5a" emissive="#ff3b3b" emissiveIntensity={2.2}/>
+    </group>
+    <group position={[2,0,.3]}>
+      <Box at={[0,1.2,0]} size={[1,2.4,1.2]} color="#efe2c8"/>
+      <GlassBlock at={[0,1.25,.02]} size={[.86,2.1,1.18]} facade="office"/>
+      <Box at={[0,2.44,0]} size={[1.06,.1,1.26]} color="#3f8a97"/>
+      <Box at={[0,2.52,0]} size={[.9,.06,1.1]} color="#6fb35e"/>
+      {[-.28,0,.28].map((x,i)=><Dome key={x} at={[x,2.55,(i-1)*.25]} radius={.16} color="#4f9a57"/>)}
+      <Box at={[0,.35,.64]} size={[.8,.06,.2]} color="#e8b140"/>
+    </group>
+  </group>;
+}
 function Strut({ from,to,color,metal = false,radius = .065 }: { from: Position; to: Position; color: string; metal?: boolean; radius?: number }): JSX.Element {
   const a = new Vector3(...from), b = new Vector3(...to), direction = b.clone().sub(a);
   return <mesh castShadow position={a.clone().add(b).multiplyScalar(.5)} quaternion={new Quaternion().setFromUnitVectors(new Vector3(0,1,0),direction.clone().normalize())}><cylinderGeometry args={[radius,radius,direction.length(),6]} /><meshStandardMaterial color={color} metalness={metal ? GOLD.metalness : .35} roughness={metal ? GOLD.roughness : .5}/></mesh>;
@@ -226,7 +266,7 @@ function Landmark({ id }: { id: string }): JSX.Element {
   if (id === "cairo-giza") return <group><Cone at={[-1,1.7,0]} radius={3.1} height={3.4} color="#d7b46c" /><Cone at={[2,1.1,1]} radius={1.9} height={2.2} color="#e3c17f" /><Box at={[-2,.4,2.5]} size={[2,.8,.7]} color="#cba870" /><Dome at={[-1.2,.8,2.5]} radius={.5} color="#cba870" /></group>;
   if (id === "kyoto") return <group>{[0,1,2,3].map((level) => <group key={level} position={[0,level*.95,0]}><Box at={[0,.4,0]} size={[2.3-level*.35,.8,2-level*.3]} color="#986546" /><Cone at={[0,1,0]} radius={2-level*.25} height={.6} color="#445d59" /></group>)}<Cylinder at={[0,4.6,0]} radius={.06} height={1.3} color="#c7a352" /><Box at={[-3,.9,1]} size={[.18,1.8,.18]} color="#be4237" /><Box at={[-1.7,.9,1]} size={[.18,1.8,.18]} color="#be4237" /><Box at={[-2.35,1.8,1]} size={[1.9,.2,.25]} color="#be4237" /></group>;
   if (id === "bangkok") return <ThaiTemple/>;
-  if (id === "new-york") return <group>{[-2,-.7,.7,2].map((x,i) => <group key={x}><Box at={[x,(2+i%3)/2,-.7+i%2]} size={[1,2+i%3,1.3]} color={["#667f92","#b58d69","#71939c","#9aa6a1"][i]!} /><Box at={[x,2+i%3+.3,-.7+i%2]} size={[.65,.6,.9]} color="#d5cdb4" />{Array.from({length:4},(_,n)=><Box key={n} at={[x,.5+n*.55,.01+i%2]} size={[.7,.12,.025]} color="#d8e7d9" />)}</group>)}</group>;
+  if (id === "new-york") return <NewYorkSkyline/>;
   if (id === "singapore") return <group>{[-1.5,0,1.5].map((x) => <Box key={x} at={[x,1.5,0]} size={[.7,3,1.3]} color="#c0d8d8" />)}<Box at={[0,3.2,0]} size={[4.7,.35,1.7]} color="#5c9574" />{[-2.5,2.5].map((x) => <group key={x}><Cylinder at={[x,1.15,2]} radius={.14} height={2.3} color="#8a4b67" /><Cone at={[x,2.25,2]} radius={.85} height={.55} color="#789b60" sides={10} /></group>)}</group>;
   if (id === "zermatt") return <group><Cone at={[0,2,-.6]} radius={3.5} height={4.7} color="#82959a" sides={5} /><Cone at={[0,3.7,-.6]} radius={1.25} height={1.4} color="#f5f4e7" sides={5} /><Box at={[0,.2,3]} size={[6,.15,.65]} color="#788184" /><Box at={[-1,.55,3]} size={[1.5,.6,.55]} color="#c74d43" /><Box at={[-1,.6,3.29]} size={[1,.25,.03]} color="#bed5d9" /></group>;
   if (id === "santorini") return <group><Cone at={[0,.65,0]} radius={3.5} height={1.6} color="#b6a38c" sides={7} />{[-1.4,0,1.4].map((x,i)=><group key={x} position={[x,.7+i*.25,0]}><Box at={[0,.55,0]} size={[1.1,1.1,1.1]} color="#fff6e8" /><Dome at={[0,1.1,0]} radius={.65} color="#347bb7" /><Box at={[0,.5,.56]} size={[.25,.45,.03]} color="#436b95" /></group>)}</group>;

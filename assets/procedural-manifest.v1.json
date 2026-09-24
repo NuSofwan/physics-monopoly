@@ -14,13 +14,13 @@
   "sources": [
     {
       "path": "client/src/game3d/CityKit.tsx",
-      "sha256": "cb07634985cb2068bf16f4a88ec9ed44974c574b00a9678270a02482eb8b3bc0",
-      "bytes": 42931
+      "sha256": "6af4817ff0eda6990cff1a33b3075dfc3bc11cf7d4de465e866a626362e26c5b",
+      "bytes": 45343
     },
     {
       "path": "client/src/game3d/AvatarFigure.tsx",
-      "sha256": "36e65ada967d326aa8ae6e811c2ceb168a655bf621195455187f84fb570d4993",
-      "bytes": 10818
+      "sha256": "329cb463fd044a7c43ed4f42927a6edfc36d184df629ce17fa59c89c7dacb8cd",
+      "bytes": 20045
     },
     {
       "path": "client/src/game3d/diceGeometry.ts",
@@ -29,8 +29,8 @@
     },
     {
       "path": "client/src/game3d/Board3D.tsx",
-      "sha256": "8176af81b2794aa47f9cec78afa6ede96b641507ff1ad17f480e22f4a16f88b6",
-      "bytes": 22225
+      "sha256": "85068e88097b8ec7bb87f927885b1a4c9624732e64618477984e9ba6a06914c7",
+      "bytes": 22271
     },
     {
       "path": "shared/src/locations.ts",
@@ -39,8 +39,8 @@
     },
     {
       "path": "shared/src/avatars.ts",
-      "sha256": "ac45aed205054ea8606c1739f58980558fdd72d1e1015a530e911e34a88bcdf7",
-      "bytes": 3963
+      "sha256": "6cb13d0bd5d66beb150f786a99b410e3becb5cf6d44c70453c91dd0cef17151f",
+      "bytes": 6631
     },
     {
       "path": "shared/src/appearance.ts",
@@ -51,6 +51,16 @@
       "path": "client/src/game3d/SurfaceTextures.ts",
       "sha256": "40ba085ab1ca1594199ce6fd3babb541549d419775430881ef8e3691fe22a753",
       "bytes": 9883
+    },
+    {
+      "path": "client/src/game3d/PropertyArchitecture.tsx",
+      "sha256": "70ecfd71c9b44629142e8498db68649a3f7cb2e64f79f740e915af9c46e6828e",
+      "bytes": 27839
+    },
+    {
+      "path": "shared/src/boardConfig.ts",
+      "sha256": "40a4c4fce50e14f06f8134c0ad49ee784490e0e0697aa661817bad8b51f436c2",
+      "bytes": 4542
     }
   ],
   "assets": [
@@ -66,6 +76,22 @@
         3
       ],
       "variants": 2,
+      "propertyTileIndices": [
+        1,
+        2,
+        4,
+        8,
+        9,
+        11,
+        13,
+        15,
+        17,
+        19,
+        21,
+        23,
+        24,
+        26
+      ],
       "clips": [],
       "textures": [
         "client/public/assets/textures/limestone-plaster.png",
@@ -95,6 +121,22 @@
             1592,
             2048
           ]
+        ],
+        "properties": [
+          7048,
+          6668,
+          6056,
+          10864,
+          7200,
+          6932,
+          8092,
+          7068,
+          7176,
+          6804,
+          7036,
+          6544,
+          5404,
+          7268
         ]
       },
       "readiness": "review_required"
@@ -111,6 +153,22 @@
         3
       ],
       "variants": 2,
+      "propertyTileIndices": [
+        1,
+        2,
+        4,
+        8,
+        9,
+        11,
+        13,
+        15,
+        17,
+        19,
+        21,
+        23,
+        24,
+        26
+      ],
       "clips": [],
       "textures": [
         "client/public/assets/textures/limestone-plaster.png",
@@ -139,6 +197,22 @@
             1812,
             2268
           ]
+        ],
+        "properties": [
+          7048,
+          6668,
+          6056,
+          10864,
+          7200,
+          6932,
+          5740,
+          7068,
+          7176,
+          6804,
+          7036,
+          6544,
+          5404,
+          7268
         ]
       },
       "readiness": "review_required"
@@ -155,6 +229,22 @@
         3
       ],
       "variants": 2,
+      "propertyTileIndices": [
+        1,
+        2,
+        4,
+        8,
+        9,
+        11,
+        13,
+        15,
+        17,
+        19,
+        21,
+        23,
+        24,
+        26
+      ],
       "clips": [],
       "textures": [
         "client/public/assets/textures/limestone-plaster.png",
@@ -165,7 +255,7 @@
         "procedural:water"
       ],
       "triangles": {
-        "environment": 53220,
+        "environment": 56048,
         "buildings": [
           [
             428,
@@ -183,6 +273,22 @@
             1724,
             2180
           ]
+        ],
+        "properties": [
+          7048,
+          6864,
+          6056,
+          10864,
+          7200,
+          6932,
+          7336,
+          7068,
+          7176,
+          6804,
+          7036,
+          6544,
+          5404,
+          7268
         ]
       },
       "readiness": "review_required"
@@ -199,6 +305,22 @@
         3
       ],
       "variants": 2,
+      "propertyTileIndices": [
+        1,
+        2,
+        4,
+        8,
+        9,
+        11,
+        13,
+        15,
+        17,
+        19,
+        21,
+        23,
+        24,
+        26
+      ],
       "clips": [],
       "textures": [
         "client/public/assets/textures/limestone-plaster.png",
@@ -227,6 +349,22 @@
             2240,
             2696
           ]
+        ],
+        "properties": [
+          7048,
+          6668,
+          6056,
+          10864,
+          7200,
+          6932,
+          8360,
+          7068,
+          7176,
+          6804,
+          7036,
+          6544,
+          5404,
+          7268
         ]
       },
       "readiness": "review_required"
@@ -243,6 +381,22 @@
         3
       ],
       "variants": 2,
+      "propertyTileIndices": [
+        1,
+        2,
+        4,
+        8,
+        9,
+        11,
+        13,
+        15,
+        17,
+        19,
+        21,
+        23,
+        24,
+        26
+      ],
       "clips": [],
       "textures": [
         "client/public/assets/textures/limestone-plaster.png",
@@ -271,6 +425,22 @@
             4360,
             4504
           ]
+        ],
+        "properties": [
+          7048,
+          6668,
+          6056,
+          10864,
+          7200,
+          6932,
+          5684,
+          7068,
+          7176,
+          6804,
+          7036,
+          6544,
+          5404,
+          7268
         ]
       },
       "readiness": "review_required"
@@ -287,6 +457,22 @@
         3
       ],
       "variants": 2,
+      "propertyTileIndices": [
+        1,
+        2,
+        4,
+        8,
+        9,
+        11,
+        13,
+        15,
+        17,
+        19,
+        21,
+        23,
+        24,
+        26
+      ],
       "clips": [],
       "textures": [
         "client/public/assets/textures/limestone-plaster.png",
@@ -315,6 +501,22 @@
             5282,
             5498
           ]
+        ],
+        "properties": [
+          7048,
+          6668,
+          6056,
+          10864,
+          7200,
+          6932,
+          8092,
+          7068,
+          7176,
+          6804,
+          7036,
+          6544,
+          5404,
+          7268
         ]
       },
       "readiness": "review_required"
@@ -331,6 +533,22 @@
         3
       ],
       "variants": 2,
+      "propertyTileIndices": [
+        1,
+        2,
+        4,
+        8,
+        9,
+        11,
+        13,
+        15,
+        17,
+        19,
+        21,
+        23,
+        24,
+        26
+      ],
       "clips": [],
       "textures": [
         "client/public/assets/textures/limestone-plaster.png",
@@ -359,6 +577,22 @@
             4080,
             4296
           ]
+        ],
+        "properties": [
+          7048,
+          6668,
+          6056,
+          10864,
+          7200,
+          6932,
+          4880,
+          7068,
+          7176,
+          6804,
+          7036,
+          6544,
+          5404,
+          7268
         ]
       },
       "readiness": "review_required"
@@ -375,6 +609,22 @@
         3
       ],
       "variants": 2,
+      "propertyTileIndices": [
+        1,
+        2,
+        4,
+        8,
+        9,
+        11,
+        13,
+        15,
+        17,
+        19,
+        21,
+        23,
+        24,
+        26
+      ],
       "clips": [],
       "textures": [
         "client/public/assets/textures/limestone-plaster.png",
@@ -403,6 +653,22 @@
             5642,
             5786
           ]
+        ],
+        "properties": [
+          7048,
+          6668,
+          6056,
+          10864,
+          7200,
+          6932,
+          4880,
+          7068,
+          7176,
+          6804,
+          7036,
+          6544,
+          5404,
+          7268
         ]
       },
       "readiness": "review_required"
@@ -419,6 +685,22 @@
         3
       ],
       "variants": 2,
+      "propertyTileIndices": [
+        1,
+        2,
+        4,
+        8,
+        9,
+        11,
+        13,
+        15,
+        17,
+        19,
+        21,
+        23,
+        24,
+        26
+      ],
       "clips": [],
       "textures": [
         "client/public/assets/textures/limestone-plaster.png",
@@ -447,6 +729,22 @@
             3516,
             3732
           ]
+        ],
+        "properties": [
+          7048,
+          6668,
+          6056,
+          10864,
+          7200,
+          6932,
+          6148,
+          7068,
+          7176,
+          6804,
+          7036,
+          6544,
+          5404,
+          7268
         ]
       },
       "readiness": "review_required"
@@ -463,6 +761,22 @@
         3
       ],
       "variants": 2,
+      "propertyTileIndices": [
+        1,
+        2,
+        4,
+        8,
+        9,
+        11,
+        13,
+        15,
+        17,
+        19,
+        21,
+        23,
+        24,
+        26
+      ],
       "clips": [],
       "textures": [
         "client/public/assets/textures/limestone-plaster.png",
@@ -491,6 +805,22 @@
             4316,
             4460
           ]
+        ],
+        "properties": [
+          7048,
+          6668,
+          6056,
+          10864,
+          7200,
+          6932,
+          6968,
+          7068,
+          7176,
+          6804,
+          7036,
+          6544,
+          5404,
+          7268
         ]
       },
       "readiness": "review_required"
@@ -507,6 +837,22 @@
         3
       ],
       "variants": 2,
+      "propertyTileIndices": [
+        1,
+        2,
+        4,
+        8,
+        9,
+        11,
+        13,
+        15,
+        17,
+        19,
+        21,
+        23,
+        24,
+        26
+      ],
       "clips": [],
       "textures": [
         "client/public/assets/textures/limestone-plaster.png",
@@ -535,6 +881,22 @@
             4382,
             4526
           ]
+        ],
+        "properties": [
+          7048,
+          6668,
+          6056,
+          10864,
+          7200,
+          6932,
+          5764,
+          7068,
+          7176,
+          6804,
+          7036,
+          6544,
+          5404,
+          7268
         ]
       },
       "readiness": "review_required"
@@ -551,6 +913,22 @@
         3
       ],
       "variants": 2,
+      "propertyTileIndices": [
+        1,
+        2,
+        4,
+        8,
+        9,
+        11,
+        13,
+        15,
+        17,
+        19,
+        21,
+        23,
+        24,
+        26
+      ],
       "clips": [],
       "textures": [
         "client/public/assets/textures/limestone-plaster.png",
@@ -579,6 +957,22 @@
             1572,
             2028
           ]
+        ],
+        "properties": [
+          7048,
+          6668,
+          6056,
+          10864,
+          7200,
+          6932,
+          4934,
+          7068,
+          7176,
+          6804,
+          7036,
+          6544,
+          5404,
+          7268
         ]
       },
       "readiness": "review_required"
@@ -596,7 +990,7 @@
         "wave"
       ],
       "textures": [],
-      "triangles": 8108,
+      "triangles": 9876,
       "readiness": "review_required"
     },
     {
@@ -612,7 +1006,7 @@
         "wave"
       ],
       "textures": [],
-      "triangles": 7820,
+      "triangles": 10384,
       "readiness": "review_required"
     },
     {
@@ -628,7 +1022,7 @@
         "wave"
       ],
       "textures": [],
-      "triangles": 8058,
+      "triangles": 10474,
       "readiness": "review_required"
     },
     {
@@ -644,7 +1038,7 @@
         "wave"
       ],
       "textures": [],
-      "triangles": 8126,
+      "triangles": 9922,
       "readiness": "review_required"
     },
     {
@@ -660,7 +1054,7 @@
         "wave"
       ],
       "textures": [],
-      "triangles": 8132,
+      "triangles": 10250,
       "readiness": "review_required"
     },
     {
@@ -676,7 +1070,7 @@
         "wave"
       ],
       "textures": [],
-      "triangles": 9996,
+      "triangles": 11030,
       "readiness": "review_required"
     },
     {
@@ -692,7 +1086,7 @@
         "wave"
       ],
       "textures": [],
-      "triangles": 8860,
+      "triangles": 10926,
       "readiness": "review_required"
     },
     {
@@ -708,7 +1102,7 @@
         "wave"
       ],
       "textures": [],
-      "triangles": 9512,
+      "triangles": 11406,
       "readiness": "review_required"
     },
     {
@@ -724,7 +1118,7 @@
         "wave"
       ],
       "textures": [],
-      "triangles": 7940,
+      "triangles": 10656,
       "readiness": "review_required"
     },
     {
@@ -740,7 +1134,7 @@
         "wave"
       ],
       "textures": [],
-      "triangles": 8880,
+      "triangles": 10680,
       "readiness": "review_required"
     },
     {
@@ -756,7 +1150,7 @@
         "wave"
       ],
       "textures": [],
-      "triangles": 8120,
+      "triangles": 9994,
       "readiness": "review_required"
     },
     {
@@ -772,7 +1166,7 @@
         "wave"
       ],
       "textures": [],
-      "triangles": 8052,
+      "triangles": 10174,
       "readiness": "review_required"
     },
     {
@@ -788,7 +1182,7 @@
         "wave"
       ],
       "textures": [],
-      "triangles": 8108,
+      "triangles": 9558,
       "readiness": "review_required"
     },
     {
@@ -804,7 +1198,7 @@
         "wave"
       ],
       "textures": [],
-      "triangles": 7820,
+      "triangles": 10064,
       "readiness": "review_required"
     },
     {
@@ -820,7 +1214,7 @@
         "wave"
       ],
       "textures": [],
-      "triangles": 7388,
+      "triangles": 9844,
       "readiness": "review_required"
     },
     {
@@ -836,7 +1230,7 @@
         "wave"
       ],
       "textures": [],
-      "triangles": 9540,
+      "triangles": 11284,
       "readiness": "review_required"
     },
     {
@@ -852,7 +1246,7 @@
         "wave"
       ],
       "textures": [],
-      "triangles": 8220,
+      "triangles": 10354,
       "readiness": "review_required"
     },
     {
@@ -868,7 +1262,7 @@
         "wave"
       ],
       "textures": [],
-      "triangles": 8152,
+      "triangles": 10834,
       "readiness": "review_required"
     },
     {
@@ -884,7 +1278,7 @@
         "wave"
       ],
       "textures": [],
-      "triangles": 8144,
+      "triangles": 10638,
       "readiness": "review_required"
     },
     {
@@ -900,7 +1294,7 @@
         "wave"
       ],
       "textures": [],
-      "triangles": 8864,
+      "triangles": 10502,
       "readiness": "review_required"
     },
     {
@@ -916,7 +1310,7 @@
         "wave"
       ],
       "textures": [],
-      "triangles": 7960,
+      "triangles": 9962,
       "readiness": "review_required"
     },
     {
@@ -932,7 +1326,7 @@
         "wave"
       ],
       "textures": [],
-      "triangles": 8900,
+      "triangles": 10582,
       "readiness": "review_required"
     },
     {
@@ -948,7 +1342,7 @@
         "wave"
       ],
       "textures": [],
-      "triangles": 8144,
+      "triangles": 10548,
       "readiness": "review_required"
     },
     {
@@ -964,7 +1358,7 @@
         "wave"
       ],
       "textures": [],
-      "triangles": 9516,
+      "triangles": 11452,
       "readiness": "review_required"
     },
     {

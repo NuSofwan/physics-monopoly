@@ -10,8 +10,10 @@ it("defines 12 unique locations without per-location economy overrides", () => {
   for (const location of locations) { expect(location.buildings).toHaveLength(3); expect(location).not.toHaveProperty("rent"); }
   expect(classroomBoard).toHaveLength(28);
 });
-it("defines 24 presets spanning all 12 roles, ages and wheelchairs", () => {
-  expect(avatarPresets).toHaveLength(24); expect(new Set(avatarPresets.map((p) => p.role)).size).toBe(12);
+it("defines 24 distinct anime characters spanning roles, genders, ages and wheelchairs", () => {
+  expect(avatarPresets).toHaveLength(24); expect(new Set(avatarPresets.map((p) => p.role)).size).toBeGreaterThanOrEqual(12);
+  expect(new Set(avatarPresets.map((p) => p.gender))).toEqual(new Set(["female","male"]));
+  expect(new Set(avatarPresets.map((p) => p.cut)).size).toBeGreaterThanOrEqual(6);
   expect(new Set(avatarPresets.map((p) => p.age)).size).toBe(4);
   expect(avatarPresets.filter((p) => "wheelchair" in p && p.wheelchair)).toHaveLength(2);
   expect(new Set(avatarPresets.map((p) => p.skin)).size).toBeGreaterThan(8);
