@@ -24,6 +24,8 @@ const property = (
 export const START_MONEY = 2000;
 export const INITIAL_MONEY = 15000;
 export const MAX_PLAYERS = 4;
+/** Free-play window to choose Buy/Pass after landing on an unowned property. */
+export const BUY_DECISION_MS = 30_000;
 export const JAIL_TILE_INDEX = 7;
 export const BOARD_SIZE = 28;
 
