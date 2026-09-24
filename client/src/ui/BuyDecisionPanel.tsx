@@ -11,7 +11,7 @@ export function BuyDecisionPanel({ open, tile, deadline, now, onBuy, onUpgrade, 
     wasOpen.current = false;
     if (acted.current || !lastTile.current) return;
     setExpired(lastTile.current);
-    const timer = window.setTimeout(() => setExpired(null), 6000);
+    const timer = window.setTimeout(() => setExpired(null), 12000);
     return () => window.clearTimeout(timer);
   }, [open, tile?.name]);
 
