@@ -167,7 +167,7 @@ function TileModel({ tile, ownerIndex, mapId, hideBuilding = false }: { tile: Ti
         <Box at={[side*.785,.318,0]} size={[.03,.022,1.1]} color="#d8b366" metalness={.8} roughness={.3}/>
       </group>)}
       <Box at={[0,.322,.465]} size={[1.52,.014,.13]} color={color} emissive={color} emissiveIntensity={.4} roughness={.35}/>
-      <group position={[0, 0, -0.3]}>{isProperty ? hideBuilding ? null : <LocalBuilding mapId={mapId} variant={tile.index % 2} level={tile.level ?? 0} owned={Boolean(tile.ownerId)} /> : <TileMarker type={tile.type} />}</group>
+      <group position={[0, 0, -0.3]}>{isProperty ? hideBuilding ? null : <LocalBuilding mapId={mapId} tileIndex={tile.index} variant={tile.index % 2} level={tile.level ?? 0} owned={Boolean(tile.ownerId)} /> : <TileMarker type={tile.type} />}</group>
       {owner ? <group position={[.68,0,-.47]}>
         <mesh position={[0,.34,0]} rotation={[-Math.PI / 2, 0, 0]}><circleGeometry args={[0.1, ownerIndex + 3]} /><meshStandardMaterial color={owner} emissive={owner} emissiveIntensity={.5}/></mesh>
         <mesh castShadow position={[0,.6,0]}><cylinderGeometry args={[.012,.012,.56,6]}/><meshStandardMaterial color="#d8dde0" metalness={.8} roughness={.3}/></mesh>
@@ -215,7 +215,7 @@ function TileLabels({ tiles }: { tiles: Tile[] }): JSX.Element {
 function Construction({tile,mapId}:{tile:Tile;mapId:string}):JSX.Element {
   const [x,z,rotation]=tilePosition(tile.index),root=useRef<Group>(null),progress=useRef(0);
   useFrame((_state,delta)=>{progress.current=Math.min(1,progress.current+delta/1.8);if(root.current)root.current.scale.y=1-Math.pow(1-progress.current,3);});
-  return <group position={[x,0,z]} rotation={[0,rotation,0]}><group position={[0,0,-.3]} ref={root} scale={[1,.01,1]}><LocalBuilding mapId={mapId} variant={tile.index%2} level={tile.level??0} owned={Boolean(tile.ownerId)}/></group></group>;
+  return <group position={[x,0,z]} rotation={[0,rotation,0]}><group position={[0,0,-.3]} ref={root} scale={[1,.01,1]}><LocalBuilding mapId={mapId} tileIndex={tile.index} variant={tile.index%2} level={tile.level??0} owned={Boolean(tile.ownerId)}/></group></group>;
 }
 
 export function Building({ level, owned }: { level: number; owned: boolean }): JSX.Element {

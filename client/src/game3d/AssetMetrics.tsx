@@ -13,7 +13,8 @@ export function AssetMetrics(): null {
       if (!root.name.startsWith("asset:")) return;
       let triangles = 0;
       root.traverseVisible(object => {
-        if (!(object instanceof Mesh)) return;
+        // Outline passes re-draw a batch's existing geometry (like the shadow pass); count the shape once.
+        if (!(object instanceof Mesh) || object.userData.outlinePass) return;
         const count = object.geometry.index?.count ?? object.geometry.getAttribute("position")?.count ?? 0;
         triangles += count / 3 * (object instanceof InstancedMesh ? object.count : 1);
       });
