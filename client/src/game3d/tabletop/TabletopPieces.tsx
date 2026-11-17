@@ -1,4 +1,4 @@
-import { BufferGeometry, BoxGeometry, CylinderGeometry, ExtrudeGeometry, LatheGeometry, Shape, SphereGeometry, TorusGeometry, Vector2 } from "three";
+import { BufferGeometry, BoxGeometry, Color, CylinderGeometry, ExtrudeGeometry, LatheGeometry, Shape, SphereGeometry, TorusGeometry, Vector2 } from "three";
 import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeometry.js";
 
 /** Geometry detail level for tabletop pieces. */
@@ -64,37 +64,49 @@ function Window({ position, side = false, quality, width = 0.095, height = 0.105
     <Block size={[width, height, 0.012]} position={[0, 0, 0.012]} quality={quality} finish="light" rounded={false} />
   </group>;
 }
-/** A lacquered house, condominium, or hotel, standing on the tabletop. */
-export function PropertyPiece({ level, quality = "medium", accent = "#66432e" }: { level: 1 | 2 | 3; quality?: PieceQuality; accent?: string }): JSX.Element {
-  if (level === 1) return <group>
-    <Block size={[0.45, 0.31, 0.36]} position={[0, 0.155, 0]} color="#2f8f4e" quality={quality} />
-    <Part geometry={roof(0.49, 0.18, 0.4)} position={[0, 0.31, 0]} color="#216a3b" finish="wood" />
-    <Block size={[0.065, 0.13, 0.07]} position={[-0.12, 0.405, -0.06]} color="#287b46" quality={quality} />
+/** Darkens a hex colour for lacquer trim (roof, plinth, cornice) so every colour set gets matching detail. */
+function shade(hex: string, factor: number): string {
+  const value = new Color(hex).multiplyScalar(factor);
+  return `#${value.getHexString()}`;
+}
+/**
+ * A lacquered house, condominium, or hotel, standing on the tabletop. `paint` is the body lacquer
+ * (the board passes the property's colour-set colour so sets read at a glance); `accent` trims doors.
+ */
+export function PropertyPiece({ level, quality = "medium", accent = "#66432e", paint: paintOverride }: { level: 1 | 2 | 3; quality?: PieceQuality; accent?: string; paint?: string }): JSX.Element {
+  if (level === 1) {
+    const body = paintOverride ?? "#2f8f4e";
+    return <group>
+    <Block size={[0.45, 0.31, 0.36]} position={[0, 0.155, 0]} color={body} quality={quality} />
+    <Part geometry={roof(0.49, 0.18, 0.4)} position={[0, 0.31, 0]} color={shade(body, .62)} finish="wood" />
+    <Block size={[0.065, 0.13, 0.07]} position={[-0.12, 0.405, -0.06]} color={shade(body, .8)} quality={quality} />
     <Block size={[0.095, 0.16, 0.02]} position={[0, 0.09, 0.187]} color={accent} quality={quality} />
     <Window position={[-0.15, 0.19, 0.19]} quality={quality} width={0.075} height={0.085} />
     <Window position={[0.15, 0.19, 0.19]} quality={quality} width={0.075} height={0.085} />
     <Block size={[0.06, 0.09, 0.01]} position={[0, 0.11, 0.202]} quality={quality} finish="light" rounded={false} />
   </group>;
+  }
   const hotel = level === 3;
   const width = hotel ? 1.2 : 0.9;
   const depth = hotel ? 0.55 : 0.48;
   const bodyHeight = hotel ? 0.91 : 0.63;
-  const paint = hotel ? "#c8242b" : "#2b7fa3";
+  const paint = paintOverride ?? (hotel ? "#c8242b" : "#2b7fa3");
+  const trim = shade(paint, .72), deep = shade(paint, .82);
   const columns = hotel ? 7 : 5;
   const rows = hotel ? 5 : 3;
   return <group>
     <Block size={[width, bodyHeight, depth]} position={[0, bodyHeight / 2, 0]} color={paint} quality={quality} />
-    <Block size={[width + 0.025, 0.055, depth + 0.025]} position={[0, 0.0275, 0]} color={hotel ? "#9c2026" : "#226680"} quality={quality} />
+    <Block size={[width + 0.025, 0.055, depth + 0.025]} position={[0, 0.0275, 0]} color={trim} quality={quality} />
     <Block size={[width + 0.035, 0.055, depth + 0.035]} position={[0, bodyHeight, 0]} color={paint} quality={quality} />
     {hotel ? <>
-      <Block size={[0.94, 0.075, 0.43]} position={[0, 0.98, 0]} color="#a81e26" quality={quality} />
+      <Block size={[0.94, 0.075, 0.43]} position={[0, 0.98, 0]} color={trim} quality={quality} />
       <Block size={[0.65, 0.065, 0.34]} position={[0, 1.05, 0]} color={paint} quality={quality} />
       <Block size={[0.32, 0.09, 0.035]} position={[0, 1.125, 0.1]} color="#e0bd78" quality={quality} />
       <Block size={[0.32, 0.035, 0.035]} position={[0, 0.23, depth / 2 + 0.0175]} color={accent} quality={quality} />
       <Block size={[0.17, 0.19, 0.018]} position={[0, 0.115, depth / 2 + 0.012]} color={accent} quality={quality} />
     </> : <>
       <Block size={[width, 0.08, 0.04]} position={[0, 0.695, -depth / 2 + 0.02]} color={paint} quality={quality} />
-      <Block size={[0.24, 0.09, 0.2]} position={[0.18, 0.70, 0]} color="#246e8c" quality={quality} />
+      <Block size={[0.24, 0.09, 0.2]} position={[0.18, 0.70, 0]} color={deep} quality={quality} />
     </>}
     {Array.from({ length: rows }, (_, row) => Array.from({ length: columns }, (_, col) => {
       const x = (col - (columns - 1) / 2) * 0.15;

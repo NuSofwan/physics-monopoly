@@ -35,16 +35,6 @@ function random(seed: number): () => number {
   let state = seed >>> 0;
   return () => { state = (state * 1664525 + 1013904223) >>> 0; return state / 4294967296; };
 }
-/** Re-runs a texture builder once web fonts are ready, so Thai print never renders in a fallback face. */
-function useFontsVersion(): number {
-  const [version, setVersion] = useState(0);
-  useEffect(() => {
-    let alive = true;
-    void document.fonts?.ready.then(() => { if (alive) setVersion(value => value + 1); });
-    return () => { alive = false; };
-  }, []);
-  return version;
-}
 function atlasPlane(width: number, depth: number, u0: number, v0: number, u1: number, v1: number): PlaneGeometry {
   const plane = new PlaneGeometry(width, depth), uv = plane.getAttribute("uv");
   for (let i = 0; i < uv.count; i++) uv.setXY(i, u0 + uv.getX(i) * (u1 - u0), v0 + uv.getY(i) * (v1 - v0));
@@ -56,9 +46,9 @@ function atlasPlane(width: number, depth: number, u0: number, v0: number, u1: nu
 
 /** Polished walnut table, printed board, banknotes, deeds, card decks, mug and chair. Static: safe inside StaticBatch. */
 export function TabletopSet({ tiles, title, subtitle, quality }: { tiles: Tile[]; title: string; subtitle: string; quality: RenderQuality }): JSX.Element {
-  const fonts = useFontsVersion();
   const names = tiles.map(tile => `${tile.name}:${tile.price ?? ""}`).join("|");
-  const face = useMemo(() => boardFaceTexture(tiles, title, subtitle, quality === "low" ? 2048 : 4096, tilePosition), [names, title, subtitle, quality, fonts]);
+  // 4096² only on the high tier (desktops); tablets/phones default to medium and keep a 2048² print (~16 MB less ×4).
+  const face = useMemo(() => boardFaceTexture(tiles, title, subtitle, quality === "high" ? 4096 : 2048, tilePosition), [names, title, subtitle, quality]);
   useEffect(() => () => face.dispose(), [face]);
   const wood = useMemo(() => { const texture = walnutTexture().clone(); texture.repeat.set(2.2, 3.2); texture.needsUpdate = true; return texture; }, []);
   const boardBody = useMemo(() => new RoundedBoxGeometry(BOARD_HALF * 2, BOARD_THICK, BOARD_HALF * 2, 2, .035), []);
@@ -129,8 +119,7 @@ function MoneyStacks(): JSX.Element {
 function DeedFan({ tiles }: { tiles: Tile[] }): JSX.Element {
   const deeds = useMemo(() => [1, 4, 11, 19, 24].map(index => tiles[index]).filter((tile): tile is Tile => tile?.type === "property"), [tiles]);
   const key = deeds.map(tile => tile.name).join("|");
-  const fonts = useFontsVersion();
-  const texture = useMemo(() => deedAtlas(deeds), [key, fonts]);
+  const texture = useMemo(() => deedAtlas(deeds), [key]);
   const cards = useMemo(() => deeds.map((_, i) => atlasPlane(1.24, 2, i / deeds.length, 0, (i + 1) / deeds.length, 1)), [key]);
   useEffect(() => () => { texture.dispose(); cards.forEach(card => card.dispose()); }, [texture, cards]);
   return <group position={[10.8, TABLE_TOP, 2.8]} rotation={[0, -.35, 0]}>
@@ -326,7 +315,7 @@ export function TabletopProperty({ tile, ownerColor, quality, hidden = false }: 
     {/* Enamel ownership strip along the inner edge of the space. */}
     <mesh receiveShadow position={[0, .006, -.86]}><boxGeometry args={[1.66, .012, .07]}/><meshStandardMaterial color={ownerColor} emissive={ownerColor} emissiveIntensity={.35} roughness={.3}/></mesh>
     {hidden ? null : level > 0
-      ? <group position={[0, 0, BAND_Z]}><PropertyPiece level={level as 1 | 2 | 3} quality={quality} accent={tile.groupColor}/></group>
+      ? <group position={[0, 0, BAND_Z]}><PropertyPiece level={level as 1 | 2 | 3} quality={quality} paint={tile.groupColor} accent="#efe2bf"/></group>
       : <group position={[.6, 0, BAND_Z]}><OwnershipPeg color={ownerColor}/></group>}
   </group>;
 }
@@ -343,7 +332,7 @@ export function TabletopConstruction({ tile, ownerColor, quality }: { tile: Tile
   });
   return <group position={[x, BOARD_TOP, z]} rotation={[0, rotation, 0]}>
     <group position={[level > 0 ? 0 : .6, 0, BAND_Z]}><group ref={ref} position={[0, 3.2, 0]}>
-      {level > 0 ? <PropertyPiece level={level as 1 | 2 | 3} quality={quality} accent={tile.groupColor}/> : <OwnershipPeg color={ownerColor}/>}
+      {level > 0 ? <PropertyPiece level={level as 1 | 2 | 3} quality={quality} paint={tile.groupColor} accent="#efe2bf"/> : <OwnershipPeg color={ownerColor}/>}
     </group></group>
   </group>;
 }
@@ -361,17 +350,23 @@ export function TabletopMetalToken({ slot, color, quality }: { slot: number; col
   return <group scale={1.25}><MetalToken kind={TOKEN_KINDS[slot % TOKEN_KINDS.length]!} color={color} quality={quality}/></group>;
 }
 
-/** Cage that lowers on a chain over a jailed player's token. */
+/**
+ * Cage that lowers on a chain over a jailed player's token. The server sets inJail together with the
+ * walk to the jail space, so the drop waits for that walk (~2.4 s) instead of landing on a moving token.
+ */
 export function JailCage({ position, reducedMotion }: { position: [number, number, number]; reducedMotion: boolean }): JSX.Element {
-  const ref = useRef<Group>(null), time = useRef(reducedMotion ? 10 : 0);
+  const ref = useRef<Group>(null), time = useRef(reducedMotion ? 10 : -2.6);
   useFrame((_state, delta) => {
     time.current += delta;
-    const t = Math.min(1, time.current / 1.1), eased = 1 - Math.pow(1 - t, 3);
+    const group = ref.current;
+    if (!group) return;
+    group.visible = time.current >= 0;
+    const t = Math.min(1, Math.max(0, time.current) / 1.1), eased = 1 - Math.pow(1 - t, 3);
     const settle = t >= 1 ? 0 : Math.sin(t * Math.PI * 4) * (1 - t) * .12 * (t > .7 ? 1 : 0);
-    if (ref.current) ref.current.position.y = (1 - eased) * 6 + settle;
+    group.position.y = (1 - eased) * 6 + settle;
   });
   const bars = 12, radius = .36, height = 1.15;
-  return <group position={position}><group ref={ref} position={[0, 6, 0]}>
+  return <group position={position}><group ref={ref} position={[0, 6, 0]} visible={reducedMotion}>
     {Array.from({ length: bars }, (_, i) => { const a = i / bars * Math.PI * 2; return <mesh key={i} castShadow position={[Math.cos(a) * radius, height / 2, Math.sin(a) * radius]}><cylinderGeometry args={[.016, .016, height, 6]}/><meshStandardMaterial color="#2b2b2e" metalness={.9} roughness={.4}/></mesh>; })}
     {[.02, height * .55, height].map(y => <mesh key={y} castShadow position={[0, y, 0]} rotation={[Math.PI / 2, 0, 0]}><torusGeometry args={[radius, .025, 6, 32]}/><meshStandardMaterial color="#2b2b2e" metalness={.9} roughness={.35}/></mesh>)}
     <mesh castShadow position={[0, height + .05, 0]}><cylinderGeometry args={[radius + .02, radius + .02, .03, 24]}/><meshStandardMaterial color="#2b2b2e" metalness={.9} roughness={.4}/></mesh>

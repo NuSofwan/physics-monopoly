@@ -145,7 +145,7 @@ function drawSpace(context: CanvasRenderingContext2D, tile: Tile, unit: number):
     context.font = `500 ${unit * .1}px ${THAI_FONT}`; context.fillStyle = "rgba(29,42,58,.62)"; context.fillText(kind, 0, .09 * unit);
     context.font = `700 ${unit * .17}px ${THAI_FONT}`; context.fillStyle = INK; context.fillText(`฿${(tile.price ?? 0).toLocaleString("en-US")}`, 0, 1.52 * unit);
   } else {
-    const accent = tile.type === "challenge" ? "#6b3fb5" : tile.type === "chance" ? "#c46a12" : "#8a6a1e";
+    const accent = tile.type === "challenge" ? "#6b3fb5" : tile.type === "chance" ? "#0f7f74" : "#8a6a1e";
     context.save(); context.translate(0, .55 * unit); icon(context, tile.type, unit * 1.45, accent); context.restore();
     context.fillStyle = accent; fitText(context, tile.name, w * .9, unit * .19);
     context.fillText(tile.name, 0, -.5 * unit);
@@ -311,12 +311,12 @@ export function boardFaceTexture(tiles: Tile[], title: string, subtitle: string,
 // ───────────────────────────── Money, deeds, decks ─────────────────────────────
 
 export const BILLS: ReadonlyArray<{ value: number; color: string; ink: string }> = [
-  { value: 100, color: "#f3efe4", ink: "#6d6a5e" },
-  { value: 500, color: "#f2c6cf", ink: "#9b3a52" },
-  { value: 1000, color: "#f4e19a", ink: "#8a6a12" },
-  { value: 5000, color: "#bfe0b5", ink: "#2f6b3a" },
-  { value: 10000, color: "#b9d4ef", ink: "#2c5687" },
-  { value: 20000, color: "#f3c79a", ink: "#9a5418" },
+  { value: 100, color: "#dcd4ee", ink: "#4f3f86" },
+  { value: 500, color: "#c4e4e6", ink: "#1f6470" },
+  { value: 1000, color: "#ecd7bf", ink: "#7a4a22" },
+  { value: 5000, color: "#d3dcb8", ink: "#4d5d22" },
+  { value: 10000, color: "#efc9d6", ink: "#8a2f52" },
+  { value: 20000, color: "#e6dcae", ink: "#6e5a14" },
 ];
 /** Atlas: one banknote per row (6 rows), each 2.3:1. */
 export function billAtlas(): CanvasTexture {
@@ -376,7 +376,7 @@ const deckDraw: Record<"question" | "chance", Draw> = {
     context.font = `900 ${unit * .2}px ${THAI_FONT}`; context.fillText("ฟิสิกส์", unit * .35, unit * .17);
   },
   chance: (context, unit) => {
-    const g = context.createLinearGradient(-unit, -unit, unit, unit); g.addColorStop(0, "#f0a43a"); g.addColorStop(1, "#b5560f");
+    const g = context.createLinearGradient(-unit, -unit, unit, unit); g.addColorStop(0, "#1fa093"); g.addColorStop(1, "#0b5a52");
     context.fillStyle = g; context.fillRect(-unit, -unit * .667, unit * 2, unit * 1.333);
     context.strokeStyle = "#fff4dc"; context.lineWidth = unit * .03; context.strokeRect(-unit * .9, -unit * .58, unit * 1.8, unit * 1.16);
     context.save(); context.translate(-unit * .45, unit * .02); icon(context, "chance", unit * 1.3, "#fff4dc"); context.restore();
