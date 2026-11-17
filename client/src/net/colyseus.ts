@@ -63,9 +63,12 @@ async function connect(mode: "create" | "join", roomCode: string | undefined, na
     catch (error) {
       // The saved seat no longer exists (e.g. it was released when this tab left or refreshed in the lobby).
       // Forget it and join the room as a new player instead of failing forever.
+      // Only when the seat is really gone: a fresh join is refused once the game has started, and then the
+      // saved seat must survive for the next retry (e.g. a refresh that beat the old socket's close).
       if (rejoin || !isAuthFailure(error)) throw error;
+      try { room = await joinByRoomCode(client, roomCode ?? "", freshOptions); }
+      catch { throw error; }
       storageRemove("session", participantSessionKey);
-      room = await joinByRoomCode(client, roomCode ?? "", freshOptions);
     }
   } else room = await joinByRoomCode(client, roomCode ?? "", options);
   if (generation !== connectionGeneration) { await room.leave(); return; }
@@ -73,7 +76,7 @@ async function connect(mode: "create" | "join", roomCode: string | undefined, na
 }
 
 function isAuthFailure(error: unknown): boolean {
-  return error instanceof Error && /onAuth failed|locked|not found|ไม่พบ/i.test(error.message);
+  return error instanceof Error && /onAuth failed/i.test(error.message);
 }
 
 function bindRoom(room: Room<GameState>, generation: number, name: string, avatar: string, appearance?: Appearance): void {
@@ -166,8 +169,8 @@ async function reconnect(roomId: string, generation: number, name: string, avata
       const lobby = useGameStore.getState().state;
       if (lobby?.phase === "lobby" && !session.activityScope && isAuthFailure(error)) {
         try {
-          storageRemove("session", participantSessionKey);
           const room = await joinByRoomCode(new Client(serverUrl), lobby.roomCode, { name, avatar, appearance: loadProfileAppearance() });
+          storageRemove("session", participantSessionKey);
           if (generation !== connectionGeneration) { await room.leave(); return; }
           bindRoom(room, generation, name, avatar);
           return;

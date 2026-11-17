@@ -37,3 +37,18 @@ describe("turn rules", () => {
     expect(checkWinner(state)).toBe("solo");
   });
 });
+
+describe("payments", () => {
+  it("credits the owner only what a bankrupt payer actually had", () => {
+    const state = threePlayers();
+    state.players[0]!.money = 300;
+    const before = state.players[1]!.money;
+    pay(state, "a", "b", 1000);
+    expect(state.players[0]!.bankrupt).toBe(true);
+    expect(state.players[1]!.money).toBe(before + 300);
+    const pot = state.centerPot;
+    state.players[2]!.money = 50;
+    pay(state, "c", "pot", 800);
+    expect(state.centerPot).toBe(pot + 50);
+  });
+});

@@ -120,3 +120,13 @@
 - Moments: dice thrown in from the near edge (only events carrying dice re-throw), follow camera that dollies in on the walking token and restores the player's view, buildings drop in on purchase, a cage lowers on a chain over jailed players. All disabled by reduced motion.
 - Quality tiers: low has no shadows/post; medium adds spotlight shadows and dust motes; high adds GTAO, depth of field focused on the camera target, bloom and vignette under the existing PerformanceGuard. Measured board: 85 draw calls / 66k triangles on low (budget 150 / 250k).
 - `asset-lab?mode=pieces` (piece gallery) and `?mode=turn` (simulated turns, clearly labelled as a demo) exist for visual QA without a server.
+
+## D-017 — Bug sweep: turn integrity, rejoin, clocks, rendering
+
+- A bankrupt player never keeps the turn (even after a double); a game in which everyone is bankrupt ends with the least-indebted player. Debts only transfer what the payer actually had (no money is created).
+- The doubles streak is per turn. A skip-turn penalty is consumed by a timed-out turn. Free-play seats offline for 2+ minutes pass their turn immediately.
+- Questions asked before rolling (upgrade on your own space, jail quiz) keep the roll afterwards, except a failed jail quiz. Only one upgrade question per turn, so a wrong answer cannot be retried.
+- Snapshots carry `serverNow`; every client countdown uses server time, so a device with a wrong clock can still answer.
+- A lobby seat released by the server is replaced by a fresh join, and the saved seat is deleted only after that join succeeds (mid-game refresh races keep their seat).
+- Migration checksums are computed on LF-normalised SQL and accept legacy raw hashes.
+- Not changed: jail has no "roll doubles" release (message no longer offers it); bankruptcy is immediate with no chance to sell first; a purchase rebuilds the static board batch twice.

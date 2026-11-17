@@ -99,12 +99,14 @@ export function canAfford(player: Player, amount: number): boolean {
 export function pay(state: GameState, fromId: string, toId: string | "bank" | "pot", amount: number): void {
   const from = findPlayer(state, fromId);
   if (!from || amount <= 0) return;
+  // The receiver only gets what the payer actually had; a bankrupting debt must not create money.
+  const collected = Math.min(amount, Math.max(0, from.money));
   from.money -= amount;
   if (toId === "pot") {
-    state.centerPot += amount;
+    state.centerPot += collected;
   } else if (toId !== "bank") {
     const to = findPlayer(state, toId);
-    if (to) to.money += amount;
+    if (to) to.money += collected;
   }
   if (from.money < 0) {
     from.bankrupt = true;

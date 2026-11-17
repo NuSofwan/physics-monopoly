@@ -56,6 +56,8 @@ export function App({ activity }: { activity?: ActivitySummary } = {}): JSX.Elem
   const [pieceStyle, setPieceStyle] = useState<PieceStyle>(() => storageGet("local", "physics-monopoly-pieces") === "metal" ? "metal" : "figure");
   useEffect(() => { storageSet("local", "physics-monopoly-pieces", pieceStyle); }, [pieceStyle]);
   const [textScale, setTextScale] = useState(100);
+  // The server allows one upgrade question per turn; hide the button once it has been used this turn.
+  const [upgradeTurn, setUpgradeTurn] = useState<number | null>(null);
   const [now, setNow] = useState(serverNow);
   const [mute, setMute] = useState(() => storageGet("local", "physics-monopoly-muted") === "true");
   // Once the 3D canvas is unmounted (renderer switches to "html"), its
@@ -290,8 +292,8 @@ export function App({ activity }: { activity?: ActivitySummary } = {}): JSX.Elem
 
           <BuyDecisionPanel open={state.phase === "buying" && isMyTurn && landedTile?.type === "property"} tile={landedTile} deadline={state.turnDeadline} now={now} onBuy={sendBuy} onUpgrade={sendUpgrade} onPass={sendSkipBuy} />
 
-          {!state.classroomMode && landedTile?.type === "property" && landedTile.ownerId === playerId && isMyTurn && state.phase === "rolling" && (landedTile.level ?? 0) < 3 ? (
-            <button className="panel rounded-lg p-4 text-left font-black" onClick={sendUpgrade}>Upgrade {landedTile.name}</button>
+          {!state.classroomMode && landedTile?.type === "property" && landedTile.ownerId === playerId && isMyTurn && state.phase === "rolling" && (landedTile.level ?? 0) < 3 && upgradeTurn !== state.turnCount ? (
+            <button className="panel rounded-lg p-4 text-left font-black" onClick={() => { setUpgradeTurn(state.turnCount); sendUpgrade(); }}>Upgrade {landedTile.name}</button>
           ) : null}
 
           <PropertyPortfolio state={state} playerId={playerId} />

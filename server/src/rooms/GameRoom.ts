@@ -86,6 +86,7 @@ export class GameRoom extends Room<{ state: GameState }> {
   private learningGame?: ClassroomGame;
   private disconnectedAt = new Map<string, number>();
   private questionBeforeRoll = false;
+  private upgradeAskedFor = "";
   private resumeRollAfterReveal = false;
   private writes = Promise.resolve();
   private commands = Promise.resolve();
@@ -380,6 +381,10 @@ export class GameRoom extends Room<{ state: GameState }> {
     if (!player || player.id !== this.participantIdFor(client) || this.state.phase !== "rolling") return;
     const tile = this.state.tiles[player.tileIndex];
     if (!tile || tile.type !== "property" || tile.ownerId !== player.id || (tile.level ?? 0) >= 3) return;
+    // One upgrade question per turn: the roll is kept afterwards, so a wrong answer must not be retryable.
+    const turnKey = `${this.state.turnCount}:${player.id}`;
+    if (this.upgradeAskedFor === turnKey) return;
+    this.upgradeAskedFor = turnKey;
     this.askQuestion(player, "buy", tile.index, tile.difficulty ?? "medium");
     this.sendSnapshot();
   }
