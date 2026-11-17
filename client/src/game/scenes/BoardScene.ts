@@ -1,5 +1,5 @@
 import Phaser from "phaser";
-import { avatarById, avatarPresets, type GameState, type Tile } from "@physics-monopoly/shared";
+import { avatarById, type GameState, type Tile } from "@physics-monopoly/shared";
 
 export const BOARD_WIDTH = 1672;
 export const BOARD_HEIGHT = 941;
@@ -10,12 +10,12 @@ const centerX = BOARD_WIDTH / 2;
 const centerY = BOARD_HEIGHT / 2;
 const nightBg = "#0b1224";
 const boardPalette = [0xd99a36, 0x2a9b9b, 0xc75f46, 0xf0dfb9, 0x1f6f94, 0xd99a36, 0x2f7f90];
-/** Every valid avatar id (server allowlist parity), used to derive a distinct token color per avatar. */
-const AVATAR_IDS = [...avatarPresets.map((preset) => preset.id), "robot"];
-const tokenPalette = [0x34d399, 0xf8c24a, 0xff6b5f, 0x60a5fa, 0xa78bfa, 0xfb923c, 0x2dd4bf, 0xe879f9, 0xf472b6, 0x38bdf8];
-function tokenColorFor(avatar: string): number {
-  const index = AVATAR_IDS.indexOf(avatar);
-  return tokenPalette[(index < 0 ? 0 : index) % tokenPalette.length] ?? 0x34d399;
+/** Seat colours match the 3D board, so two players with the same avatar are still told apart. */
+const seatPalette = [0x34d399, 0xf8c24a, 0xf472b6, 0x60a5fa, 0xa78bfa, 0xfb923c, 0x2dd4bf, 0xe879f9];
+function seatColor(slot: number): number { return seatPalette[slot % seatPalette.length] ?? 0x34d399; }
+/** Everything that changes how tiles are drawn: names (map changes), owners and building levels. */
+function boardKeyFor(state: GameState): string {
+  return state.tiles.map((tile) => `${tile.name}|${tile.ownerId ?? ""}|${tile.level ?? 0}`).join(";") + `#${state.players.map((player) => player.id).join(",")}`;
 }
 
 const boardPath = [
@@ -53,6 +53,8 @@ export class BoardScene extends Phaser.Scene {
   private tokenGroup!: Phaser.GameObjects.Group;
   private tilePositions = new Map<number, Phaser.Math.Vector2>();
   private tokens = new Map<string, Phaser.GameObjects.Container>();
+  private animating = new Set<string>();
+  private boardKey = "";
   private stepLabel?: Phaser.GameObjects.Text;
   // Phaser boots the scene asynchronously; React can push state in before
   // create() runs. Guard with a ready flag and replay the latest state once the
@@ -81,24 +83,31 @@ export class BoardScene extends Phaser.Scene {
   syncState(state: GameState): void {
     this.latestState = state;
     if (!this.ready) return;
-    if (this.tilePositions.size === 0 || this.tokens.size !== state.players.length) {
-      this.renderBoard(state);
-      return;
+    if (this.tilePositions.size === 0 || this.tokens.size !== state.players.length || this.boardKey !== boardKeyFor(state)) {
+      // Never rebuild under a walking token; the walk's completion re-syncs with the latest state.
+      if (this.animating.size === 0) { this.renderBoard(state); return; }
     }
     state.players.forEach((player, index) => {
       let token = this.tokens.get(player.id);
       if (!token) token = this.addToken(player.id, player.avatar, player.tileIndex, index);
-      const pos = this.positionForToken(player.tileIndex, index);
-      token.setPosition(pos.x, pos.y);
+      // A snapshot can land while this token is still walking; let the walk finish instead of snapping ahead.
+      if (!this.animating.has(player.id)) {
+        const pos = this.positionForToken(player.tileIndex, index);
+        token.setPosition(pos.x, pos.y);
+      }
       token.setAlpha(player.bankrupt ? 0.3 : player.connected ? 1 : 0.55);
     });
   }
 
   renderBoard(state: GameState): void {
-    this.children.removeAll();
+    // Destroy (not just detach) the previous objects, or every redraw leaks texts and graphics.
+    this.tweens.killAll();
+    this.animating.clear();
+    this.children.removeAll(true);
     this.tokens.clear();
     this.tilePositions.clear();
-    this.drawBoard(state.tiles);
+    this.boardKey = boardKeyFor(state);
+    this.drawBoard(state.tiles, state);
     this.stepLabel = this.add
       .text(centerX, BOARD_HEIGHT - 34, "", {
         fontFamily: "Arial",
@@ -116,10 +125,14 @@ export class BoardScene extends Phaser.Scene {
     if (!this.ready) return;
     const token = this.tokens.get(playerId);
     if (!token || path.length === 0) return;
+    this.tweens.killTweensOf(token);
+    this.animating.add(playerId);
     let step = 0;
     const runStep = (): void => {
       const tileIndex = path[step];
       if (tileIndex === undefined) {
+        this.animating.delete(playerId);
+        if (this.latestState) this.syncState(this.latestState);
         this.stepLabel?.setText("");
         this.cameras.main.pan(centerX, centerY, 380, "Sine.easeInOut");
         this.cameras.main.zoomTo(1, 380);
@@ -147,7 +160,7 @@ export class BoardScene extends Phaser.Scene {
     runStep();
   }
 
-  private drawBoard(tiles: Tile[]): void {
+  private drawBoard(tiles: Tile[], state: GameState): void {
     if (this.textures.exists("citybg")) {
       this.add.image(centerX, centerY, "citybg").setDisplaySize(BOARD_WIDTH, BOARD_HEIGHT).setDepth(-30);
       this.add.rectangle(centerX, centerY, BOARD_WIDTH, BOARD_HEIGHT, 0x071328, 0.12).setDepth(-29);
@@ -157,10 +170,10 @@ export class BoardScene extends Phaser.Scene {
 
     this.drawRouteGlow();
     this.drawLakeBlueprints();
-    tiles.forEach((tile) => this.drawTile(tile));
+    tiles.forEach((tile) => this.drawTile(tile, state));
   }
 
-  private drawTile(tile: Tile): void {
+  private drawTile(tile: Tile, state: GameState): void {
     const pos = tilePosition(tile.index);
     this.tilePositions.set(tile.index, new Phaser.Math.Vector2(pos.x, pos.y));
     const fill = tile.type === "property" ? (boardPalette[tile.index % boardPalette.length] ?? 0xd99a36) : specialColor(tile.type);
@@ -181,6 +194,14 @@ export class BoardScene extends Phaser.Scene {
     g.fillRoundedRect(-width / 2 + 5, -height / 2 + 5, width - 10, height * 0.34, 9);
     g.lineStyle(3, 0xfff5db, 0.86);
     g.strokeRoundedRect(-width / 2, -height / 2, width, height, 12);
+    // Owner: a thick ring in the owner's seat colour plus one dot per building level.
+    const owner = tile.ownerId ? state.players.findIndex((player) => player.id === tile.ownerId) : -1;
+    if (owner >= 0) {
+      g.lineStyle(5, seatColor(owner), 1);
+      g.strokeRoundedRect(-width / 2 + 3, -height / 2 + 3, width - 6, height - 6, 10);
+      g.fillStyle(seatColor(owner), 1);
+      for (let level = 0; level < (tile.level ?? 0); level++) g.fillCircle(-width / 2 + 14 + level * 12, height / 2 - 12, 4.5);
+    }
 
     this.drawTileIcon(tile, pos.x, pos.y, angle, fill);
 
@@ -293,7 +314,7 @@ export class BoardScene extends Phaser.Scene {
 
   private addToken(playerId: string, avatar: string, tileIndex: number, offset: number): Phaser.GameObjects.Container {
     const pos = this.positionForToken(tileIndex, offset);
-    const color = tokenColorFor(avatar);
+    const color = seatColor(offset);
     const container = this.add.container(pos.x, pos.y).setDepth(20 + offset);
     const shadow = this.add.ellipse(0, 20, 34, 12, 0x05070f, 0.35);
     const glow = this.add.circle(0, 0, 24, color, 0.28);

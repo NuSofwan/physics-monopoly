@@ -7,7 +7,7 @@
     "client/src/game3d/AvatarFigure.tsx": "329cb463fd044a7c43ed4f42927a6edfc36d184df629ce17fa59c89c7dacb8cd",
     "client/src/game3d/Character.tsx": "0adb321977d39a6077e22519405fc2215182e7a9fd031ddc6edb155ea8c630e0",
     "client/src/game3d/StaticBatch.tsx": "90ada09671aacf7b93431c80aa6a4a187873ae028de5d1aac647621a0256f0f7",
-    "client/src/game3d/Board3D.tsx": "2f23d4c28a54b0e05347fa80088b5424d390f78b49d5e34f993e8c9684a311c0",
+    "client/src/game3d/Board3D.tsx": "01fdff700d96c8467e6a3fca1e3dabf8dfa3b81de23bc15549b01a6720bf04f9",
     "shared/src/avatars.ts": "6cb13d0bd5d66beb150f786a99b410e3becb5cf6d44c70453c91dd0cef17151f",
     "shared/src/appearance.ts": "95d93f294271ae0b5adc10bc869ed0c43b0a501deaee79d830417d70b0d64698",
     "shared/src/boardConfig.ts": "40a4c4fce50e14f06f8134c0ad49ee784490e0e0697aa661817bad8b51f436c2"

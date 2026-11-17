@@ -103,7 +103,8 @@ export class ClassroomGame {
     if (path.includes(0)) this.credit(player, 2000);
     this.action = "pass"; this.applied = false;
     this.state.phase = "moving"; this.state.turnDeadline = this.now() + 3000;
-    this.hooks.snapshot(); this.hooks.event("tokenMove", { playerId: player.id, path, dice });
+    // Move event first (as in free play), so clients animate the walk before the snapshot moves the token.
+    this.hooks.event("tokenMove", { playerId: player.id, path, dice }); this.hooks.snapshot();
   }
   private openQuestion(): void {
     const unused = this.questions.filter((question) => !this.seen.has(question.id));

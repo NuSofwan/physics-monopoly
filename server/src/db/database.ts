@@ -5,6 +5,13 @@ import { createHash } from "node:crypto";
 
 export const pool = new Pool({ connectionString: process.env.DATABASE_URL, max: 10, connectionTimeoutMillis: 5000 });
 export const tokenHash = (token: string): string => createHash("sha256").update(token).digest("hex");
+/** Line-ending independent migration checksum. */
+export const migrationHash = (sql: string): string => tokenHash(sql.replace(/\r\n/g, "\n"));
+/** True when a stored checksum matches the file in either canonical (LF) or legacy raw form, CRLF or LF. */
+export function migrationHashMatches(stored: string, sql: string): boolean {
+  const lf = sql.replace(/\r\n/g, "\n");
+  return [tokenHash(lf), tokenHash(lf.replace(/\n/g, "\r\n")), tokenHash(sql)].includes(stored);
+}
 
 export async function transaction<T>(work: (client: PoolClient) => Promise<T>, target = pool): Promise<T> {
   const client = await target.connect();
@@ -26,10 +33,12 @@ export async function migrate(target = pool): Promise<void> {
     const directory = new URL("./migrations/", import.meta.url);
     for (const name of (await readdir(directory)).filter((file) => file.endsWith(".sql")).sort()) {
       const sql = await readFile(new URL(name, directory), "utf8");
-      const hash = tokenHash(sql);
+      // Hash canonical LF text: Windows checkouts (core.autocrlf) turn the same SQL into CRLF, which must
+      // not look like an edited migration. Older rows may hold a raw-file hash, so that is accepted too.
+      const hash = migrationHash(sql);
       const previous = await client.query("SELECT hash FROM schema_migrations WHERE name=$1", [name]);
       if (previous.rowCount) {
-        if (previous.rows[0].hash !== hash) throw new Error(`Migration changed after application: ${name}`);
+        if (!migrationHashMatches(previous.rows[0].hash, sql)) throw new Error(`Migration changed after application: ${name}`);
         continue;
       }
       await client.query(sql);

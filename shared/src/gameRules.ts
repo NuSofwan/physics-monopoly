@@ -203,7 +203,11 @@ export function nextActivePlayerIndex(state: GameState): number {
 export function endTurn(state: GameState, keepTurn = false): void {
   state.pendingQuestion = null;
   state.phase = state.winnerId ? "game_over" : "rolling";
-  if (!keepTurn) {
+  const leaving = state.players[state.currentPlayerIndex];
+  // A bankrupt player never keeps the turn (a double that ends in bankruptcy would otherwise freeze the room),
+  // and the doubles streak only counts consecutive rolls within one turn.
+  if (!keepTurn || leaving?.bankrupt) {
+    if (leaving) leaving.doublesInRow = 0;
     state.currentPlayerIndex = nextActivePlayerIndex(state);
     state.turnCount += 1;
   }
@@ -212,6 +216,10 @@ export function endTurn(state: GameState, keepTurn = false): void {
 export function checkWinner(state: GameState, maxTurns = 80): string | null {
   const active = state.players.filter((player) => !player.bankrupt);
   if (active.length === 1 && state.players.length > 1) return active[0]?.id ?? null;
+  // Everyone bankrupt (e.g. a solo game): end with the least-indebted player instead of looping forever.
+  if (active.length === 0 && state.players.length > 0) {
+    return [...state.players].sort((a, b) => calculateNetWorth(state, b.id) - calculateNetWorth(state, a.id))[0]?.id ?? null;
+  }
   if (state.turnCount >= maxTurns && active.length > 0) {
     return [...active].sort((a, b) => calculateNetWorth(state, b.id) - calculateNetWorth(state, a.id))[0]?.id ?? null;
   }

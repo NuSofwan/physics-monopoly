@@ -29,8 +29,8 @@
     },
     {
       "path": "client/src/game3d/Board3D.tsx",
-      "sha256": "2f23d4c28a54b0e05347fa80088b5424d390f78b49d5e34f993e8c9684a311c0",
-      "bytes": 31869
+      "sha256": "01fdff700d96c8467e6a3fca1e3dabf8dfa3b81de23bc15549b01a6720bf04f9",
+      "bytes": 34391
     },
     {
       "path": "shared/src/locations.ts",

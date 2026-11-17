@@ -39,8 +39,9 @@ export function Board3D({ state, moveEvent, reducedMotion = false, quality: requ
   const priorBuildings=useRef(buildingsKey),[construction,setConstruction]=useState<number|null>(null);
   useEffect(()=>{
     const previous=priorBuildings.current.split(";");priorBuildings.current=buildingsKey;
-    const changed=buildingsKey.split(";").findIndex((value,index)=>value!==previous[index]);
-    if(changed<0||reducedMotion){setConstruction(null);return;}
+    const next=buildingsKey.split(";"),changed=next.findIndex((value,index)=>value!==previous[index]);
+    // Animate purchases/upgrades only; a property released by bankruptcy or a sale simply disappears.
+    if(changed<0||reducedMotion||next[changed]!.startsWith(":")){setConstruction(null);return;}
     setConstruction(changed);const timer=window.setTimeout(()=>setConstruction(null),1900);return()=>window.clearTimeout(timer);
   },[buildingsKey,reducedMotion]);
   const city = locationById(state.mapId);
@@ -89,6 +90,10 @@ function TabletopBoard({ state, moveEvent, reducedMotion, quality, markSlow, onU
   // Only real rolls (events that carry dice) re-throw the dice; forced moves such as "go to jail" do not.
   const throwNonce = useRef(0);
   if (moveEvent?.dice && moveEvent.nonce !== throwNonce.current) throwNonce.current = moveEvent.nonce;
+  // Whatever was already true when the board mounted (reload, reconnect, renderer switch) is shown settled, not replayed.
+  const mountedThrow = useRef(throwNonce.current), mountedAt = useRef(performance.now());
+  const freshThrow = throwNonce.current !== mountedThrow.current;
+  const diceValues: [number, number] | null = moveEvent?.dice && moveEvent.nonce === throwNonce.current ? moveEvent.dice : state.dice;
   return (
     <div className="board-frame tabletop-frame relative h-[60vh] min-h-[360px] w-full" aria-label={`กระดานเกมบนโต๊ะ ${cityName}`}>
       <div className="absolute left-2 top-2 z-10 flex flex-wrap gap-2 sm:left-3 sm:top-3"><button className="min-h-11 rounded-lg bg-white/90 px-2 text-sm font-bold sm:px-3 sm:text-base" onClick={() => setReset(value => value + 1)}>ภาพรวม / รีเซ็ตกล้อง</button><button aria-pressed={tracking} disabled={reducedMotion} title={reducedMotion ? "ปิดอยู่เพราะเลือกลดการเคลื่อนไหว" : undefined} className="min-h-11 rounded-lg bg-white/90 px-2 text-sm font-bold disabled:opacity-50 sm:px-3 sm:text-base" onClick={() => setCinematic(value => !value)}>กล้องตามตัวเดิน: {tracking ? "เปิด" : "ปิด"}</button></div>
@@ -107,8 +112,8 @@ function TabletopBoard({ state, moveEvent, reducedMotion, quality, markSlow, onU
         </StaticBatch>
         {constructionTile?.type === "property" && constructionColor ? <TabletopConstruction key={`${construction}:${buildingsKey}`} tile={constructionTile} ownerColor={constructionColor} quality={quality}/> : null}
         <group name="asset:tokens">{state.players.map((player, index) => <Token key={player.id} look={pieceStyle} quality={quality} groupRef={index === state.currentPlayerIndex ? mover : undefined} pose={state.phase === "answering" || state.phase === "reveal" ? "think" : state.phase === "moving" && index === state.currentPlayerIndex ? "walk" : "idle"} xp={player.xp} tileIndex={player.tileIndex} name={player.name} avatar={player.avatar} appearance={player.appearance} moveEvent={moveEvent?.playerId === player.id ? moveEvent : null} reducedMotion={reducedMotion} slot={index} color={playerColors[index % playerColors.length] ?? "#34d399"} />)}</group>
-        {state.players.map((player, index) => player.inJail && !player.bankrupt ? <JailCage key={`jail:${player.id}`} position={tokenPosition(player.tileIndex, index)} reducedMotion={reducedMotion}/> : null)}
-        {state.dice ? <TabletopDice dice={state.dice} nonce={throwNonce.current} reducedMotion={reducedMotion}/> : null}
+        {state.players.map((player, index) => player.inJail && !player.bankrupt ? <JailCage key={`jail:${player.id}`} position={tokenPosition(player.tileIndex, index)} reducedMotion={reducedMotion || performance.now() - mountedAt.current < 1500}/> : null)}
+        {diceValues ? <TabletopDice dice={diceValues} nonce={throwNonce.current} animate={freshThrow} reducedMotion={reducedMotion}/> : null}
         </QualityContext.Provider>
       </Canvas>
     </div>
@@ -136,12 +141,17 @@ export function CameraControls({ reset, onUnavailable, onRestored, followTile, i
   const frames=useRef(0);
   // Cinematic tracking: while the tracked token walks (userData.moving) the camera glides to it and dollies in,
   // lingers briefly after it stops, then eases back to the distance and look-at point the player had before.
-  const track = useMemo(() => ({ active: false, linger: 0, restore: 0, point: new Vector3(), offset: new Vector3() }), []);
+  // `suppressed`: the player grabbed the camera (orbit/zoom/reset) during this walk, so stop steering it until the walk ends.
+  const track = useMemo(() => ({ active: false, linger: 0, restore: 0, suppressed: false, point: new Vector3(), offset: new Vector3() }), []);
+  // Callbacks live in refs so a parent re-render with new function identities never rebuilds (and snaps) the camera.
+  const callbacks = useRef({ onUnavailable, onRestored });
+  callbacks.current = { onUnavailable, onRestored };
   useFrame(({ clock },delta) => {
     const controls = controlsRef.current;
     const tracked = trackRef?.current, walking = Boolean(tracked?.userData.moving);
+    if (!walking && track.linger <= 0) track.suppressed = false;
     track.linger = walking ? 1.3 : Math.max(0, track.linger - delta);
-    if (controls && tracked && track.linger > 0) {
+    if (controls && tracked && track.linger > 0 && !track.suppressed) {
       if (!track.active) { track.active = true; track.restore = camera.position.distanceTo(controls.target); }
       tracked.getWorldPosition(track.point); track.point.y += .45;
       shift.copy(track.point).sub(controls.target).multiplyScalar(Math.min(1,delta*2.6));
@@ -176,6 +186,10 @@ export function CameraControls({ reset, onUnavailable, onRestored, followTile, i
     camera.position.set(...initialPosition);
     const controls = new OrbitControls(camera, gl.domElement);
     controlsRef.current = controls; track.active = false; track.linger = 0;
+    // A reset (or remount) mid-walk shows the overview instead of being dragged straight back to the token.
+    track.suppressed = Boolean(trackRef?.current?.userData.moving);
+    const grabbed = () => { track.suppressed = Boolean(trackRef?.current); track.active = false; };
+    controls.addEventListener("start", grabbed);
     controls.target.set(...initialTarget);
     controls.minDistance = minDistance;
     controls.maxDistance = maxDistance;
@@ -183,13 +197,13 @@ export function CameraControls({ reset, onUnavailable, onRestored, followTile, i
     controls.maxPolarAngle = Math.PI / 2.4;
     controls.enablePan = false;
     controls.update();
-    const lost = (event: Event) => { event.preventDefault(); onUnavailable(); };
-    const restored = () => onRestored?.();
+    const lost = (event: Event) => { event.preventDefault(); callbacks.current.onUnavailable(); };
+    const restored = () => callbacks.current.onRestored?.();
     gl.domElement.addEventListener("webglcontextlost", lost);
     gl.domElement.addEventListener("webglcontextrestored", restored);
-    if (gl.getContext().isContextLost()) onUnavailable();
-    return () => { controlsRef.current = null; controls.dispose(); gl.domElement.removeEventListener("webglcontextlost", lost); gl.domElement.removeEventListener("webglcontextrestored", restored); };
-  }, [camera, gl, reset, onUnavailable, onRestored,initialPosition[0],initialPosition[1],initialPosition[2],initialTarget[0],initialTarget[1],initialTarget[2],minDistance,maxDistance,track]);
+    if (gl.getContext().isContextLost()) callbacks.current.onUnavailable();
+    return () => { controlsRef.current = null; controls.removeEventListener("start", grabbed); controls.dispose(); gl.domElement.removeEventListener("webglcontextlost", lost); gl.domElement.removeEventListener("webglcontextrestored", restored); };
+  }, [camera, gl, reset, initialPosition[0],initialPosition[1],initialPosition[2],initialTarget[0],initialTarget[1],initialTarget[2],minDistance,maxDistance,track]);
   return null;
 }
 
@@ -319,12 +333,30 @@ function Token({ tileIndex, slot, color, avatar, moveEvent, reducedMotion, pose,
   const queue = useRef<Vector3[]>([]);
   const hop = useRef(0);
   const speed = useRef(5);
+  // The move event already in the store when this token mounted is history: never replay it.
+  const lastNonce = useRef<number | null>(moveEvent?.nonce ?? null);
   useEffect(() => {
-    queue.current = reducedMotion ? [] : (moveEvent?.path ?? []).map(targetFor);
-    let previous = ref.current?.position ?? targetFor(tileIndex), distance = 0;
-    for (const point of queue.current) { distance += previous.distanceTo(point); previous = point; }
-    speed.current = Math.max(5, distance / 2.4);
-    if (reducedMotion || !queue.current.length) ref.current?.position.copy(targetFor(tileIndex));
+    const destination = targetFor(tileIndex), nonce = moveEvent?.nonce ?? null;
+    const fresh = nonce !== null && nonce !== lastNonce.current;
+    if (fresh) lastNonce.current = nonce;
+    if (reducedMotion) { queue.current = []; ref.current?.position.copy(destination); return; }
+    if (fresh && moveEvent) {
+      queue.current = moveEvent.path.map(targetFor);
+      let previous = ref.current?.position ?? destination, distance = 0;
+      for (const point of queue.current) { distance += previous.distanceTo(point); previous = point; }
+      speed.current = Math.max(5, distance / 2.4);
+      if (!queue.current.length) ref.current?.position.copy(destination);
+      return;
+    }
+    // A snapshot changed the tile (or seat) without a new move event.
+    if (queue.current.length) {
+      // Mid-walk: keep walking, but make sure the walk ends on the authoritative space.
+      if (!queue.current.at(-1)!.equals(destination)) queue.current.push(destination);
+      return;
+    }
+    // Idle: the snapshot may simply have beaten its move event over the network, so wait briefly before snapping.
+    const timer = window.setTimeout(() => { if (!queue.current.length) ref.current?.position.copy(targetFor(tileIndex)); }, 650);
+    return () => window.clearTimeout(timer);
   }, [moveEvent?.nonce, tileIndex, slot, reducedMotion]);
   useFrame((_state, delta) => {
     const token = ref.current;

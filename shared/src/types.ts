@@ -180,6 +180,8 @@ export interface GameState {
   tradeOffers: TradeOffer[];
   lastMovePath: number[];
   turnDeadline: number | null;
+  /** Server clock (ms) when this snapshot was sent; clients derive their clock offset from it for countdowns. */
+  serverNow?: number;
   turnTimeSec: number;
 }
 

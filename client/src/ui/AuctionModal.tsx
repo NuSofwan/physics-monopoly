@@ -1,5 +1,6 @@
 ﻿import { useMemo, useState } from "react";
 import type { GameState } from "@physics-monopoly/shared";
+import { serverNow } from "../net/serverClock";
 
 interface Props {
   state: GameState;
@@ -16,7 +17,7 @@ export function AuctionModal({ state, playerId }: Props): JSX.Element | null {
   const tile = auction ? state.tiles[auction.tileIndex] : null;
   const me = state.players.find((player) => player.id === playerId);
   const minimum = auction ? (auction.bidderId ? auction.currentBid + 100 : auction.currentBid) : 0;
-  const seconds = auction ? Math.max(0, Math.ceil((auction.deadline - Date.now()) / 1000)) : 0;
+  const seconds = auction ? Math.max(0, Math.ceil((auction.deadline - serverNow()) / 1000)) : 0;
   const suggested = useMemo(() => Math.max(minimum, bid || minimum), [bid, minimum]);
   if (!auction || !tile) return null;
 

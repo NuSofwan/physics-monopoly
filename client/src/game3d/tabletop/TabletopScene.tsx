@@ -378,12 +378,12 @@ export function JailCage({ position, reducedMotion }: { position: [number, numbe
 
 const DIE = .46;
 /** Dice are thrown in from the near edge, tumble, bounce and settle on the server's result. */
-export function TabletopDice({ dice, nonce, reducedMotion }: { dice: [number, number]; nonce: number; reducedMotion: boolean }): JSX.Element {
-  return <group name="asset:dice:pair">{dice.map((value, index) => <TabletopDie key={index} value={value} index={index} nonce={nonce} reducedMotion={reducedMotion}/>)}</group>;
+export function TabletopDice({ dice, nonce, reducedMotion, animate = true }: { dice: [number, number]; nonce: number; reducedMotion: boolean; animate?: boolean }): JSX.Element {
+  return <group name="asset:dice:pair">{dice.map((value, index) => <TabletopDie key={index} value={value} index={index} nonce={nonce} reducedMotion={reducedMotion || !animate}/>)}</group>;
 }
 
 function TabletopDie({ value, index, nonce, reducedMotion }: { value: number; index: number; nonce: number; reducedMotion: boolean }): JSX.Element {
-  const ref = useRef<Group>(null), elapsed = useRef(reducedMotion ? 10 : 0);
+  const ref = useRef<Group>(null), elapsed = useRef(10);
   const rest = useMemo(() => new Vector3(index === 0 ? -.45 : .95, BOARD_TOP + DIE / 2, index === 0 ? 4.15 : 3.8), [index]);
   const start = useMemo(() => new Vector3(rest.x + (index === 0 ? -1.5 : 1.2), BOARD_TOP + 3.2, rest.z + 6.5), [rest, index]);
   const target = useMemo(() => {
@@ -391,7 +391,9 @@ function TabletopDie({ value, index, nonce, reducedMotion }: { value: number; in
     return yaw.multiply(new Quaternion().setFromEuler(new Euler(...(diceOrientations[value] ?? diceOrientations[1]!))));
   }, [value, nonce, index]);
   const spin = useMemo(() => new Vector3(9 + index * 3, 4 - index * 2, 7 + index), [index]);
-  useEffect(() => { elapsed.current = reducedMotion ? 10 : 0; if (reducedMotion && ref.current) { ref.current.position.copy(rest); ref.current.quaternion.copy(target); } }, [nonce, reducedMotion, rest, target]);
+  // Only a new throw (nonce) restarts the tumble; the result value arriving a moment later just retargets the landing.
+  useEffect(() => { if (!reducedMotion) elapsed.current = 0; }, [nonce]);
+  useEffect(() => { if (reducedMotion) { elapsed.current = 10; if (ref.current) { ref.current.position.copy(rest); ref.current.quaternion.copy(target); } } }, [reducedMotion, rest, target]);
   useFrame((_state, delta) => {
     const die = ref.current;
     if (!die) return;
