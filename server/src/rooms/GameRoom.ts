@@ -85,6 +85,9 @@ export class GameRoom extends Room<{ state: GameState }> {
   private classroom?: ClassroomContext;
   private learningGame?: ClassroomGame;
   private disconnectedAt = new Map<string, number>();
+  private questionBeforeRoll = false;
+  private upgradeAskedFor = "";
+  private resumeRollAfterReveal = false;
   private writes = Promise.resolve();
   private commands = Promise.resolve();
   private storageFailed = false;
@@ -151,7 +154,7 @@ export class GameRoom extends Room<{ state: GameState }> {
     this.onMessage("kickPlayer", (client, payload: PlayerPayload) => this.kickPlayer(client, payload));
     this.onMessage("getParticipantSession", (client) => {
       this.sendParticipantSession(client);
-      client.send("snapshot", this.state);
+      client.send("snapshot", { ...this.state, serverNow: Date.now() });
       if (this.state.phase === "reveal" && this.lastAnswerResult) client.send("answerResult", this.lastAnswerResult);
       const id = this.participantIdFor(client); if (id) this.learningGame?.sendReceipt(id);
     });
@@ -291,8 +294,9 @@ export class GameRoom extends Room<{ state: GameState }> {
       this.sendSnapshot();
       return;
     }
+    if (player.bankrupt) { this.finishLanding(false); this.sendSnapshot(); return; }
     if (player.inJail) {
-      this.state.log.unshift(`${player.name} อยู่ในคุก: ทอย doubles, จ่ายปรับ, หรือแก้โจทย์`);
+      this.state.log.unshift(`${player.name} อยู่ในคุก: จ่ายค่าปรับ ฿500 หรือแก้โจทย์เพื่อออก`);
       this.sendSnapshot();
       return;
     }
@@ -319,9 +323,10 @@ export class GameRoom extends Room<{ state: GameState }> {
 
   private resolveLanding(playerId: string, keepTurnOnDouble = false): void {
     const player = findPlayer(this.state, playerId);
-    if (!player || player.bankrupt) return;
+    if (!player) return;
+    // Never leave the room parked in "moving": a bankrupt or off-board player still hands the turn on.
     const tile = this.state.tiles[player.tileIndex];
-    if (!tile) return;
+    if (player.bankrupt || !tile) { this.finishLanding(false); this.sendSnapshot(); return; }
     this.state.phase = "resolving_tile";
     if (tile.type === "property") {
       if (!tile.ownerId) {
@@ -376,6 +381,10 @@ export class GameRoom extends Room<{ state: GameState }> {
     if (!player || player.id !== this.participantIdFor(client) || this.state.phase !== "rolling") return;
     const tile = this.state.tiles[player.tileIndex];
     if (!tile || tile.type !== "property" || tile.ownerId !== player.id || (tile.level ?? 0) >= 3) return;
+    // One upgrade question per turn: the roll is kept afterwards, so a wrong answer must not be retryable.
+    const turnKey = `${this.state.turnCount}:${player.id}`;
+    if (this.upgradeAskedFor === turnKey) return;
+    this.upgradeAskedFor = turnKey;
     this.askQuestion(player, "buy", tile.index, tile.difficulty ?? "medium");
     this.sendSnapshot();
   }
@@ -412,8 +421,8 @@ export class GameRoom extends Room<{ state: GameState }> {
     if (pending.reason === "buy") {
       if (correct && pending.tileIndex !== undefined) {
         const tile = this.state.tiles[pending.tileIndex];
-        if (tile?.ownerId === player.id) upgradeProperty(this.state, player.id, pending.tileIndex);
-        else buyProperty(this.state, player.id, pending.tileIndex);
+        const done = tile?.ownerId === player.id ? upgradeProperty(this.state, player.id, pending.tileIndex) : buyProperty(this.state, player.id, pending.tileIndex);
+        if (!done) this.state.log.unshift(`${player.name} ตอบถูก แต่เงินไม่พอสำหรับ${tile?.ownerId === player.id ? "อัปเกรด" : "ซื้อ"} ${tile?.name ?? ""}`);
       } else {
         this.state.log.unshift(`${player.name} ตอบผิด ซื้อ/อัปเกรดไม่ได้ในรอบนี้`);
       }
@@ -442,6 +451,7 @@ export class GameRoom extends Room<{ state: GameState }> {
       xpDelta: xp,
     };
     this.pendingAnswers.delete(pending.id);
+    this.resumeRollAfterReveal = this.questionBeforeRoll && !player.bankrupt && !player.inJail;
     this.lastAnswerResult = result;
     this.state.phase = "reveal";
     this.state.turnDeadline = Date.now() + 10000;
@@ -475,6 +485,9 @@ export class GameRoom extends Room<{ state: GameState }> {
       : selectQuestion(difficulty);
     if (!question) throw new Error("กิจกรรมไม่มีโจทย์ที่เผยแพร่แล้ว");
     const id = randomUUID();
+    // Upgrades and the jail quiz are asked before the roll; the player keeps that roll afterwards.
+    this.questionBeforeRoll = this.state.phase === "rolling";
+    this.resumeRollAfterReveal = false;
     this.lastAnswerResult = null;
     this.pendingAnswers.set(id, question);
     this.state.pendingQuestion = {
@@ -601,14 +614,18 @@ export class GameRoom extends Room<{ state: GameState }> {
         const player = currentPlayer(this.state), tile = player ? this.state.tiles[player.tileIndex] : undefined;
         if (player && tile) this.state.log.unshift(`${player.name} หมดเวลาตัดสินใจ ไม่ได้ซื้อ ${tile.name}`);
       }
+      const resume = this.state.phase === "reveal" && this.resumeRollAfterReveal;
       this.lastAnswerResult = null;
-      this.finishLanding(false);
+      this.resumeRollAfterReveal = false;
+      this.finishLanding(resume);
       this.sendSnapshot();
       return;
     }
     if (this.state.phase !== "rolling") return;
     const player = currentPlayer(this.state);
-    if (player) this.state.log.unshift(player.name + " timed out");
+    if (player) this.state.log.unshift(`${player.name} หมดเวลา ข้ามตา`);
+    // The timed-out turn counts as the turn the player had to skip.
+    if (player?.skipNextTurn) player.skipNextTurn = false;
     this.finishLanding(false);
     this.refreshTurnTimer();
     this.sendSnapshot();
@@ -641,7 +658,7 @@ export class GameRoom extends Room<{ state: GameState }> {
 
   private sendSnapshot(): void {
     this.state.log = this.state.log.slice(0, 100);
-    this.publish("snapshot", this.state);
+    this.publish("snapshot", { ...this.state, serverNow: Date.now() });
   }
 
   private lifecycle(work: () => void): Promise<void> {
@@ -686,7 +703,7 @@ export class GameRoom extends Room<{ state: GameState }> {
       await checkpoint(this.classroom!, type, state, privateState);
       if (participantId) {
         for (const client of this.clients) if (this.participantIdFor(client) === participantId) client.send(type, payload);
-      } else this.broadcast(type, payload);
+      } else this.broadcast(type, type === "snapshot" ? { ...(payload as object), serverNow: Date.now() } : payload); // stamp at send time, after the checkpoint write
     }).catch(() => this.failStorage());
   }
 
@@ -712,7 +729,16 @@ export class GameRoom extends Room<{ state: GameState }> {
     }
     if (changed) this.sendSnapshot();
     if (!connected.length && this.state.phase === "game_over") { this.autoDispose = true; void this.disconnect(); }
-    if (!this.learningGame && !connected.length && this.disconnectedAt.size && Math.min(...this.disconnectedAt.values()) + 600_000 < Date.now()) { this.autoDispose = true; void this.disconnect(); }
+    // Grace period counts from the most recent disconnect (when the room actually became empty).
+    if (!this.learningGame && !connected.length && this.disconnectedAt.size && Math.max(...this.disconnectedAt.values()) + 600_000 < Date.now()) { this.autoDispose = true; void this.disconnect(); }
+    // Free play: an abandoned seat (offline > 2 min) passes its turn at once instead of stalling everyone 45 s.
+    const current = currentPlayer(this.state);
+    if (!this.learningGame && this.state.phase === "rolling" && connected.length && current && !current.connected && current.inactive) {
+      this.state.log.unshift(`${current.name} ออฟไลน์ ข้ามตาอัตโนมัติ`);
+      if (current.skipNextTurn) current.skipNextTurn = false;
+      this.finishLanding(false);
+      this.sendSnapshot();
+    }
   }
   private applyMap(id: string): void {
     if (!isLocationId(id) || (this.classroom?.maps && !this.classroom.maps.includes(id))) throw new Error("สถานที่ไม่อยู่ในกิจกรรมนี้");

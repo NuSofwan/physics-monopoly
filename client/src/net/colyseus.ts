@@ -1,6 +1,8 @@
 import { Client, type Room } from "@colyseus/sdk";
 import type { GameState, Appearance } from "@physics-monopoly/shared";
 import { useGameStore } from "../store/gameStore";
+import { readJson, storageGet, storageRemove, storageSet } from "../safeStorage";
+import { syncServerClock } from "./serverClock";
 
 const serverUrl = (import.meta.env.VITE_SERVER_URL || "ws://localhost:2567").replace(/\/+$/, "");
 export const apiUrl = (import.meta.env.VITE_API_URL || serverUrl.replace(/^ws/, "http")).replace(/\/+$/, "");
@@ -40,19 +42,41 @@ async function connect(mode: "create" | "join", roomCode: string | undefined, na
     if (savedSession) rejoin = await ticketRequest("rejoin", savedSession);
     else joinTicket = (await ticketRequest("join", { assignmentToken: assignmentToken(), name, avatar })).ticket;
   }
-  const options = {
+  const freshOptions = {
     appearance,
     name,
     avatar,
     ...(mapId ? { mapId } : {}),
     ...(assignmentToken() ? { assignmentToken: assignmentToken()! } : {}),
-    ...(savedSession ? { participantId: savedSession.participantId, reconnectToken: savedSession.reconnectToken } : {}),
     ...(joinTicket ? { joinTicket } : {}),
+  };
+  const options = {
+    ...freshOptions,
+    ...(savedSession ? { participantId: savedSession.participantId, reconnectToken: savedSession.reconnectToken } : {}),
     ...(rejoin ? { rejoinTicket: rejoin.ticket } : {}),
   };
-  const room = mode === "create" ? await client.create<GameState>("game", options) : (rejoin?.roomId ?? savedSession?.roomId) ? await rejoinAfterTransportClose(client, (rejoin?.roomId ?? savedSession!.roomId)!, options) : await joinByRoomCode(client, roomCode ?? "", options);
+  let room: Room<GameState>;
+  const rejoinRoomId = rejoin?.roomId ?? savedSession?.roomId;
+  if (mode === "create") room = await client.create<GameState>("game", options);
+  else if (rejoinRoomId) {
+    try { room = await rejoinAfterTransportClose(client, rejoinRoomId, options); }
+    catch (error) {
+      // The saved seat no longer exists (e.g. it was released when this tab left or refreshed in the lobby).
+      // Forget it and join the room as a new player instead of failing forever.
+      // Only when the seat is really gone: a fresh join is refused once the game has started, and then the
+      // saved seat must survive for the next retry (e.g. a refresh that beat the old socket's close).
+      if (rejoin || !isAuthFailure(error)) throw error;
+      try { room = await joinByRoomCode(client, roomCode ?? "", freshOptions); }
+      catch { throw error; }
+      storageRemove("session", participantSessionKey);
+    }
+  } else room = await joinByRoomCode(client, roomCode ?? "", options);
   if (generation !== connectionGeneration) { await room.leave(); return; }
   bindRoom(room, generation, name, avatar, appearance);
+}
+
+function isAuthFailure(error: unknown): boolean {
+  return error instanceof Error && /onAuth failed/i.test(error.message);
 }
 
 function bindRoom(room: Room<GameState>, generation: number, name: string, avatar: string, appearance?: Appearance): void {
@@ -64,14 +88,14 @@ function bindRoom(room: Room<GameState>, generation: number, name: string, avata
   store.setError(null);
   // Reconnects call bindRoom without an appearance; keep whatever was last persisted instead of clobbering it with {}.
   const persistedAppearance = appearance ?? loadProfileAppearance();
-  localStorage.setItem("physics-monopoly-profile", JSON.stringify({ name, avatar, appearance: persistedAppearance }));
+  storageSet("local", "physics-monopoly-profile", JSON.stringify({ name, avatar, appearance: persistedAppearance }));
 
   const isCurrent = () => generation === connectionGeneration && useGameStore.getState().room === room;
-  room.onMessage("snapshot", (state: GameState) => { if (isCurrent()) useGameStore.getState().setState(state); });
+  room.onMessage("snapshot", (state: GameState) => { if (!isCurrent()) return; syncServerClock(state.serverNow); useGameStore.getState().setState(state); });
   room.onMessage("participantSession", (session: ParticipantSession) => {
     if (!isCurrent()) return;
-    sessionStorage.setItem(participantSessionKey, JSON.stringify({ ...session, roomId: room.roomId, activityScope: assignmentToken() ?? "" }));
     useGameStore.getState().setPlayerId(session.participantId);
+    storageSet("session", participantSessionKey, JSON.stringify({ ...session, roomId: room.roomId, activityScope: assignmentToken() ?? "" }));
   });
   room.onMessage("tokenMove", (event: { playerId: string; path: number[]; dice: [number, number] | null }) => {
     if (!isCurrent()) return;
@@ -82,12 +106,14 @@ function bindRoom(room: Room<GameState>, generation: number, name: string, avata
   room.onLeave((code) => {
     if (generation !== connectionGeneration) return;
     useGameStore.getState().setConnected(false);
-    if (code === 1000 || code === 4000) {
+    // 1011 = the server closed the room because its storage failed; it will refuse every rejoin.
+    if (code === 1000 || code === 4000 || code === 1011) {
       useGameStore.getState().setRoom(null);
       useGameStore.getState().setState(null);
       useGameStore.getState().setPlayerId(null);
-      sessionStorage.removeItem(participantSessionKey);
+      storageRemove("session", participantSessionKey);
       if (code === 4000) useGameStore.getState().setError("เจ้าของห้องนำคุณออกจากห้องแล้ว");
+      if (code === 1011) useGameStore.getState().setError("ห้องนี้ปิดเพราะเซิร์ฟเวอร์บันทึกข้อมูลไม่สำเร็จ กรุณาสร้างหรือเข้าห้องใหม่");
     } else {
       void reconnect(room.roomId, generation, name, avatar);
     }
@@ -109,7 +135,7 @@ async function rejoinAfterTransportClose(client: Client, roomId: string, options
 
 export function savedRoomCode(): string | null {
   try {
-    const session = JSON.parse(sessionStorage.getItem(participantSessionKey) ?? "null") as ParticipantSession | null;
+    const session = JSON.parse(storageGet("session", participantSessionKey) ?? "null") as ParticipantSession | null;
     return session && (session.activityScope ?? "") === (assignmentToken() ?? "") && typeof session.roomCode === "string" && /^[A-Z2-9]{6}$/.test(session.roomCode) ? session.roomCode : null;
   } catch { return null; }
 }
@@ -118,7 +144,7 @@ export async function loadPersonalResults(roomCode: string, signal: AbortSignal)
   const session = loadParticipantSession(roomCode);
   if (!session?.activityScope) throw new Error("ไม่พบสิทธิ์อ่านผลของคุณในอุปกรณ์นี้");
   const response = await fetch(`${apiUrl}/api/tickets/results`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(session), signal });
-  const result = await response.json();
+  const result = await readJson<{ error?: string }>(response);
   if (!response.ok) throw new Error(result.error ?? "ไม่สามารถอ่านผลได้");
   return result;
 }
@@ -138,13 +164,26 @@ async function reconnect(roomId: string, generation: number, name: string, avata
       if (generation !== connectionGeneration) { await room.leave(); return; }
       bindRoom(room, generation, name, avatar);
       return;
-    } catch { /* The server may still be retiring the old transport. Retry with backoff. */ }
+    } catch (error) {
+      // In the lobby the server releases a dropped seat, so the old token can never work again: join fresh.
+      const lobby = useGameStore.getState().state;
+      if (lobby?.phase === "lobby" && !session.activityScope && isAuthFailure(error)) {
+        try {
+          const room = await joinByRoomCode(new Client(serverUrl), lobby.roomCode, { name, avatar, appearance: loadProfileAppearance() });
+          storageRemove("session", participantSessionKey);
+          if (generation !== connectionGeneration) { await room.leave(); return; }
+          bindRoom(room, generation, name, avatar);
+          return;
+        } catch { /* fall through to the next retry */ }
+      }
+      /* Otherwise the server may still be retiring the old transport. Retry with backoff. */
+    }
   }
   if (generation === connectionGeneration) useGameStore.getState().setError("กลับเข้าเกมไม่สำเร็จ กรุณาตรวจเครือข่ายแล้วรีโหลดหน้าเว็บเพื่อเข้าห้องเดิม");
 }
 async function ticketRequest(action: "join" | "rejoin", body: object): Promise<{ ticket: string; roomId: string }> {
   const response = await fetch(`${apiUrl}/api/tickets/${action}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
-  const result = await response.json();
+  const result = await readJson<{ ticket: string; roomId: string; error?: string }>(response);
   if (!response.ok) throw new Error(result.error ?? "ขอตั๋วเข้าร่วมไม่สำเร็จ");
   return result;
 }
@@ -158,7 +197,7 @@ export function leaveGame(): void {
   store.setState(null);
   store.setPlayerId(null);
   store.setError(null);
-  sessionStorage.removeItem(participantSessionKey);
+  storageRemove("session", participantSessionKey);
 }
 
 export function sendReady(): void {
@@ -224,7 +263,7 @@ function createRequestId(): string {
 
 function loadProfileAppearance(): Appearance {
   try {
-    const saved = JSON.parse(localStorage.getItem("physics-monopoly-profile") ?? "{}") as { appearance?: Appearance };
+    const saved = JSON.parse(storageGet("local", "physics-monopoly-profile") ?? "{}") as { appearance?: Appearance };
     return saved.appearance ?? {};
   } catch {
     return {};
@@ -233,17 +272,17 @@ function loadProfileAppearance(): Appearance {
 
 function loadParticipantSession(roomCode: string | undefined): ParticipantSession | null {
   try {
-    const parsed = JSON.parse(sessionStorage.getItem(participantSessionKey) ?? "null") as ParticipantSession | null;
+    const parsed = JSON.parse(storageGet("session", participantSessionKey) ?? "null") as ParticipantSession | null;
     return parsed && parsed.roomCode === roomCode && (parsed.activityScope ?? "") === (assignmentToken() ?? "") ? parsed : null;
   } catch {
     return null;
   }
 }
 
-async function joinByRoomCode(client: Client, roomCode: string, options: { assignmentToken?: string }): Promise<Room<GameState>> {
+async function joinByRoomCode(client: Client, roomCode: string, options: { assignmentToken?: string; [key: string]: unknown }): Promise<Room<GameState>> {
   const suffix = options.assignmentToken ? `?assignmentToken=${encodeURIComponent(options.assignmentToken)}` : "";
   const response = await fetch(`${apiUrl}/api/rooms/${encodeURIComponent(roomCode)}${suffix}`);
-  const payload = (await response.json()) as { roomId?: string; error?: string };
+  const payload = await readJson<{ roomId?: string; error?: string }>(response);
   if (!response.ok || !payload.roomId) throw new Error(payload.error ?? "ไม่พบห้องหรือห้องปิดรับผู้เล่นแล้ว");
   return client.joinById<GameState>(payload.roomId, options);
 }

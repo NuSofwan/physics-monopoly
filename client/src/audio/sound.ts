@@ -3,7 +3,12 @@ let audioContext: AudioContext | null = null;
 
 export function setMuted(value: boolean): void { muted = value; }
 
+/** Fire-and-forget beep. Audio failures (blocked AudioContext, no output device) must never break gameplay. */
 export function playSound(name: "dice" | "step" | "good" | "bad"): void {
+  try { beep(name); } catch { /* sound is optional */ }
+}
+
+function beep(name: "dice" | "step" | "good" | "bad"): void {
   if (!muted && typeof AudioContext !== "undefined") {
     const context = audioContext ??= new AudioContext();
     if (context.state === "suspended") void context.resume().catch(() => undefined);

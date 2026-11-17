@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import type { AnswerResult, PendingQuestion, LearningReceipt } from "@physics-monopoly/shared";
 import { sendAnswer, sendNumericAnswer, sendHint, sendReflection, apiUrl } from "../net/colyseus";
 import { playSound } from "../audio/sound";
+import { serverNow } from "../net/serverClock";
 import { EquationText } from "./EquationText";
 
 interface Props {
@@ -17,12 +18,19 @@ export function QuestionModal({ pending, answerResult, isMine, revealDeadline, r
   const [selected, setSelected] = useState<number | null>(null);
   const [numericValue, setNumericValue] = useState("");
   const [unit, setUnit] = useState(pending.question.allowedUnits?.[0] ?? "");
-  const [now, setNow] = useState(Date.now());
+  const [now, setNow] = useState(serverNow);
   const panel = useRef<HTMLDivElement>(null);
   const canSubmit = isMine && (!pending.group || receipt?.status === "open" || receipt?.status === "retry_open");
   useEffect(() => {
     if (receipt?.status === "retry_open") { setSelected(null); setNumericValue(""); }
   }, [receipt?.status]);
+  // If an answer was lost (e.g. sent during a reconnect) and no result arrives, unlock the choices so the
+  // player can answer again; the server accepts only the first answer it actually receives.
+  useEffect(() => {
+    if (selected === null || answerResult) return;
+    const timer = window.setTimeout(() => setSelected(null), 5000);
+    return () => window.clearTimeout(timer);
+  }, [selected, answerResult]);
   const secondsLeft = Math.max(0, Math.ceil(((revealDeadline ?? pending.deadline) - now) / 1000));
   const progress = useMemo(() => {
     const total = (pending.stage==="retry"?20:pending.question.timeLimitSec) * 1000 * (pending.timeMultiplier??1);
@@ -30,7 +38,7 @@ export function QuestionModal({ pending, answerResult, isMine, revealDeadline, r
   }, [now, pending]);
 
   useEffect(() => {
-    const id = window.setInterval(() => setNow(Date.now()), 250);
+    const id = window.setInterval(() => setNow(serverNow()), 250);
     return () => window.clearInterval(id);
   }, []);
 
@@ -99,7 +107,7 @@ export function QuestionModal({ pending, answerResult, isMine, revealDeadline, r
             const done = Boolean(answerResult);
             return (
               <button
-                key={choice}
+                key={`${index}:${choice}`}
                 disabled={!canSubmit || done || selected !== null || secondsLeft === 0}
                 onClick={() => choose(index)}
                 className={`focus-ring answer-option flex items-center gap-3 rounded-xl border px-4 py-3 text-left font-bold transition ${

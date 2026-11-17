@@ -32,6 +32,8 @@ import type { ActivitySummary } from "./teacher/ActivityEntry";
 import { AppearanceEditor } from "./ui/AppearanceEditor";
 import { defaultQuality, type RenderQuality } from "./game3d/RenderQuality";
 import type { PieceStyle } from "./game3d/Board3D";
+import { storageGet, storageSet } from "./safeStorage";
+import { serverNow } from "./net/serverClock";
 
 const avatarOptions = avatarPresets.map((preset) => preset.id);
 const Board3D = lazy(() => import("./game3d/Board3D").then((module) => ({ default: module.Board3D })));
@@ -51,11 +53,13 @@ export function App({ activity }: { activity?: ActivitySummary } = {}): JSX.Elem
   const [renderer, setRenderer] = useState(new URLSearchParams(window.location.search).get("renderer") ?? "3d");
   const [reducedMotion, setReducedMotion] = useState(() => window.matchMedia("(prefers-reduced-motion: reduce)").matches);
   const [quality, setQuality] = useState<RenderQuality>(defaultQuality);
-  const [pieceStyle, setPieceStyle] = useState<PieceStyle>(() => localStorage.getItem("physics-monopoly-pieces") === "metal" ? "metal" : "figure");
-  useEffect(() => { localStorage.setItem("physics-monopoly-pieces", pieceStyle); }, [pieceStyle]);
+  const [pieceStyle, setPieceStyle] = useState<PieceStyle>(() => storageGet("local", "physics-monopoly-pieces") === "metal" ? "metal" : "figure");
+  useEffect(() => { storageSet("local", "physics-monopoly-pieces", pieceStyle); }, [pieceStyle]);
   const [textScale, setTextScale] = useState(100);
-  const [now, setNow] = useState(Date.now());
-  const [mute, setMute] = useState(() => localStorage.getItem("physics-monopoly-muted") === "true");
+  // The server allows one upgrade question per turn; hide the button once it has been used this turn.
+  const [upgradeTurn, setUpgradeTurn] = useState<number | null>(null);
+  const [now, setNow] = useState(serverNow);
+  const [mute, setMute] = useState(() => storageGet("local", "physics-monopoly-muted") === "true");
   // Once the 3D canvas is unmounted (renderer switches to "html"), its
   // webglcontextrestored listener is torn down with it, so we can never observe
   // the context coming back on its own. The "ลองใหม่" banner therefore offers a
@@ -64,8 +68,8 @@ export function App({ activity }: { activity?: ActivitySummary } = {}): JSX.Elem
   const [lostGraphicsContext, setLostGraphicsContext] = useState(false);
   const fallbackToHtml = useCallback(() => { setRenderer("html"); setLostGraphicsContext(true); }, []);
   const retry3d = useCallback(() => { setLostGraphicsContext(false); setRenderer("3d"); }, []);
-  useEffect(() => { const timer = window.setInterval(() => setNow(Date.now()), 1000); return () => window.clearInterval(timer); }, []);
-  useEffect(() => { setMuted(mute); localStorage.setItem("physics-monopoly-muted", String(mute)); }, [mute]);
+  useEffect(() => { const timer = window.setInterval(() => setNow(serverNow()), 1000); return () => window.clearInterval(timer); }, []);
+  useEffect(() => { setMuted(mute); storageSet("local", "physics-monopoly-muted", String(mute)); }, [mute]);
   useEffect(() => {
     const previous = document.documentElement.style.fontSize;
     document.documentElement.style.fontSize = `${textScale}%`;
@@ -139,11 +143,11 @@ export function App({ activity }: { activity?: ActivitySummary } = {}): JSX.Elem
             <AppearanceEditor avatar={avatar} value={appearance} onChange={setAppearance} disabled={Boolean(state)}/>
             <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
               <label className="block sm:col-span-2"><span className="mb-1 block text-sm font-bold">เลือกเมือง</span><select aria-label="สถานที่" className="w-full rounded-lg border p-3" value={state?.mapId ?? mapId} disabled={Boolean(state) && !isHost} onChange={(event) => { setMapId(event.target.value); if (state) sendMap(event.target.value); }}>{locations.filter((location) => !activity?.rules?.maps || activity.rules.maps.includes(location.id)).map((location) => <option key={location.id} value={location.id}>{location.name} · {location.category}</option>)}</select></label><a href={`/asset-lab?map=${state?.mapId ?? mapId}`} target="_blank" rel="noreferrer" className="text-sm font-bold text-sky-800 underline sm:col-span-2">ดูตัวอย่างเมืองหมุนได้ (เปิดแท็บใหม่)</a>
-              <button className="focus-ring game-primary inline-flex items-center justify-center gap-2 rounded-lg px-5 py-3 font-black text-white disabled:opacity-50" disabled={joining || activityClosed} onClick={() => connect("create")}>
+              <button className="focus-ring game-primary inline-flex items-center justify-center gap-2 rounded-lg px-5 py-3 font-black text-white disabled:opacity-50" disabled={joining || activityClosed || Boolean(state)} onClick={() => connect("create")}>
                 <Play className="h-5 w-5" />
                 สร้างห้อง
               </button>
-              <button className="focus-ring game-secondary inline-flex items-center justify-center gap-2 rounded-lg px-5 py-3 font-black text-ink disabled:opacity-50" disabled={joining || !roomCode || (activityClosed && savedRoomCode() !== roomCode)} onClick={() => connect("join")}>
+              <button className="focus-ring game-secondary inline-flex items-center justify-center gap-2 rounded-lg px-5 py-3 font-black text-ink disabled:opacity-50" disabled={joining || Boolean(state) || !roomCode || (activityClosed && savedRoomCode() !== roomCode)} onClick={() => connect("join")}>
                 <DoorOpen className="h-5 w-5" />
                 {savedRoomCode() === roomCode ? "กลับเข้าเกมเดิม" : "เข้าห้อง"}
               </button>
@@ -191,7 +195,7 @@ export function App({ activity }: { activity?: ActivitySummary } = {}): JSX.Elem
 
                 <div className="mt-5 grid gap-2 sm:grid-cols-2">
                   <button className="rounded-lg bg-white px-4 py-3 font-bold" onClick={sendReady}>พร้อมเล่น</button>
-                  <button className="rounded-lg bg-ink px-4 py-3 font-bold text-white disabled:opacity-40" disabled={!isHost || !state.players.every((player) => player.ready)} onClick={sendStart}>เริ่มเกม</button>
+                  <button className="rounded-lg bg-ink px-4 py-3 font-bold text-white disabled:opacity-40" disabled={!isHost || !state.players.filter((player) => player.connected).every((player) => player.ready)} onClick={sendStart}>เริ่มเกม</button>
                 </div>
                 <button className="mt-3 rounded-lg bg-white px-4 py-3 font-bold" onClick={leaveGame}>ออกจากห้อง / ล้างตัวตน</button>
               </>
@@ -264,12 +268,12 @@ export function App({ activity }: { activity?: ActivitySummary } = {}): JSX.Elem
                 <h2 className="text-xl font-black">{active?.name ?? "Waiting"}</h2>
               </div>
               <div className="rounded-lg bg-white px-3 py-2 text-center font-black">
-                {state.dice ? `${state.dice[0]} + ${state.dice[1]}` : turnSeconds !== null ? `${turnSeconds}s` : "--"}
+                {state.phase === "rolling" && turnSeconds !== null ? `${turnSeconds}s` : state.dice ? `${state.dice[0]} + ${state.dice[1]}` : turnSeconds !== null ? `${turnSeconds}s` : "--"}
               </div>
             </div>
             <button
               className="focus-ring game-primary mt-4 inline-flex w-full items-center justify-center gap-2 rounded-lg px-5 py-4 text-lg font-black text-white disabled:cursor-not-allowed disabled:opacity-45"
-              disabled={!connected || !isMyTurn || state.phase !== "rolling"}
+              disabled={!connected || !isMyTurn || state.phase !== "rolling" || Boolean(me?.bankrupt) || (Boolean(me?.inJail) && !state.classroomMode)}
               onClick={() => {
                 playSound("dice");
                 sendRoll();
@@ -280,16 +284,16 @@ export function App({ activity }: { activity?: ActivitySummary } = {}): JSX.Elem
             </button>
             {me?.inJail && isMyTurn ? (
               <div className="mt-3 grid grid-cols-2 gap-2">
-                <button className="rounded-lg bg-white px-3 py-2 text-sm font-bold" onClick={sendPayJailFine}>Pay $500</button>
-                <button className="rounded-lg bg-white px-3 py-2 text-sm font-bold" onClick={sendJailQuestion}>Solve jail quiz</button>
+                <button className="rounded-lg bg-white px-3 py-2 text-sm font-bold disabled:opacity-45" disabled={state.phase !== "rolling" || (me?.money ?? 0) < 500} onClick={sendPayJailFine}>จ่ายค่าปรับ ฿500</button>
+                <button className="rounded-lg bg-white px-3 py-2 text-sm font-bold disabled:opacity-45" disabled={state.phase !== "rolling"} onClick={sendJailQuestion}>Solve jail quiz</button>
               </div>
             ) : null}
           </div>
 
           <BuyDecisionPanel open={state.phase === "buying" && isMyTurn && landedTile?.type === "property"} tile={landedTile} deadline={state.turnDeadline} now={now} onBuy={sendBuy} onUpgrade={sendUpgrade} onPass={sendSkipBuy} />
 
-          {!state.classroomMode && landedTile?.type === "property" && landedTile.ownerId === playerId && state.phase === "rolling" ? (
-            <button className="panel rounded-lg p-4 text-left font-black" onClick={sendUpgrade}>Upgrade {landedTile.name}</button>
+          {!state.classroomMode && landedTile?.type === "property" && landedTile.ownerId === playerId && isMyTurn && state.phase === "rolling" && (landedTile.level ?? 0) < 3 && upgradeTurn !== state.turnCount ? (
+            <button className="panel rounded-lg p-4 text-left font-black" onClick={() => { setUpgradeTurn(state.turnCount); sendUpgrade(); }}>Upgrade {landedTile.name}</button>
           ) : null}
 
           <PropertyPortfolio state={state} playerId={playerId} />
@@ -326,7 +330,7 @@ export function App({ activity }: { activity?: ActivitySummary } = {}): JSX.Elem
 }
 function loadProfile(): { name: string; avatar: string; appearance: Appearance } {
   try {
-    const saved = JSON.parse(localStorage.getItem("physics-monopoly-profile") ?? "{}") as Partial<{ name: string; avatar: string; appearance: Appearance }>;
+    const saved = JSON.parse(storageGet("local", "physics-monopoly-profile") ?? "{}") as Partial<{ name: string; avatar: string; appearance: Appearance }>;
     return { name: saved.name ?? "Physics Student", avatar: saved.avatar ?? "astro", appearance: saved.appearance ?? {} };
   } catch {
     return { name: "Physics Student", avatar: "astro", appearance: {} };
