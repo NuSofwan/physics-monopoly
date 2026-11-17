@@ -1,7 +1,7 @@
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { locationById, type GameState, type Tile } from "@physics-monopoly/shared";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { CanvasTexture, CircleGeometry, Color, Euler, Float32BufferAttribute, Group, LinearFilter, PlaneGeometry, Quaternion, SRGBColorSpace, Vector3 } from "three";
+import { useCallback, useEffect, useMemo, useRef, useState, type MutableRefObject } from "react";
+import { CanvasTexture, CircleGeometry, Color, Euler, Float32BufferAttribute, Group, LinearFilter, PlaneGeometry, Quaternion, SRGBColorSpace, Vector3, type Object3D } from "three";
 import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeometry.js";
 import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
@@ -16,11 +16,18 @@ import { diceOrientations, pipPositions, tilePosition, tokenPosition } from "./d
 import { PerformanceGuard, PostEffects, SKY, SceneLights, SkyAndEnvironment, WaterMotion } from "./Atmosphere";
 import { QualityContext, type RenderQuality } from "./RenderQuality";
 import { Ambience } from "./Ambience";
+import { cameraFocus } from "./tabletop/cameraFocus";
+import { DustMotes, JailCage, ROOM, TabletopConstruction, TabletopDice, TabletopLighting, TabletopMetalToken, TabletopPostEffects, TabletopProperty, TabletopSet, TokenPedestal } from "./tabletop/TabletopScene";
+
+/** "tabletop": a real board game on a lamp-lit wooden table (default). "city": the original island-city diorama. */
+export type BoardStyle = "tabletop" | "city";
+/** Tabletop tokens: a painted miniature of the player's character, or a cast-metal physics token. */
+export type PieceStyle = "figure" | "metal";
 
 const playerColors = ["#34d399", "#f8c24a", "#f472b6", "#60a5fa", "#a78bfa", "#fb923c", "#2dd4bf", "#e879f9"];
 const tileColors = ["#d99a36", "#2a9b9b", "#c75f46", "#f0dfb9", "#1f6f94"];
 
-export function Board3D({ state, moveEvent, reducedMotion = false, quality: requestedQuality = "low", onUnavailable, onRestored, measureAssets = false }: { state: GameState; moveEvent: MoveEvent | null; reducedMotion?: boolean; quality?: RenderQuality; onUnavailable: () => void; onRestored?: () => void; measureAssets?: boolean }): JSX.Element {
+export function Board3D({ state, moveEvent, reducedMotion = false, quality: requestedQuality = "low", onUnavailable, onRestored, measureAssets = false, boardStyle = "tabletop", pieceStyle = "figure" }: { state: GameState; moveEvent: MoveEvent | null; reducedMotion?: boolean; quality?: RenderQuality; onUnavailable: () => void; onRestored?: () => void; measureAssets?: boolean; boardStyle?: BoardStyle; pieceStyle?: PieceStyle }): JSX.Element {
   const [reset, setReset] = useState(0);
   const [slowDevice, setSlowDevice] = useState(false);
   useEffect(() => setSlowDevice(false), [requestedQuality]);
@@ -37,6 +44,7 @@ export function Board3D({ state, moveEvent, reducedMotion = false, quality: requ
     setConstruction(changed);const timer=window.setTimeout(()=>setConstruction(null),1900);return()=>window.clearTimeout(timer);
   },[buildingsKey,reducedMotion]);
   const city = locationById(state.mapId);
+  if (boardStyle === "tabletop") return <TabletopBoard state={state} moveEvent={moveEvent} reducedMotion={reducedMotion} quality={quality} markSlow={markSlow} onUnavailable={onUnavailable} onRestored={onRestored} measureAssets={measureAssets} pieceStyle={pieceStyle} construction={construction} buildingsKey={buildingsKey} cityName={city.name}/>;
   return (
     <div className="board-frame relative h-[60vh] min-h-[360px] w-full" style={{ aspectRatio: "auto" }} aria-label={`กระดานสามมิติ${city.name}`}>
       <div className="absolute left-3 top-3 z-10 flex flex-wrap gap-2"><button className="rounded-lg bg-white px-3 py-3 font-bold" onClick={() => { setFollow(false); setReset(value => value+1); }}>ภาพรวม / รีเซ็ตกล้อง</button><button aria-pressed={follow} disabled={reducedMotion} className="rounded-lg bg-white px-3 py-3 font-bold disabled:opacity-50" onClick={()=>setFollow(value=>!value)}>ตามผู้เล่น{reducedMotion?" (ปิดเมื่อใช้ลดการเคลื่อนไหว)":""}</button></div>
@@ -66,6 +74,47 @@ export function Board3D({ state, moveEvent, reducedMotion = false, quality: requ
   );
 }
 
+const TABLETOP_CAMERA: [number,number,number] = [0, 10.5, 15.5];
+const TABLETOP_TARGET: [number,number,number] = [0, 0, 1];
+
+/** The lamp-lit tabletop scene: printed board, wooden pieces, money and cards, with cinematic camera moments. */
+function TabletopBoard({ state, moveEvent, reducedMotion, quality, markSlow, onUnavailable, onRestored, measureAssets, pieceStyle, construction, buildingsKey, cityName }: { state: GameState; moveEvent: MoveEvent | null; reducedMotion: boolean; quality: RenderQuality; markSlow: () => void; onUnavailable: () => void; onRestored?: () => void; measureAssets: boolean; pieceStyle: PieceStyle; construction: number | null; buildingsKey: string; cityName: string }): JSX.Element {
+  const [reset, setReset] = useState(0);
+  const [cinematic, setCinematic] = useState(true);
+  const mover = useRef<Group | null>(null);
+  const tracking = cinematic && !reducedMotion;
+  const ownerColor = (tile: Tile): string | null => { const owner = state.players.findIndex(player => player.id === tile.ownerId); return owner >= 0 ? playerColors[owner % playerColors.length] ?? "#34d399" : null; };
+  const constructionTile = construction !== null ? state.tiles[construction] : undefined;
+  const constructionColor = constructionTile ? ownerColor(constructionTile) : null;
+  // Only real rolls (events that carry dice) re-throw the dice; forced moves such as "go to jail" do not.
+  const throwNonce = useRef(0);
+  if (moveEvent?.dice && moveEvent.nonce !== throwNonce.current) throwNonce.current = moveEvent.nonce;
+  return (
+    <div className="board-frame tabletop-frame relative h-[60vh] min-h-[360px] w-full" aria-label={`กระดานเกมบนโต๊ะ ${cityName}`}>
+      <div className="absolute left-2 top-2 z-10 flex flex-wrap gap-2 sm:left-3 sm:top-3"><button className="min-h-11 rounded-lg bg-white/90 px-2 text-sm font-bold sm:px-3 sm:text-base" onClick={() => setReset(value => value + 1)}>ภาพรวม / รีเซ็ตกล้อง</button><button aria-pressed={tracking} disabled={reducedMotion} title={reducedMotion ? "ปิดอยู่เพราะเลือกลดการเคลื่อนไหว" : undefined} className="min-h-11 rounded-lg bg-white/90 px-2 text-sm font-bold disabled:opacity-50 sm:px-3 sm:text-base" onClick={() => setCinematic(value => !value)}>กล้องตามตัวเดิน: {tracking ? "เปิด" : "ปิด"}</button></div>
+      <Canvas shadows={quality !== "low"} camera={{ position: TABLETOP_CAMERA, fov: 36, near: .3, far: 160 }} dpr={quality === "low" ? 1 : quality === "high" ? [1, 1.75] : [1, 1.5]} gl={{ antialias: true, powerPreference: "high-performance" }} onCreated={({ gl }) => { gl.toneMappingExposure = 1.05; }} fallback={<p>ไม่สามารถเปิด 3 มิติ กรุณาเลือกกระดานข้อความ</p>}>
+        <QualityContext.Provider value={quality}>
+        {measureAssets ? <AssetMetrics/> : null}
+        <CameraControls reset={reset} onUnavailable={onUnavailable} onRestored={onRestored} initialPosition={TABLETOP_CAMERA} initialTarget={TABLETOP_TARGET} minDistance={5} maxDistance={30} trackRef={tracking ? mover : undefined}/>
+        <color attach="background" args={[ROOM.background]}/>
+        <fog attach="fog" args={[ROOM.fog, 26, 70]}/>
+        <TabletopLighting quality={quality}/>
+        {quality === "high" ? <><TabletopPostEffects closeUp={tracking && state.phase === "moving"}/><PerformanceGuard onSlow={markSlow}/></> : null}
+        {quality !== "low" ? <DustMotes reducedMotion={reducedMotion}/> : null}
+        <StaticBatch version={`tabletop:${cityName}:${buildingsKey}:${construction}:${quality}`} name="asset:board-static">
+          <TabletopSet tiles={state.tiles} title="เศรษฐีฟิสิกส์" subtitle={cityName} quality={quality}/>
+          {state.tiles.map(tile => tile.type === "property" ? <TabletopProperty key={tile.index} tile={tile} ownerColor={ownerColor(tile)} quality={quality} hidden={construction === tile.index}/> : null)}
+        </StaticBatch>
+        {constructionTile?.type === "property" && constructionColor ? <TabletopConstruction key={`${construction}:${buildingsKey}`} tile={constructionTile} ownerColor={constructionColor} quality={quality}/> : null}
+        <group name="asset:tokens">{state.players.map((player, index) => <Token key={player.id} look={pieceStyle} quality={quality} groupRef={index === state.currentPlayerIndex ? mover : undefined} pose={state.phase === "answering" || state.phase === "reveal" ? "think" : state.phase === "moving" && index === state.currentPlayerIndex ? "walk" : "idle"} xp={player.xp} tileIndex={player.tileIndex} name={player.name} avatar={player.avatar} appearance={player.appearance} moveEvent={moveEvent?.playerId === player.id ? moveEvent : null} reducedMotion={reducedMotion} slot={index} color={playerColors[index % playerColors.length] ?? "#34d399"} />)}</group>
+        {state.players.map((player, index) => player.inJail && !player.bankrupt ? <JailCage key={`jail:${player.id}`} position={tokenPosition(player.tileIndex, index)} reducedMotion={reducedMotion}/> : null)}
+        {state.dice ? <TabletopDice dice={state.dice} nonce={throwNonce.current} reducedMotion={reducedMotion}/> : null}
+        </QualityContext.Provider>
+      </Canvas>
+    </div>
+  );
+}
+
 function WalkingRing(): JSX.Element {
   // A continuous raised promenade supports the second row of tokens outside tile
   // footprints. Top is just below tile tops, avoiding coplanar z-fighting.
@@ -78,19 +127,43 @@ function WalkingRing(): JSX.Element {
   </group>)}</group>;
 }
 
-export function CameraControls({ reset, onUnavailable, onRestored, followTile, initialPosition = [0,17,18], initialTarget = [0,0,0], minDistance = 12 }: { reset: number; onUnavailable: () => void; onRestored?: () => void; followTile?: number; initialPosition?: [number,number,number]; initialTarget?: [number,number,number]; minDistance?: number }): null {
+export function CameraControls({ reset, onUnavailable, onRestored, followTile, initialPosition = [0,17,18], initialTarget = [0,0,0], minDistance = 12, maxDistance = 32, trackRef }: { reset: number; onUnavailable: () => void; onRestored?: () => void; followTile?: number; initialPosition?: [number,number,number]; initialTarget?: [number,number,number]; minDistance?: number; maxDistance?: number; trackRef?: MutableRefObject<Object3D | null> }): null {
   const { camera, gl } = useThree();
   const controlsRef = useRef<OrbitControls | null>(null);
   const desiredTarget = useMemo(() => { const [x,z] = tilePosition(followTile ?? 0); return followTile === undefined ? new Vector3(...initialTarget) : new Vector3(x*.7,0,z*.7); },[followTile,initialTarget[0],initialTarget[1],initialTarget[2]]);
   const shift = useMemo(() => new Vector3(), []);
   const sampleAt = useRef(0);
   const frames=useRef(0);
+  // Cinematic tracking: while the tracked token walks (userData.moving) the camera glides to it and dollies in,
+  // lingers briefly after it stops, then eases back to the distance and look-at point the player had before.
+  const track = useMemo(() => ({ active: false, linger: 0, restore: 0, point: new Vector3(), offset: new Vector3() }), []);
   useFrame(({ clock },delta) => {
     const controls = controlsRef.current;
-    if (controls && controls.target.distanceToSquared(desiredTarget) > .00001) {
-      shift.copy(desiredTarget).sub(controls.target).multiplyScalar(Math.min(1,delta*3));
-      controls.target.add(shift); camera.position.add(shift); controls.update();
+    const tracked = trackRef?.current, walking = Boolean(tracked?.userData.moving);
+    track.linger = walking ? 1.3 : Math.max(0, track.linger - delta);
+    if (controls && tracked && track.linger > 0) {
+      if (!track.active) { track.active = true; track.restore = camera.position.distanceTo(controls.target); }
+      tracked.getWorldPosition(track.point); track.point.y += .45;
+      shift.copy(track.point).sub(controls.target).multiplyScalar(Math.min(1,delta*2.6));
+      controls.target.add(shift); camera.position.add(shift);
+      track.offset.copy(camera.position).sub(controls.target);
+      const distance = track.offset.length(), close = Math.max(minDistance, 7.5);
+      if (distance > close) camera.position.copy(controls.target).addScaledVector(track.offset.normalize(), distance + (close - distance) * Math.min(1, delta * 1.6));
+      controls.update();
+    } else if (controls) {
+      if (controls.target.distanceToSquared(desiredTarget) > .00001) {
+        shift.copy(desiredTarget).sub(controls.target).multiplyScalar(Math.min(1,delta*3));
+        controls.target.add(shift); camera.position.add(shift);
+      }
+      if (track.active) {
+        track.offset.copy(camera.position).sub(controls.target);
+        const distance = track.offset.length();
+        if (Math.abs(track.restore - distance) < .05) track.active = false;
+        else camera.position.copy(controls.target).addScaledVector(track.offset.normalize(), distance + (track.restore - distance) * Math.min(1, delta * 1.8));
+      }
+      controls.update();
     }
+    if (controls) cameraFocus.copy(controls.target);
     frames.current++;
     if (clock.elapsedTime - sampleAt.current < 1) return;
     gl.domElement.dataset.fps=(frames.current/(clock.elapsedTime-sampleAt.current)).toFixed(1);frames.current=0;
@@ -102,10 +175,10 @@ export function CameraControls({ reset, onUnavailable, onRestored, followTile, i
   useEffect(() => {
     camera.position.set(...initialPosition);
     const controls = new OrbitControls(camera, gl.domElement);
-    controlsRef.current = controls;
+    controlsRef.current = controls; track.active = false; track.linger = 0;
     controls.target.set(...initialTarget);
     controls.minDistance = minDistance;
-    controls.maxDistance = 32;
+    controls.maxDistance = maxDistance;
     controls.minPolarAngle = Math.PI / 6;
     controls.maxPolarAngle = Math.PI / 2.4;
     controls.enablePan = false;
@@ -116,7 +189,7 @@ export function CameraControls({ reset, onUnavailable, onRestored, followTile, i
     gl.domElement.addEventListener("webglcontextrestored", restored);
     if (gl.getContext().isContextLost()) onUnavailable();
     return () => { controlsRef.current = null; controls.dispose(); gl.domElement.removeEventListener("webglcontextlost", lost); gl.domElement.removeEventListener("webglcontextrestored", restored); };
-  }, [camera, gl, reset, onUnavailable, onRestored,initialPosition[0],initialPosition[1],initialPosition[2],initialTarget[0],initialTarget[1],initialTarget[2],minDistance]);
+  }, [camera, gl, reset, onUnavailable, onRestored,initialPosition[0],initialPosition[1],initialPosition[2],initialTarget[0],initialTarget[1],initialTarget[2],minDistance,maxDistance,track]);
   return null;
 }
 
@@ -228,7 +301,7 @@ export function Building({ level, owned }: { level: number; owned: boolean }): J
   </group>;
 }
 
-function Token({ tileIndex, slot, color, avatar, moveEvent, reducedMotion, pose, xp, appearance, name }: { name: string; tileIndex: number; slot: number; color: string; avatar: string; moveEvent: MoveEvent | null; reducedMotion: boolean; pose: AvatarPose; xp: number; appearance?: import("@physics-monopoly/shared").Appearance }): JSX.Element {
+function Token({ tileIndex, slot, color, avatar, moveEvent, reducedMotion, pose, xp, appearance, name, look = "city", quality = "medium", groupRef }: { name: string; tileIndex: number; slot: number; color: string; avatar: string; moveEvent: MoveEvent | null; reducedMotion: boolean; pose: AvatarPose; xp: number; appearance?: import("@physics-monopoly/shared").Appearance; look?: "city" | PieceStyle; quality?: RenderQuality; groupRef?: MutableRefObject<Group | null> }): JSX.Element {
   const previousXp = useRef(xp), [celebrating, setCelebrating] = useState(false);
   useEffect(() => {
     if (xp <= previousXp.current) return;
@@ -240,8 +313,11 @@ function Token({ tileIndex, slot, color, avatar, moveEvent, reducedMotion, pose,
     return new Vector3(...tokenPosition(index, slot));
   }
   const initial = useRef(targetFor(tileIndex));
-  const ref = useRef<Group>(null);
+  const ref = useRef<Group | null>(null);
+  const attach = useCallback((group: Group | null) => { ref.current = group; if (groupRef) groupRef.current = group; }, [groupRef]);
+  useEffect(() => { if (groupRef) groupRef.current = ref.current; return () => { if (groupRef && groupRef.current === ref.current) groupRef.current = null; }; }, [groupRef]);
   const queue = useRef<Vector3[]>([]);
+  const hop = useRef(0);
   const speed = useRef(5);
   useEffect(() => {
     queue.current = reducedMotion ? [] : (moveEvent?.path ?? []).map(targetFor);
@@ -253,14 +329,21 @@ function Token({ tileIndex, slot, color, avatar, moveEvent, reducedMotion, pose,
   useFrame((_state, delta) => {
     const token = ref.current;
     const target = queue.current[0];
+    if (token) token.userData.moving = Boolean(target);
     if (!token || !target) return;
-    const distance = token.position.distanceTo(target);
+    const distance = Math.hypot(target.x - token.position.x, target.z - token.position.z);
     const step = Math.min(1, delta * speed.current / Math.max(distance, 0.001));
     token.rotation.y = Math.atan2(target.x - token.position.x, target.z - token.position.z);
-    token.position.lerp(target, step);
-    if (distance < 0.03) { token.position.copy(target); queue.current.shift(); }
+    token.position.x += (target.x - token.position.x) * step; token.position.z += (target.z - token.position.z) * step;
+    // Metal tokens are lifted and hopped space to space, the way a hand moves a real piece.
+    if (look === "metal") { hop.current += delta * speed.current / 1.75 * Math.PI; token.position.y = target.y + Math.abs(Math.sin(hop.current)) * .32; } else token.position.y = target.y;
+    if (distance < 0.03) { token.position.set(target.x, look === "metal" ? token.position.y : target.y, target.z); queue.current.shift(); if (!queue.current.length) { hop.current = 0; token.position.y = target.y; } }
   });
-  return <group ref={ref} position={initial.current}><Character appearance={appearance} badge={slot} avatar={avatar} color={color} pose={celebrating ? "celebrate" : pose} reducedMotion={reducedMotion} /><PlayerBadge name={name} slot={slot}/></group>;
+  const figure = <Character appearance={appearance} badge={slot} avatar={avatar} color={color} pose={celebrating ? "celebrate" : pose} reducedMotion={reducedMotion} />;
+  return <group ref={attach} position={initial.current}>
+    {look === "city" ? figure : look === "metal" ? <TabletopMetalToken slot={slot} color={color} quality={quality}/> : <><TokenPedestal color={color}/><group position={[0,.065,0]} scale={.82}>{figure}</group></>}
+    <PlayerBadge name={name} slot={slot}/>
+  </group>;
 }
 
 function Dice({ dice, nonce, reducedMotion }: { dice: [number, number]; nonce: number; reducedMotion: boolean }): JSX.Element {
