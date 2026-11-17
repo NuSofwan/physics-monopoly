@@ -29,8 +29,8 @@
     },
     {
       "path": "client/src/game3d/Board3D.tsx",
-      "sha256": "85068e88097b8ec7bb87f927885b1a4c9624732e64618477984e9ba6a06914c7",
-      "bytes": 22271
+      "sha256": "2f23d4c28a54b0e05347fa80088b5424d390f78b49d5e34f993e8c9684a311c0",
+      "bytes": 31869
     },
     {
       "path": "shared/src/locations.ts",
@@ -1370,7 +1370,7 @@
         "roll"
       ],
       "textures": [],
-      "triangles": 2784,
+      "triangles": 3912,
       "readiness": "review_required"
     }
   ],

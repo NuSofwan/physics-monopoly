@@ -31,6 +31,7 @@ import { GameResults } from "./ui/GameResults";
 import type { ActivitySummary } from "./teacher/ActivityEntry";
 import { AppearanceEditor } from "./ui/AppearanceEditor";
 import { defaultQuality, type RenderQuality } from "./game3d/RenderQuality";
+import type { PieceStyle } from "./game3d/Board3D";
 
 const avatarOptions = avatarPresets.map((preset) => preset.id);
 const Board3D = lazy(() => import("./game3d/Board3D").then((module) => ({ default: module.Board3D })));
@@ -50,6 +51,8 @@ export function App({ activity }: { activity?: ActivitySummary } = {}): JSX.Elem
   const [renderer, setRenderer] = useState(new URLSearchParams(window.location.search).get("renderer") ?? "3d");
   const [reducedMotion, setReducedMotion] = useState(() => window.matchMedia("(prefers-reduced-motion: reduce)").matches);
   const [quality, setQuality] = useState<RenderQuality>(defaultQuality);
+  const [pieceStyle, setPieceStyle] = useState<PieceStyle>(() => localStorage.getItem("physics-monopoly-pieces") === "metal" ? "metal" : "figure");
+  useEffect(() => { localStorage.setItem("physics-monopoly-pieces", pieceStyle); }, [pieceStyle]);
   const [textScale, setTextScale] = useState(100);
   const [now, setNow] = useState(Date.now());
   const [mute, setMute] = useState(() => localStorage.getItem("physics-monopoly-muted") === "true");
@@ -232,7 +235,8 @@ export function App({ activity }: { activity?: ActivitySummary } = {}): JSX.Elem
 
         <section className="order-1 min-w-0 xl:order-2">
           <div className="game-toolbar mb-2 flex flex-wrap gap-3 rounded-xl p-3">
-            <label>กระดาน <select aria-label="กระดาน" className="min-h-11 max-w-full rounded border p-2" value={renderer} onChange={(event) => setRenderer(event.target.value)}><option value="3d">3 มิติ</option><option value="html">ข้อความ (ประหยัดเครื่อง)</option><option value="2d">2 มิติเดิม</option></select></label>
+            <label>กระดาน <select aria-label="กระดาน" className="min-h-11 max-w-full rounded border p-2" value={renderer} onChange={(event) => setRenderer(event.target.value)}><option value="3d">3 มิติ · โต๊ะเกมจริง</option><option value="city">3 มิติ · เมืองจำลอง</option><option value="html">ข้อความ (ประหยัดเครื่อง)</option><option value="2d">2 มิติเดิม</option></select></label>
+            {renderer === "3d" ? <label>ตัวเดิน <select aria-label="ตัวเดิน" className="min-h-11 rounded border p-2" value={pieceStyle} onChange={(event) => setPieceStyle(event.target.value === "metal" ? "metal" : "figure")}><option value="figure">ตัวละครบนฐาน</option><option value="metal">หมากโลหะฟิสิกส์</option></select></label> : null}
             <label>คุณภาพ <select aria-label="คุณภาพ" className="min-h-11 rounded border p-2" value={quality} onChange={(event) => setQuality(event.target.value as RenderQuality)}><option value="low">ต่ำ</option><option value="medium">กลาง</option><option value="high">สูง (สวยสุด)</option></select></label>
             <label>ขนาดข้อความ <select aria-label="ขนาดข้อความ" className="min-h-11 rounded border p-2" value={textScale} onChange={event=>setTextScale(Number(event.target.value))}><option value={100}>ปกติ</option><option value={125}>ใหญ่ 125%</option><option value={150}>ใหญ่พิเศษ 150%</option></select></label>
             <label className="flex min-h-11 items-center gap-2"><input type="checkbox" checked={reducedMotion} onChange={(event) => setReducedMotion(event.target.checked)} />ลดการเคลื่อนไหว</label>
@@ -246,7 +250,7 @@ export function App({ activity }: { activity?: ActivitySummary } = {}): JSX.Elem
           ) : null}
           <ErrorBoundary key={renderer} fallback={<AccessibleBoard state={state} />}>
             <Suspense fallback={<AccessibleBoard state={state} />}>
-              {renderer === "3d" ? <Board3D state={state} moveEvent={moveEvent} reducedMotion={reducedMotion} quality={quality} onUnavailable={fallbackToHtml} /> : renderer === "2d" ? <PhaserGame state={state} moveEvent={moveEvent} /> : <AccessibleBoard state={state} />}
+              {renderer === "3d" || renderer === "city" ? <Board3D state={state} moveEvent={moveEvent} reducedMotion={reducedMotion} quality={quality} onUnavailable={fallbackToHtml} boardStyle={renderer === "city" ? "city" : "tabletop"} pieceStyle={pieceStyle} /> : renderer === "2d" ? <PhaserGame state={state} moveEvent={moveEvent} /> : <AccessibleBoard state={state} />}
             </Suspense>
           </ErrorBoundary>
           {renderer !== "html" ? <details className="mt-2"><summary className="cursor-pointer rounded bg-white p-3 font-bold">รายชื่อช่อง ราคา และผู้ถือครอง (คีย์บอร์ด)</summary><AccessibleBoard state={state} /></details> : null}
