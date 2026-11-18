@@ -3,7 +3,7 @@ import type { Tile } from "@physics-monopoly/shared";
 
 /**
  * Procedural print/material textures for the tabletop board style. Everything is drawn on canvases
- * at runtime: the board face, money, deeds and card backs are this project's own designs.
+ * at runtime: the board face, money, deeds, mortgaged sign and card backs are this project's own designs.
  */
 export const BOARD_HALF = 8.1;
 /** Inner edge of the ring of spaces (world units from the centre). */
@@ -12,7 +12,7 @@ export const RING_INNER = 5.25;
 export const RING_OUTER = 7.85;
 export const THAI_FONT = '"Noto Sans Thai", "Leelawadee UI", "Leelawadee", Tahoma, sans-serif';
 
-const INK = "#1d2a3a", PAPER = "#f1e8d2", GOLD = "#b8892f", NAVY = "#14243a";
+const INK = "#192330", PAPER = "#efe6d0", GOLD = "#c89632", NAVY = "#101e33", CRIMSON = "#b9221d";
 
 function canvas(width: number, height: number): [HTMLCanvasElement, CanvasRenderingContext2D] {
   const element = document.createElement("canvas");
@@ -61,17 +61,17 @@ export function walnutTexture(): Texture {
   const W = 1024, H = 1024, [element, context] = canvas(W, H), next = random(77);
   const planks = 4, plankH = H / planks;
   for (let p = 0; p < planks; p++) {
-    const y0 = p * plankH, hue = 22 + next() * 6, light = 17 + next() * 7;
+    const y0 = p * plankH, hue = 20 + next() * 6, light = 15 + next() * 7;
     const base = context.createLinearGradient(0, y0, 0, y0 + plankH);
-    base.addColorStop(0, `hsl(${hue},48%,${light + 2}%)`); base.addColorStop(.5, `hsl(${hue},52%,${light + 5}%)`); base.addColorStop(1, `hsl(${hue},46%,${light}%)`);
+    base.addColorStop(0, `hsl(${hue},50%,${light + 2}%)`); base.addColorStop(.5, `hsl(${hue},54%,${light + 5}%)`); base.addColorStop(1, `hsl(${hue},48%,${light}%)`);
     context.fillStyle = base; context.fillRect(0, y0, W, plankH);
     // Long grain lines: sums of sines give a natural meander; periodic in x so the texture tiles.
-    const lines = 70;
+    const lines = 85;
     for (let l = 0; l < lines; l++) {
-      const yBase = y0 + next() * plankH, amp = 3 + next() * 12, phase = next() * Math.PI * 2, f1 = 1 + Math.floor(next() * 3), f2 = 3 + Math.floor(next() * 4);
-      const dark = next() < .6;
-      context.strokeStyle = dark ? `rgba(18,8,3,${.12 + next() * .28})` : `rgba(160,98,52,${.06 + next() * .12})`;
-      context.lineWidth = .6 + next() * 2.2;
+      const yBase = y0 + next() * plankH, amp = 3 + next() * 13, phase = next() * Math.PI * 2, f1 = 1 + Math.floor(next() * 3), f2 = 3 + Math.floor(next() * 4);
+      const dark = next() < .62;
+      context.strokeStyle = dark ? `rgba(14,6,2,${.14 + next() * .32})` : `rgba(175,110,60,${.07 + next() * .13})`;
+      context.lineWidth = .6 + next() * 2.3;
       context.beginPath();
       for (let x = 0; x <= W; x += 8) {
         const t = x / W * Math.PI * 2;
@@ -83,15 +83,15 @@ export function walnutTexture(): Texture {
     // Cathedral grain arches and a couple of knots.
     for (let k = 0; k < 2; k++) {
       const kx = next() * W, ky = y0 + plankH * (.3 + next() * .4);
-      for (let r = 0; r < 9; r++) {
-        context.strokeStyle = `rgba(20,9,4,${.32 - r * .03})`; context.lineWidth = 1.2;
+      for (let r = 0; r < 10; r++) {
+        context.strokeStyle = `rgba(18,8,3,${.34 - r * .03})`; context.lineWidth = 1.25;
         context.beginPath(); context.ellipse(kx, ky, 10 + r * 9, 3 + r * 2.4, 0, 0, Math.PI * 2); context.stroke();
       }
-      context.fillStyle = "rgba(15,6,2,.55)"; context.beginPath(); context.ellipse(kx, ky, 8, 3, 0, 0, Math.PI * 2); context.fill();
+      context.fillStyle = "rgba(12,5,2,.6)"; context.beginPath(); context.ellipse(kx, ky, 8, 3, 0, 0, Math.PI * 2); context.fill();
     }
     // Plank seam.
-    context.fillStyle = "rgba(6,3,1,.85)"; context.fillRect(0, y0, W, 3);
-    context.fillStyle = "rgba(140,90,50,.18)"; context.fillRect(0, y0 + 3, W, 1);
+    context.fillStyle = "rgba(5,2,1,.88)"; context.fillRect(0, y0, W, 3);
+    context.fillStyle = "rgba(160,105,58,.22)"; context.fillRect(0, y0 + 3, W, 1);
   }
   paperGrain(context, W, H, .05, 5);
   const texture = finish(element, 16);
@@ -105,21 +105,21 @@ export function walnutTexture(): Texture {
 type Draw = (context: CanvasRenderingContext2D, unit: number) => void;
 
 function icon(context: CanvasRenderingContext2D, kind: Tile["type"], unit: number, color: string): void {
-  context.save(); context.strokeStyle = color; context.fillStyle = color; context.lineWidth = unit * .035; context.lineCap = "round"; context.lineJoin = "round";
-  const r = unit * .26;
+  context.save(); context.strokeStyle = color; context.fillStyle = color; context.lineWidth = unit * .038; context.lineCap = "round"; context.lineJoin = "round";
+  const r = unit * .27;
   if (kind === "challenge") {
     // Atom with a question mark nucleus.
     for (let i = 0; i < 3; i++) { context.beginPath(); context.ellipse(0, 0, r, r * .36, i * Math.PI / 3, 0, Math.PI * 2); context.stroke(); }
-    context.beginPath(); context.arc(0, 0, r * .3, 0, Math.PI * 2); context.fill();
-    context.fillStyle = PAPER; context.font = `900 ${r * .48}px ${THAI_FONT}`; context.textAlign = "center"; context.textBaseline = "middle"; context.fillText("?", 0, r * .03);
+    context.beginPath(); context.arc(0, 0, r * .32, 0, Math.PI * 2); context.fill();
+    context.fillStyle = PAPER; context.font = `900 ${r * .5}px ${THAI_FONT}`; context.textAlign = "center"; context.textBaseline = "middle"; context.fillText("?", 0, r * .03);
   } else if (kind === "chance") {
-    // Light bulb.
+    // Bold question mark / light bulb crest.
     context.beginPath(); context.arc(0, -r * .25, r * .55, Math.PI * .8, Math.PI * 2.2); context.lineTo(r * .25, r * .45); context.lineTo(-r * .25, r * .45); context.closePath(); context.stroke();
     for (let i = 0; i < 3; i++) { context.beginPath(); context.moveTo(-r * .25, r * (.58 + i * .14)); context.lineTo(r * .25, r * (.58 + i * .14)); context.stroke(); }
     context.beginPath(); context.moveTo(-r * .15, r * .3); context.lineTo(-r * .08, -r * .25); context.lineTo(0, -r * .05); context.lineTo(r * .08, -r * .25); context.lineTo(r * .15, r * .3); context.stroke();
     for (let i = 0; i < 5; i++) { const a = -Math.PI * .9 + i * Math.PI * .2; context.beginPath(); context.moveTo(Math.cos(a) * r * .75, -r * .25 + Math.sin(a) * r * .75); context.lineTo(Math.cos(a) * r * .95, -r * .25 + Math.sin(a) * r * .95); context.stroke(); }
   } else if (kind === "tax") {
-    // Stacked coins with a baht sign.
+    // Diamond & stacked coins with a baht sign.
     for (let i = 2; i >= 0; i--) { context.beginPath(); context.ellipse(0, r * .3 - i * r * .22, r * .6, r * .22, 0, 0, Math.PI * 2); context.fillStyle = PAPER; context.fill(); context.stroke(); }
     context.fillStyle = color; context.font = `900 ${r * .5}px ${THAI_FONT}`; context.textAlign = "center"; context.textBaseline = "middle"; context.fillText("฿", 0, -r * .15);
   }
@@ -129,133 +129,219 @@ function icon(context: CanvasRenderingContext2D, kind: Tile["type"], unit: numbe
 function drawSpace(context: CanvasRenderingContext2D, tile: Tile, unit: number): void {
   // Local frame: x along the edge (−0.875…0.875), y = outward (−0.875 inner … 1.725 outer).
   const w = 1.75 * unit, x0 = -.875 * unit, yIn = -.875 * unit, yOut = 1.725 * unit;
-  context.fillStyle = PAPER; context.fillRect(x0, yIn, w, yOut - yIn);
+  const g = context.createLinearGradient(0, yIn, 0, yOut);
+  g.addColorStop(0, "#f5eee0"); g.addColorStop(1, "#e8dec6");
+  context.fillStyle = g; context.fillRect(x0, yIn, w, yOut - yIn);
   context.textAlign = "center"; context.textBaseline = "middle";
   if (tile.type === "property") {
     const band = tile.groupColor ?? "#888";
-    context.fillStyle = band; context.fillRect(x0, yIn, w, .52 * unit);
-    // Printed sheen line and inner shadow on the colour band.
-    context.fillStyle = "rgba(255,255,255,.18)"; context.fillRect(x0, yIn + .03 * unit, w, .05 * unit);
-    context.fillStyle = "rgba(0,0,0,.25)"; context.fillRect(x0, yIn + .5 * unit, w, .02 * unit);
+    context.fillStyle = band; context.fillRect(x0, yIn, w, .54 * unit);
+    // Embossed gold/black header border and printed sheen on the colour band.
+    context.fillStyle = "rgba(255,255,255,.24)"; context.fillRect(x0, yIn + .02 * unit, w, .06 * unit);
+    context.fillStyle = "rgba(0,0,0,.32)"; context.fillRect(x0, yIn + .51 * unit, w, .03 * unit);
+    context.strokeStyle = INK; context.lineWidth = unit * .018;
+    context.beginPath(); context.moveTo(x0, yIn + .54 * unit); context.lineTo(x0 + w, yIn + .54 * unit); context.stroke();
     context.fillStyle = INK;
-    const size = fitText(context, tile.name, w * .9, unit * .2);
-    const lines = size < unit * .15 ? (context.font = `700 ${unit * .17}px ${THAI_FONT}`, wrap(context, tile.name, w * .9)) : [tile.name];
-    lines.forEach((line, i) => context.fillText(line, 0, -.17 * unit + (i - (lines.length - 1) / 2) * unit * .2, w * .92));
-    const kind = { land: "ที่ดิน", house: "บ้าน", condo: "คอนโด", hotel: "โรงแรม" }[tile.kind ?? "land"];
-    context.font = `500 ${unit * .1}px ${THAI_FONT}`; context.fillStyle = "rgba(29,42,58,.62)"; context.fillText(kind, 0, .09 * unit);
-    context.font = `700 ${unit * .17}px ${THAI_FONT}`; context.fillStyle = INK; context.fillText(`฿${(tile.price ?? 0).toLocaleString("en-US")}`, 0, 1.52 * unit);
+    const size = fitText(context, tile.name, w * .9, unit * .21, 800);
+    const lines = size < unit * .15 ? (context.font = `800 ${unit * .17}px ${THAI_FONT}`, wrap(context, tile.name, w * .9)) : [tile.name];
+    lines.forEach((line, i) => context.fillText(line, 0, -.15 * unit + (i - (lines.length - 1) / 2) * unit * .2, w * .92));
+    const kind = { land: "ที่ดิน · LAND", house: "บ้าน · AVENUE", condo: "คอนโด · PLAZA", hotel: "โรงแรม · GRAND" }[tile.kind ?? "land"];
+    context.font = `700 ${unit * .095}px ${THAI_FONT}`; context.fillStyle = "rgba(25,35,48,.65)"; context.fillText(kind, 0, .13 * unit);
+    // Classic price footer rule
+    context.strokeStyle = "rgba(25,35,48,.22)"; context.lineWidth = unit * .01;
+    context.beginPath(); context.moveTo(x0 + .16 * unit, 1.3 * unit); context.lineTo(x0 + w - .16 * unit, 1.3 * unit); context.stroke();
+    context.font = `900 ${unit * .185}px ${THAI_FONT}`; context.fillStyle = INK; context.fillText(`฿${(tile.price ?? 0).toLocaleString("en-US")}`, 0, 1.52 * unit);
   } else {
-    const accent = tile.type === "challenge" ? "#6b3fb5" : tile.type === "chance" ? "#0f7f74" : "#8a6a1e";
-    context.save(); context.translate(0, .55 * unit); icon(context, tile.type, unit * 1.45, accent); context.restore();
-    context.fillStyle = accent; fitText(context, tile.name, w * .9, unit * .19);
-    context.fillText(tile.name, 0, -.5 * unit);
-    if (tile.type === "tax" && tile.price) { context.font = `700 ${unit * .16}px ${THAI_FONT}`; context.fillStyle = INK; context.fillText(`จ่าย ฿${tile.price.toLocaleString("en-US")}`, 0, 1.52 * unit); }
-    if (tile.type === "challenge") { context.font = `500 ${unit * .1}px ${THAI_FONT}`; context.fillStyle = "rgba(29,42,58,.7)"; context.fillText(tile.failPenalty === "jail" ? "ตอบผิด → ติดคุก" : "ตอบผิด → หยุด 1 ตา", 0, 1.52 * unit); }
-    if (tile.type === "chance") { context.font = `500 ${unit * .1}px ${THAI_FONT}`; context.fillStyle = "rgba(29,42,58,.7)"; context.fillText("หยิบการ์ดโอกาส", 0, 1.52 * unit); }
+    const accent = tile.type === "challenge" ? "#5a2ea6" : tile.type === "chance" ? "#d96b1f" : "#7c5a14";
+    context.save(); context.translate(0, .52 * unit); icon(context, tile.type, unit * 1.48, accent); context.restore();
+    context.fillStyle = accent; fitText(context, tile.name, w * .9, unit * .2, 800);
+    context.fillText(tile.name, 0, -.52 * unit);
+    if (tile.type === "tax" && tile.price) { context.font = `800 ${unit * .165}px ${THAI_FONT}`; context.fillStyle = INK; context.fillText(`จ่าย ฿${tile.price.toLocaleString("en-US")}`, 0, 1.52 * unit); }
+    if (tile.type === "challenge") { context.font = `600 ${unit * .1}px ${THAI_FONT}`; context.fillStyle = "rgba(25,35,48,.75)"; context.fillText(tile.failPenalty === "jail" ? "ตอบผิด → ติดคุก" : "ตอบผิด → หยุด 1 ตา", 0, 1.52 * unit); }
+    if (tile.type === "chance") { context.font = `600 ${unit * .1}px ${THAI_FONT}`; context.fillStyle = "rgba(25,35,48,.75)"; context.fillText("หยิบการ์ดโอกาส", 0, 1.52 * unit); }
   }
-  context.strokeStyle = INK; context.lineWidth = unit * .018; context.strokeRect(x0, yIn, w, yOut - yIn);
+  context.strokeStyle = INK; context.lineWidth = unit * .022; context.strokeRect(x0, yIn, w, yOut - yIn);
 }
 
 function drawCorner(context: CanvasRenderingContext2D, tile: Tile, unit: number): void {
   // Square of side 2.6 with the outer corner at (+1.3,+1.3) after the caller rotates.
   const s = 2.6 * unit, h = s / 2;
-  context.fillStyle = PAPER; context.fillRect(-h, -h, s, s);
+  const g = context.createRadialGradient(0, 0, s * .08, 0, 0, s * .75);
+  g.addColorStop(0, "#f7f0e2"); g.addColorStop(1, "#e5dac0");
+  context.fillStyle = g; context.fillRect(-h, -h, s, s);
   context.save(); context.rotate(-Math.PI / 4);
   context.textAlign = "center"; context.textBaseline = "middle";
   const label = (text: string, y: number, size: number, color = INK, weight = 800) => { context.fillStyle = color; context.font = `${weight} ${size * unit}px ${THAI_FONT}`; context.fillText(text, 0, y * unit, s * .95); };
   if (tile.type === "start") {
-    // Orbit arrow around a glowing nucleus — the board's own start mark.
-    context.strokeStyle = "#b3261e"; context.lineWidth = unit * .1; context.lineCap = "round";
-    context.beginPath(); context.ellipse(0, .1 * unit, .95 * unit, .42 * unit, 0, Math.PI * .15, Math.PI * 1.85); context.stroke();
-    const ax = Math.cos(Math.PI * .15) * .95 * unit, ay = .1 * unit + Math.sin(Math.PI * .15) * .42 * unit;
-    context.fillStyle = "#b3261e"; context.beginPath(); context.moveTo(ax + .22 * unit, ay - .05 * unit); context.lineTo(ax - .12 * unit, ay - .22 * unit); context.lineTo(ax - .05 * unit, ay + .18 * unit); context.closePath(); context.fill();
-    label("START", .12, .42, "#b3261e", 900);
-    label("ผ่านรับ ฿2,000", .78, .16);
+    // Classic bold crimson GO / START arrow and salary instructions like the video at 00:02.
+    label("COLLECT ฿2,000 SALARY", -.72, .12, INK, 800);
+    label("AS YOU PASS · ผ่านรับ ฿2,000", -.52, .12, "rgba(25,35,48,.8)", 700);
+    // Bold red shaded GO / START typography
+    context.save();
+    context.fillStyle = "#18202c"; context.font = `900 ${.52 * unit}px ${THAI_FONT}`;
+    context.fillText("START", .03 * unit, .06 * unit);
+    context.fillStyle = CRIMSON; context.fillText("START", 0, .03 * unit);
+    context.restore();
+    // Large red arrow beneath START pointing along the board flow
+    context.fillStyle = CRIMSON; context.strokeStyle = "#18202c"; context.lineWidth = unit * .025;
+    context.beginPath();
+    context.moveTo(.85 * unit, .58 * unit);
+    context.lineTo(-.38 * unit, .58 * unit);
+    context.lineTo(-.38 * unit, .42 * unit);
+    context.lineTo(-.88 * unit, .66 * unit);
+    context.lineTo(-.38 * unit, .90 * unit);
+    context.lineTo(-.38 * unit, .74 * unit);
+    context.lineTo(.85 * unit, .74 * unit);
+    context.closePath();
+    context.fill(); context.stroke();
   } else if (tile.type === "jail") {
-    context.fillStyle = "#e6833a"; context.fillRect(-.62 * unit, -.75 * unit, 1.24 * unit, 1.05 * unit);
-    context.fillStyle = INK; for (let i = 0; i < 6; i++) context.fillRect((-.55 + i * .22) * unit, -.75 * unit, .06 * unit, 1.05 * unit);
-    context.fillRect(-.62 * unit, -.75 * unit, 1.24 * unit, .07 * unit); context.fillRect(-.62 * unit, .23 * unit, 1.24 * unit, .07 * unit);
-    label("คุก", .58, .32, INK, 900);
-    label("แวะเยี่ยมชมได้", .9, .14, "rgba(29,42,58,.75)", 600);
+    // Classic orange IN JAIL inner square + JUST VISITING L-corridor (like 00:09 in the video).
+    context.restore();
+    context.save();
+    // Orange jail cell in the inner corner (-h .. +0.35h)
+    const cell = s * .66;
+    context.fillStyle = "#e87a2e";
+    context.fillRect(-h, -h, cell, cell);
+    context.strokeStyle = INK; context.lineWidth = unit * .025;
+    context.strokeRect(-h, -h, cell, cell);
+    // Diagonal prison bars inside the orange cell
+    context.save();
+    context.translate(-h + cell / 2, -h + cell / 2);
+    context.rotate(-Math.PI / 4);
+    context.fillStyle = "rgba(255,245,225,.2)";
+    context.fillRect(-.48 * unit, -.45 * unit, .96 * unit, .72 * unit);
+    context.fillStyle = INK;
+    for (let i = 0; i < 6; i++) context.fillRect((-.42 + i * .168) * unit, -.45 * unit, .045 * unit, .72 * unit);
+    context.fillRect(-.48 * unit, -.45 * unit, .96 * unit, .055 * unit);
+    context.fillRect(-.48 * unit, .22 * unit, .96 * unit, .055 * unit);
+    context.fillStyle = INK; context.font = `900 ${.22 * unit}px ${THAI_FONT}`;
+    context.textAlign = "center"; context.textBaseline = "middle";
+    context.fillText("IN JAIL · คุก", 0, .46 * unit);
+    context.restore();
+    // JUST VISITING labels along the two outer corridors
+    context.fillStyle = INK; context.font = `900 ${.2 * unit}px ${THAI_FONT}`;
+    context.textAlign = "center"; context.textBaseline = "middle";
+    context.fillText("JUST", 0, h - .28 * unit);
+    context.save();
+    context.translate(h - .28 * unit, 0);
+    context.rotate(-Math.PI / 2);
+    context.fillText("VISITING · เยี่ยมชม", 0, 0);
+    context.restore();
   } else if (tile.type === "freeParking") {
-    for (let i = 0; i < 5; i++) { context.fillStyle = i % 2 ? "#d4a631" : "#e9c25a"; context.beginPath(); context.ellipse((i - 2) * .05 * unit, (.15 - i * .12) * unit, .5 * unit, .17 * unit, 0, 0, Math.PI * 2); context.fill(); context.strokeStyle = "#8a6a1e"; context.lineWidth = unit * .02; context.stroke(); }
-    label("฿", -.48, .26, "#8a6a1e", 900);
-    label("กองกลาง", .55, .32, INK, 900);
-    label("เก็บเงินกองกลาง", .88, .14, "rgba(29,42,58,.75)", 600);
+    for (let i = 0; i < 5; i++) { context.fillStyle = i % 2 ? "#d4a631" : "#f0cb62"; context.beginPath(); context.ellipse((i - 2) * .05 * unit, (.12 - i * .12) * unit, .52 * unit, .18 * unit, 0, 0, Math.PI * 2); context.fill(); context.strokeStyle = "#7a5b14"; context.lineWidth = unit * .022; context.stroke(); }
+    label("฿", -.46, .27, "#7a5b14", 900);
+    label("FREE PARKING", .44, .18, CRIMSON, 900);
+    label("กองกลาง", .74, .28, INK, 900);
   } else {
-    context.strokeStyle = "#1f5e9a"; context.lineWidth = unit * .07;
-    context.beginPath(); context.arc(-.3 * unit, -.2 * unit, .28 * unit, 0, Math.PI * 2); context.stroke();
-    context.beginPath(); context.arc(.3 * unit, -.2 * unit, .28 * unit, 0, Math.PI * 2); context.stroke();
-    context.fillStyle = "#1f5e9a"; context.fillRect(-.06 * unit, -.24 * unit, .12 * unit, .08 * unit);
-    label("ไปคุก", .5, .34, "#1f5e9a", 900);
-    label("เดินตรงไปที่คุกทันที", .86, .14, "rgba(29,42,58,.75)", 600);
+    context.strokeStyle = "#174e82"; context.lineWidth = unit * .07;
+    context.beginPath(); context.arc(-.3 * unit, -.22 * unit, .28 * unit, 0, Math.PI * 2); context.stroke();
+    context.beginPath(); context.arc(.3 * unit, -.22 * unit, .28 * unit, 0, Math.PI * 2); context.stroke();
+    context.fillStyle = "#174e82"; context.fillRect(-.06 * unit, -.26 * unit, .12 * unit, .08 * unit);
+    label("GO TO JAIL", .36, .19, CRIMSON, 900);
+    label("ไปคุกทันที", .7, .28, "#174e82", 900);
   }
   context.restore();
-  context.strokeStyle = INK; context.lineWidth = unit * .02; context.strokeRect(-h, -h, s, s);
+  context.strokeStyle = INK; context.lineWidth = unit * .024; context.strokeRect(-h, -h, s, s);
 }
 
 function atomEmblem(context: CanvasRenderingContext2D, radius: number): void {
   context.save();
   const glow = context.createRadialGradient(0, 0, 0, 0, 0, radius * 1.25);
-  glow.addColorStop(0, "rgba(232,190,92,.35)"); glow.addColorStop(1, "rgba(232,190,92,0)");
+  glow.addColorStop(0, "rgba(232,190,92,.38)"); glow.addColorStop(1, "rgba(232,190,92,0)");
   context.fillStyle = glow; context.beginPath(); context.arc(0, 0, radius * 1.25, 0, Math.PI * 2); context.fill();
-  context.strokeStyle = GOLD; context.lineWidth = radius * .045;
+  context.strokeStyle = GOLD; context.lineWidth = radius * .048;
   for (let i = 0; i < 3; i++) { context.beginPath(); context.ellipse(0, 0, radius, radius * .34, i * Math.PI / 3, 0, Math.PI * 2); context.stroke(); }
-  for (let i = 0; i < 3; i++) { const a = i * Math.PI / 3 + .9; context.fillStyle = "#e9c46a"; context.beginPath(); context.arc(Math.cos(a) * radius * Math.cos(i * Math.PI / 3) - Math.sin(a) * radius * .34 * Math.sin(i * Math.PI / 3), Math.cos(a) * radius * Math.sin(i * Math.PI / 3) + Math.sin(a) * radius * .34 * Math.cos(i * Math.PI / 3), radius * .07, 0, Math.PI * 2); context.fill(); }
+  for (let i = 0; i < 3; i++) { const a = i * Math.PI / 3 + .9; context.fillStyle = "#f2cd6d"; context.beginPath(); context.arc(Math.cos(a) * radius * Math.cos(i * Math.PI / 3) - Math.sin(a) * radius * .34 * Math.sin(i * Math.PI / 3), Math.cos(a) * radius * Math.sin(i * Math.PI / 3) + Math.sin(a) * radius * .34 * Math.cos(i * Math.PI / 3), radius * .075, 0, Math.PI * 2); context.fill(); }
   const core = context.createRadialGradient(-radius * .05, -radius * .05, 0, 0, 0, radius * .2);
-  core.addColorStop(0, "#fff1c4"); core.addColorStop(1, "#c4902f");
+  core.addColorStop(0, "#fff4cc"); core.addColorStop(1, "#c4902f");
   context.fillStyle = core; context.beginPath(); context.arc(0, 0, radius * .18, 0, Math.PI * 2); context.fill();
   context.restore();
 }
 
 /** Card-deck slots printed on the board (world centre, rotation), shared with the 3D deck meshes. */
 export const DECK_SLOTS: ReadonlyArray<{ x: number; z: number; rotation: number; kind: "question" | "chance" }> = [
-  { x: -3.3, z: -3.3, rotation: Math.PI / 4, kind: "question" },
-  { x: 3.3, z: 3.3, rotation: Math.PI / 4 + Math.PI, kind: "chance" },
+  { x: -3.25, z: -3.25, rotation: Math.PI / 4, kind: "question" },
+  { x: 3.25, z: 3.25, rotation: Math.PI / 4 + Math.PI, kind: "chance" },
 ];
-export const DECK_SIZE: [number, number] = [2.1, 1.4];
+export const DECK_SIZE: [number, number] = [2.15, 1.42];
 
 function drawCentre(context: CanvasRenderingContext2D, unit: number, title: string, subtitle: string): void {
   const r = RING_INNER * unit;
-  // Deep navy field with a gold pinstripe frame and a faint blueprint grid.
-  context.fillStyle = NAVY; context.fillRect(-r, -r, r * 2, r * 2);
-  context.strokeStyle = "rgba(120,160,210,.08)"; context.lineWidth = unit * .01;
-  for (let g = -r; g <= r; g += unit * .5) { context.beginPath(); context.moveTo(g, -r); context.lineTo(g, r); context.stroke(); context.beginPath(); context.moveTo(-r, g); context.lineTo(r, g); context.stroke(); }
-  const vignette = context.createRadialGradient(0, 0, r * .2, 0, 0, r * 1.45);
-  vignette.addColorStop(0, "rgba(40,70,110,.35)"); vignette.addColorStop(1, "rgba(0,0,0,.45)");
-  context.fillStyle = vignette; context.fillRect(-r, -r, r * 2, r * 2);
-  context.strokeStyle = GOLD; context.lineWidth = unit * .05; context.strokeRect(-r + unit * .18, -r + unit * .18, r * 2 - unit * .36, r * 2 - unit * .36);
-  context.lineWidth = unit * .015; context.strokeRect(-r + unit * .3, -r + unit * .3, r * 2 - unit * .6, r * 2 - unit * .6);
-  // Faint formulas in the background give the physics identity.
-  context.save(); context.fillStyle = "rgba(233,196,106,.1)"; context.font = `italic 600 ${unit * .3}px Georgia, serif`; context.textAlign = "center";
+  // Classic warm cream/ivory inner board field with a royal navy & gold frame so the red centre banner pops like the video.
+  const field = context.createRadialGradient(0, 0, r * .1, 0, 0, r * 1.35);
+  field.addColorStop(0, "#f5eedc"); field.addColorStop(.7, "#e8dec3"); field.addColorStop(1, "#d8cba8");
+  context.fillStyle = field; context.fillRect(-r, -r, r * 2, r * 2);
+
+  // Subtle architectural physics grid and concentric compass rings in the cream field.
+  context.strokeStyle = "rgba(25,40,65,.065)"; context.lineWidth = unit * .01;
+  for (let g = -r; g <= r; g += unit * .52) { context.beginPath(); context.moveTo(g, -r); context.lineTo(g, r); context.stroke(); context.beginPath(); context.moveTo(-r, g); context.lineTo(r, g); context.stroke(); }
+  context.strokeStyle = "rgba(184,137,47,.22)"; context.lineWidth = unit * .018;
+  context.beginPath(); context.arc(0, 0, r * .76, 0, Math.PI * 2); context.stroke();
+  context.beginPath(); context.arc(0, 0, r * .52, 0, Math.PI * 2); context.stroke();
+
+  // Inner double border frame
+  context.strokeStyle = NAVY; context.lineWidth = unit * .055; context.strokeRect(-r + unit * .16, -r + unit * .16, r * 2 - unit * .32, r * 2 - unit * .32);
+  context.strokeStyle = GOLD; context.lineWidth = unit * .022; context.strokeRect(-r + unit * .27, -r + unit * .27, r * 2 - unit * .54, r * 2 - unit * .54);
+
+  // Faint physics formulas arranged radially around the centre crest.
+  context.save(); context.fillStyle = "rgba(25,38,58,.14)"; context.font = `italic 700 ${unit * .28}px Georgia, serif`; context.textAlign = "center";
   const formulas = ["F = ma", "E = mc²", "v = u + at", "V = IR", "λ = h/p", "PV = nRT", "Q = mcΔT", "n₁sinθ₁ = n₂sinθ₂"];
-  formulas.forEach((formula, i) => { const a = i / formulas.length * Math.PI * 2 + .3; context.save(); context.translate(Math.cos(a) * r * .72, Math.sin(a) * r * .72); context.rotate(a + Math.PI / 2); context.fillText(formula, 0, 0); context.restore(); });
+  formulas.forEach((formula, i) => { const a = i / formulas.length * Math.PI * 2 + .35; context.save(); context.translate(Math.cos(a) * r * .64, Math.sin(a) * r * .64); context.rotate(a + Math.PI / 2); context.fillText(formula, 0, 0); context.restore(); });
   context.restore();
-  // Printed deck slots.
+
+  // Printed deck slots (orange Chance & sky/gold Physics Chest).
   for (const slot of DECK_SLOTS) {
     context.save(); context.translate(slot.x * unit, slot.z * unit); context.rotate(-slot.rotation);
     const [dw, dh] = DECK_SIZE;
-    context.setLineDash([unit * .1, unit * .07]); context.strokeStyle = "rgba(233,196,106,.75)"; context.lineWidth = unit * .03;
+    const accent = slot.kind === "chance" ? "#d95f18" : "#1c5d99";
+    context.setLineDash([unit * .1, unit * .07]); context.strokeStyle = accent; context.lineWidth = unit * .035;
     context.strokeRect(-dw / 2 * unit - unit * .12, -dh / 2 * unit - unit * .12, dw * unit + unit * .24, dh * unit + unit * .24);
     context.setLineDash([]);
-    context.fillStyle = "rgba(233,196,106,.85)"; context.font = `700 ${unit * .18}px ${THAI_FONT}`; context.textAlign = "center"; context.textBaseline = "middle";
-    context.fillText(slot.kind === "question" ? "การ์ดโจทย์ฟิสิกส์" : "การ์ดโอกาส", 0, dh / 2 * unit + unit * .38);
+    context.fillStyle = accent; context.font = `800 ${unit * .18}px ${THAI_FONT}`; context.textAlign = "center"; context.textBaseline = "middle";
+    context.fillText(slot.kind === "question" ? "การ์ดโจทย์ฟิสิกส์ · COMMUNITY" : "การ์ดโอกาส · CHANCE", 0, dh / 2 * unit + unit * .36);
     context.restore();
   }
-  // Diagonal title lock-up.
+
+  // Diagonal centrepiece: iconic Crimson Banner with White & Gold Embossed Trim + Professor Mascot Emblem (like 00:01 & 00:13 in the video).
   context.save(); context.rotate(-Math.PI / 4);
-  atomEmblem(context, unit * 1.05);
+  // Top emblem crest peeking over the crimson banner
+  context.save(); context.translate(0, -unit * 1.48);
+  atomEmblem(context, unit * .95);
+  context.restore();
+
+  // Drop shadow under the crimson banner
+  const bw = unit * 7.6, bh = unit * 1.95;
+  context.fillStyle = "rgba(15,12,8,.32)";
+  context.fillRect(-bw / 2 + unit * .08, -bh / 2 + unit * .1, bw, bh);
+
+  // Crimson banner body
+  const crimsonGrad = context.createLinearGradient(0, -bh / 2, 0, bh / 2);
+  crimsonGrad.addColorStop(0, "#d82922"); crimsonGrad.addColorStop(.5, "#b91c18"); crimsonGrad.addColorStop(1, "#89110e");
+  context.fillStyle = crimsonGrad;
+  context.fillRect(-bw / 2, -bh / 2, bw, bh);
+
+  // Crisp white + gold double border around the crimson banner
+  context.strokeStyle = "#fbf7ec"; context.lineWidth = unit * .07;
+  context.strokeRect(-bw / 2, -bh / 2, bw, bh);
+  context.strokeStyle = GOLD; context.lineWidth = unit * .025;
+  context.strokeRect(-bw / 2 + unit * .11, -bh / 2 + unit * .11, bw - unit * .22, bh - unit * .22);
+
+  // Main title inside the crimson banner
   context.textAlign = "center"; context.textBaseline = "middle";
-  const size = fitText(context, title, r * 1.6, unit * .95, 900);
+  const size = fitText(context, title, bw * .88, unit * 1.05, 900);
   context.font = `900 ${size}px ${THAI_FONT}`;
-  context.lineJoin = "round"; context.lineWidth = unit * .1; context.strokeStyle = "#0a1220"; context.strokeText(title, 0, unit * 1.75);
-  const goldFill = context.createLinearGradient(0, unit * 1.3, 0, unit * 2.2);
-  goldFill.addColorStop(0, "#fbe7a1"); goldFill.addColorStop(.5, "#e3b44f"); goldFill.addColorStop(1, "#9c6b1f");
-  context.fillStyle = goldFill; context.fillText(title, 0, unit * 1.75);
-  context.font = `700 ${unit * .26}px ${THAI_FONT}`; context.fillStyle = "rgba(241,232,210,.88)";
-  context.fillText(subtitle, 0, unit * 2.55, r * 1.5);
-  context.font = `600 ${unit * .2}px Georgia, serif`; context.fillStyle = "rgba(233,196,106,.7)";
-  context.fillText("P H Y S I C S   T Y C O O N", 0, -unit * 1.55);
+  context.lineJoin = "round"; context.lineWidth = unit * .11; context.strokeStyle = "#1a0806";
+  context.strokeText(title, 0, -unit * .04);
+  context.fillStyle = "#ffffff";
+  context.fillText(title, 0, -unit * .04);
+
+  // English & city subtitle ribbon below the banner
+  context.fillStyle = NAVY;
+  context.fillRect(-bw * .36, bh / 2 + unit * .16, bw * .72, unit * .46);
+  context.strokeStyle = GOLD; context.lineWidth = unit * .02;
+  context.strokeRect(-bw * .36, bh / 2 + unit * .16, bw * .72, unit * .46);
+  context.font = `800 ${unit * .23}px ${THAI_FONT}`; context.fillStyle = "#fbe8b2";
+  context.fillText(`PHYSICS MONOPOLY · ${subtitle}`, 0, bh / 2 + unit * .4);
   context.restore();
 }
 
@@ -264,19 +350,18 @@ const CORNERS: Record<number, [number, number]> = { 0: [1, 1], 7: [-1, 1], 14: [
 
 /**
  * Prints the whole board onto one canvas: paper stock, ring of spaces (colour bands, Thai names,
- * prices, icons), corner squares, navy centre with title and printed deck slots, a fold line and wear.
- * Canvas pixel (px,py) maps to world (x,z) = (px/S·2B − B, py/S·2B − B).
+ * prices, icons), corner squares, classic cream/crimson centre with title and printed deck slots, a fold line and wear.
  */
 export function boardFaceTexture(tiles: Tile[], title: string, subtitle: string, size: number, positionOf: (index: number) => [number, number, number]): CanvasTexture {
   const [element, context] = canvas(size, size), unit = size / (BOARD_HALF * 2);
   context.fillStyle = "#e9dfc6"; context.fillRect(0, 0, size, size);
   paperGrain(context, size, size, .05, 11);
   context.save(); context.translate(size / 2, size / 2);
-  // Outer navy border with gold inlay.
+  // Outer deep frame with gold inlay.
   const edge = BOARD_HALF * unit;
-  context.fillStyle = NAVY; context.fillRect(-edge, -edge, edge * 2, edge * 2);
+  context.fillStyle = "#121d2f"; context.fillRect(-edge, -edge, edge * 2, edge * 2);
   context.fillStyle = PAPER; context.fillRect(-RING_OUTER * unit, -RING_OUTER * unit, RING_OUTER * 2 * unit, RING_OUTER * 2 * unit);
-  context.strokeStyle = GOLD; context.lineWidth = unit * .03; context.strokeRect(-(BOARD_HALF - .12) * unit, -(BOARD_HALF - .12) * unit, (BOARD_HALF - .12) * 2 * unit, (BOARD_HALF - .12) * 2 * unit);
+  context.strokeStyle = GOLD; context.lineWidth = unit * .035; context.strokeRect(-(BOARD_HALF - .11) * unit, -(BOARD_HALF - .11) * unit, (BOARD_HALF - .11) * 2 * unit, (BOARD_HALF - .11) * 2 * unit);
   drawCentre(context, unit, title, subtitle);
   for (const tile of tiles) {
     const corner = CORNERS[tile.index];
@@ -284,7 +369,6 @@ export function boardFaceTexture(tiles: Tile[], title: string, subtitle: string,
     if (corner) {
       const c = (RING_INNER + RING_OUTER) / 2;
       context.translate(corner[0] * c * unit, corner[1] * c * unit);
-      // Rotate so the corner's diagonal text reads from the outside corner.
       context.rotate(Math.atan2(corner[1], corner[0]) - Math.PI / 4);
       drawCorner(context, tile, unit);
     } else {
@@ -294,47 +378,88 @@ export function boardFaceTexture(tiles: Tile[], title: string, subtitle: string,
     }
     context.restore();
   }
-  context.strokeStyle = INK; context.lineWidth = unit * .03;
+  context.strokeStyle = INK; context.lineWidth = unit * .032;
   context.strokeRect(-RING_OUTER * unit, -RING_OUTER * unit, RING_OUTER * 2 * unit, RING_OUTER * 2 * unit);
   context.strokeRect(-RING_INNER * unit, -RING_INNER * unit, RING_INNER * 2 * unit, RING_INNER * 2 * unit);
   context.restore();
-  // Board fold line + gentle edge wear: the details that make printed cardboard read as real.
-  const fold = context.createLinearGradient(size / 2 - 6, 0, size / 2 + 6, 0);
-  fold.addColorStop(0, "rgba(0,0,0,0)"); fold.addColorStop(.5, "rgba(0,0,0,.18)"); fold.addColorStop(1, "rgba(255,255,255,.05)");
-  context.fillStyle = fold; context.fillRect(size / 2 - 6, 0, 12, size);
+  // Board fold crease + gentle edge vignette wear: makes printed cardboard look tactile.
+  const fold = context.createLinearGradient(size / 2 - 7, 0, size / 2 + 7, 0);
+  fold.addColorStop(0, "rgba(0,0,0,0)"); fold.addColorStop(.5, "rgba(0,0,0,.2)"); fold.addColorStop(1, "rgba(255,255,255,.06)");
+  context.fillStyle = fold; context.fillRect(size / 2 - 7, 0, 14, size);
   const wear = context.createRadialGradient(size / 2, size / 2, size * .35, size / 2, size / 2, size * .75);
   wear.addColorStop(0, "rgba(90,60,20,0)"); wear.addColorStop(1, "rgba(90,60,20,.16)");
   context.fillStyle = wear; context.fillRect(0, 0, size, size);
   return finish(element, 16);
 }
 
+// ───────────────────────────── Mortgaged Sign & Stamp ─────────────────────────────
+
+let mortgagedSignCache: CanvasTexture | null = null;
+/**
+ * The hanging red "🔒 MORTGAGED" sign plate shown on buildings in the video (00:04–00:05).
+ */
+export function mortgagedSignTexture(): CanvasTexture {
+  if (mortgagedSignCache) return mortgagedSignCache;
+  const W = 512, H = 240, [element, context] = canvas(W, H);
+  const g = context.createLinearGradient(0, 0, 0, H);
+  g.addColorStop(0, "#d92721"); g.addColorStop(1, "#991512");
+  context.fillStyle = g; context.fillRect(0, 0, W, H);
+  paperGrain(context, W, H, .04, 91);
+  // Crisp white inner border
+  context.strokeStyle = "#fff8ee"; context.lineWidth = 10;
+  context.strokeRect(16, 16, W - 32, H - 32);
+  // Padlock icon centered at top
+  context.save();
+  context.translate(W / 2, 74);
+  context.strokeStyle = "#fff8ee"; context.fillStyle = "#fff8ee"; context.lineWidth = 9;
+  context.beginPath(); context.arc(0, -14, 18, Math.PI, 0); context.stroke();
+  context.fillRect(-24, -14, 48, 36);
+  context.fillStyle = "#b31b17";
+  context.beginPath(); context.arc(0, 2, 5, 0, Math.PI * 2); context.fill();
+  context.fillRect(-3, 2, 6, 11);
+  context.restore();
+  // Bold MORTGAGED text
+  context.fillStyle = "#fff8ee"; context.textAlign = "center"; context.textBaseline = "middle";
+  context.font = `900 58px ${THAI_FONT}`;
+  context.fillText("MORTGAGED", W / 2, 148);
+  context.font = `700 26px ${THAI_FONT}`;
+  context.fillText("ติดจำนอง / ขายคืน", W / 2, 192);
+  mortgagedSignCache = finish(element);
+  return mortgagedSignCache;
+}
+
 // ───────────────────────────── Money, deeds, decks ─────────────────────────────
 
 export const BILLS: ReadonlyArray<{ value: number; color: string; ink: string }> = [
-  { value: 100, color: "#dcd4ee", ink: "#4f3f86" },
-  { value: 500, color: "#c4e4e6", ink: "#1f6470" },
-  { value: 1000, color: "#ecd7bf", ink: "#7a4a22" },
-  { value: 5000, color: "#d3dcb8", ink: "#4d5d22" },
-  { value: 10000, color: "#efc9d6", ink: "#8a2f52" },
-  { value: 20000, color: "#e6dcae", ink: "#6e5a14" },
+  { value: 10, color: "#efe4b0", ink: "#685313" },
+  { value: 20, color: "#cbe6cf", ink: "#1f5a2d" },
+  { value: 50, color: "#dcd0ec", ink: "#4a3074" },
+  { value: 100, color: "#eed6be", ink: "#75441c" },
+  { value: 500, color: "#f1c7d3", ink: "#822645" },
+  { value: 1000, color: "#c5e4e8", ink: "#1b5d69" },
 ];
-/** Atlas: one banknote per row (6 rows), each 2.3:1. */
+/** Atlas: one banknote per row (6 rows), each 2.3:1. Styled like the crisp 10 / 20 / 50 / 100 bills in the foreground of the video. */
 export function billAtlas(): CanvasTexture {
   const W = 512, rowH = 222, [element, context] = canvas(W, rowH * BILLS.length);
   BILLS.forEach((bill, i) => {
     const y = i * rowH;
     context.fillStyle = bill.color; context.fillRect(0, y, W, rowH);
     paperGrain(context, W, rowH, .06, 30 + i);
-    context.strokeStyle = bill.ink; context.lineWidth = 6; context.strokeRect(14, y + 14, W - 28, rowH - 28);
-    context.lineWidth = 1.5; context.strokeRect(24, y + 24, W - 48, rowH - 48);
-    // Guilloche rosette.
-    context.save(); context.translate(W / 2, y + rowH / 2); context.strokeStyle = `${bill.ink}55`; context.lineWidth = 1.2;
-    for (let k = 0; k < 18; k++) { context.beginPath(); context.ellipse(0, 0, 70, 24, k * Math.PI / 18, 0, Math.PI * 2); context.stroke(); }
+    context.strokeStyle = bill.ink; context.lineWidth = 7; context.strokeRect(14, y + 14, W - 28, rowH - 28);
+    context.lineWidth = 2; context.strokeRect(24, y + 24, W - 48, rowH - 48);
+    // Guilloche rosette & central oval medallion.
+    context.save(); context.translate(W / 2, y + rowH / 2 + 4);
+    context.fillStyle = "rgba(255,255,255,.38)";
+    context.beginPath(); context.ellipse(0, 0, 118, 56, 0, 0, Math.PI * 2); context.fill();
+    context.strokeStyle = `${bill.ink}66`; context.lineWidth = 1.4;
+    for (let k = 0; k < 18; k++) { context.beginPath(); context.ellipse(0, 0, 74, 26, k * Math.PI / 18, 0, Math.PI * 2); context.stroke(); }
     context.restore();
     context.fillStyle = bill.ink; context.textAlign = "center"; context.textBaseline = "middle";
-    context.font = `900 64px ${THAI_FONT}`; context.fillText(`฿${bill.value.toLocaleString("en-US")}`, W / 2, y + rowH / 2 + 4);
-    context.font = `700 26px ${THAI_FONT}`; context.fillText(String(bill.value), 64, y + 52); context.fillText(String(bill.value), W - 64, y + rowH - 50);
-    context.font = `600 18px ${THAI_FONT}`; context.fillText("ธนาคารเศรษฐีฟิสิกส์", W / 2, y + 42);
+    context.font = `900 72px ${THAI_FONT}`; context.fillText(`${bill.value}`, W / 2, y + rowH / 2 + 6);
+    context.font = `800 26px ${THAI_FONT}`;
+    context.fillText(`฿${bill.value}`, 68, y + 52); context.fillText(`฿${bill.value}`, W - 68, y + 52);
+    context.fillText(`฿${bill.value}`, 68, y + rowH - 48); context.fillText(`฿${bill.value}`, W - 68, y + rowH - 48);
+    context.font = `700 17px ${THAI_FONT}`; context.fillText("PHYSICS MONOPOLY · ธนาคารเศรษฐีฟิสิกส์", W / 2, y + 40);
   });
   return finish(element);
 }
@@ -344,22 +469,22 @@ export function deedAtlas(deeds: Tile[]): CanvasTexture {
   const cw = 248, ch = 400, [element, context] = canvas(cw * deeds.length, ch);
   deeds.forEach((tile, i) => {
     const x = i * cw;
-    context.fillStyle = "#f8f4ea"; context.fillRect(x, 0, cw, ch);
+    context.fillStyle = "#faf6ec"; context.fillRect(x, 0, cw, ch);
     paperGrain(context, cw, ch, .04, 50 + i);
-    context.strokeStyle = INK; context.lineWidth = 3; context.strokeRect(x + 10, 10, cw - 20, ch - 20);
-    context.fillStyle = tile.groupColor ?? "#888"; context.fillRect(x + 18, 18, cw - 36, 92);
-    context.strokeRect(x + 18, 18, cw - 36, 92);
+    context.strokeStyle = INK; context.lineWidth = 4; context.strokeRect(x + 10, 10, cw - 20, ch - 20);
+    context.fillStyle = tile.groupColor ?? "#888"; context.fillRect(x + 18, 18, cw - 36, 94);
+    context.strokeRect(x + 18, 18, cw - 36, 94);
     context.fillStyle = "#fff"; context.textAlign = "center"; context.textBaseline = "middle";
-    context.font = `600 15px ${THAI_FONT}`; context.fillText("โฉนดที่ดิน", x + cw / 2, 40);
-    fitText(context, tile.name, cw - 50, 30, 800); context.fillText(tile.name, x + cw / 2, 78);
-    context.fillStyle = INK; context.font = `500 17px ${THAI_FONT}`;
-    const rows = ["ค่าเช่า ที่ดิน", "บ้าน", "คอนโด", "โรงแรม"];
+    context.font = `700 14px ${THAI_FONT}`; context.fillText("TITLE DEED · โฉนดที่ดิน", x + cw / 2, 38);
+    fitText(context, tile.name, cw - 50, 30, 900); context.fillText(tile.name, x + cw / 2, 78);
+    context.fillStyle = INK; context.font = `600 17px ${THAI_FONT}`;
+    const rows = ["ค่าเช่า ที่ดิน", "บ้าน 1 หลัง", "คอนโด", "โรงแรม"];
     (tile.rentByLevel ?? []).forEach((rent, r) => {
-      context.textAlign = "left"; context.fillText(rows[r] ?? "", x + 28, 142 + r * 40);
-      context.textAlign = "right"; context.fillText(`฿${rent.toLocaleString("en-US")}`, x + cw - 28, 142 + r * 40);
+      context.textAlign = "left"; context.fillText(rows[r] ?? "", x + 26, 144 + r * 40);
+      context.textAlign = "right"; context.fillText(`฿${rent.toLocaleString("en-US")}`, x + cw - 26, 144 + r * 40);
     });
-    context.fillStyle = "rgba(29,42,58,.25)"; context.fillRect(x + 28, 312, cw - 56, 2);
-    context.textAlign = "center"; context.fillStyle = INK; context.font = `700 20px ${THAI_FONT}`;
+    context.fillStyle = "rgba(25,35,48,.25)"; context.fillRect(x + 26, 310, cw - 52, 2);
+    context.textAlign = "center"; context.fillStyle = INK; context.font = `800 20px ${THAI_FONT}`;
     context.fillText(`ราคา ฿${(tile.price ?? 0).toLocaleString("en-US")}`, x + cw / 2, 345);
   });
   return finish(element);
@@ -367,21 +492,24 @@ export function deedAtlas(deeds: Tile[]): CanvasTexture {
 
 const deckDraw: Record<"question" | "chance", Draw> = {
   question: (context, unit) => {
-    const g = context.createLinearGradient(-unit, -unit, unit, unit); g.addColorStop(0, "#5a2ea6"); g.addColorStop(1, "#2c1460");
+    // Classic sky/gold Community Physics card back
+    const g = context.createLinearGradient(-unit, -unit, unit, unit); g.addColorStop(0, "#2b74b8"); g.addColorStop(1, "#164270");
     context.fillStyle = g; context.fillRect(-unit, -unit * .667, unit * 2, unit * 1.333);
-    context.strokeStyle = "#e9c46a"; context.lineWidth = unit * .03; context.strokeRect(-unit * .9, -unit * .58, unit * 1.8, unit * 1.16);
-    context.save(); context.translate(-unit * .45, 0); atomEmblem(context, unit * .32); context.restore();
-    context.fillStyle = "#f6e7c1"; context.textAlign = "center"; context.textBaseline = "middle";
-    context.font = `900 ${unit * .2}px ${THAI_FONT}`; context.fillText("โจทย์", unit * .35, -unit * .1);
-    context.font = `900 ${unit * .2}px ${THAI_FONT}`; context.fillText("ฟิสิกส์", unit * .35, unit * .17);
+    context.strokeStyle = "#fbe29d"; context.lineWidth = unit * .04; context.strokeRect(-unit * .9, -unit * .58, unit * 1.8, unit * 1.16);
+    context.save(); context.translate(-unit * .42, 0); atomEmblem(context, unit * .34); context.restore();
+    context.fillStyle = "#fff6dc"; context.textAlign = "center"; context.textBaseline = "middle";
+    context.font = `900 ${unit * .22}px ${THAI_FONT}`; context.fillText("โจทย์ฟิสิกส์", unit * .32, -unit * .12);
+    context.font = `800 ${unit * .16}px ${THAI_FONT}`; context.fillText("PHYSICS CHEST", unit * .32, unit * .18);
   },
   chance: (context, unit) => {
-    const g = context.createLinearGradient(-unit, -unit, unit, unit); g.addColorStop(0, "#1fa093"); g.addColorStop(1, "#0b5a52");
+    // Iconic vibrant orange Chance card deck with large '?' just like 00:01–00:02 in the video!
+    const g = context.createLinearGradient(-unit, -unit, unit, unit); g.addColorStop(0, "#f58529"); g.addColorStop(1, "#c95210");
     context.fillStyle = g; context.fillRect(-unit, -unit * .667, unit * 2, unit * 1.333);
-    context.strokeStyle = "#fff4dc"; context.lineWidth = unit * .03; context.strokeRect(-unit * .9, -unit * .58, unit * 1.8, unit * 1.16);
-    context.save(); context.translate(-unit * .45, unit * .02); icon(context, "chance", unit * 1.3, "#fff4dc"); context.restore();
-    context.fillStyle = "#fff4dc"; context.textAlign = "center"; context.textBaseline = "middle";
-    context.font = `900 ${unit * .26}px ${THAI_FONT}`; context.fillText("โอกาส", unit * .35, 0);
+    context.strokeStyle = "#fff5e4"; context.lineWidth = unit * .045; context.strokeRect(-unit * .9, -unit * .58, unit * 1.8, unit * 1.16);
+    context.fillStyle = "#fff5e4"; context.textAlign = "center"; context.textBaseline = "middle";
+    context.font = `900 ${unit * .74}px Georgia, serif`; context.fillText("?", -unit * .35, unit * .04);
+    context.font = `900 ${unit * .28}px ${THAI_FONT}`; context.fillText("โอกาส", unit * .32, -unit * .1);
+    context.font = `800 ${unit * .18}px ${THAI_FONT}`; context.fillText("CHANCE", unit * .32, unit * .2);
   },
 };
 /** Two card backs side by side (u 0–0.5 question, 0.5–1 chance). */

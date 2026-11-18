@@ -226,7 +226,7 @@ export function App({ activity }: { activity?: ActivitySummary } = {}): JSX.Elem
     <main className="game-shell game-play min-h-screen p-3 text-ink md:p-5">
       <header className="game-topbar mx-auto mb-4 flex max-w-[1700px] flex-wrap items-center justify-between gap-3 rounded-2xl px-4 py-3 sm:px-5">
         <div className="flex items-center gap-3"><div className="game-mark grid h-11 w-11 place-items-center rounded-xl"><Atom className="h-6 w-6"/></div><div><p className="text-xs font-black uppercase tracking-[.16em] text-sky-200">Physics Monopoly</p><h1 className="text-lg font-black text-white">เมือง{locations.find(item=>item.id===state.mapId)?.name ?? "ฟิสิกส์"}</h1></div></div>
-        <div className="flex flex-wrap items-center gap-2 text-xs font-bold sm:text-sm"><span className="game-topbar-pill"><MapPin className="h-4 w-4"/> ห้อง {state.roomCode}</span><span className="game-topbar-pill">{state.players.length} ผู้เล่น</span><span className="game-topbar-pill game-phase-pill">{state.phase === "rolling" ? "รอทอยลูกเต๋า" : state.phase === "answering" ? "กำลังตอบโจทย์" : state.phase === "moving" ? "กำลังเดิน" : state.phase === "game_over" ? "จบเกม" : "กำลังเล่น"}</span></div>
+        <div className="flex flex-wrap items-center gap-2 text-xs font-bold sm:text-sm"><span className="game-topbar-pill"><MapPin className="h-4 w-4"/> ห้อง {state.roomCode}</span><span className="game-topbar-pill">{state.players.length} ผู้เล่น</span>{state.centerPot > 0 ? <span className="game-topbar-pill text-amber-200 border-amber-300/40">กองกลาง ฿{state.centerPot.toLocaleString("th-TH")}</span> : null}<span className="game-topbar-pill game-phase-pill">{state.phase === "rolling" ? "รอทอยลูกเต๋า" : state.phase === "answering" ? "กำลังตอบโจทย์" : state.phase === "moving" ? "กำลังเดิน" : state.phase === "game_over" ? "จบเกม" : "กำลังเล่น"}</span></div>
       </header>
       {error || !connected ? <div role="status" className="mb-3 rounded-lg bg-amber-100 p-3 font-bold">{error ?? "กำลังเชื่อมต่อใหม่…"}</div> : null}
       {state.endsAt&&state.phase!=="game_over"?<p role="status" className="mb-3 rounded bg-white p-3">{state.paused?"หยุดนับเวลา":state.endsAt-now<=60_000?"เหลือไม่เกิน 1 นาที — เตรียมสรุปผล":state.endsAt-now<=300_000?"เหลือไม่เกิน 5 นาที":"เวลากิจกรรม"} · {Math.max(0,Math.ceil((state.endsAt-(state.paused?.since??now))/60_000))} นาที{(state.questionTimeMultiplier??1)>1?` · เวลาอ่าน/ตอบเสริม ${state.questionTimeMultiplier} เท่า`:""}</p>:null}
@@ -261,13 +261,14 @@ export function App({ activity }: { activity?: ActivitySummary } = {}): JSX.Elem
         </section>
 
         <aside className="order-2 grid min-w-0 content-start gap-4 xl:order-3" aria-label="คำสั่งและรายละเอียดตา">
-          <div className="panel turn-panel rounded-xl p-4">
+          <div className="panel turn-panel rounded-2xl p-4">
             <div className="flex items-center justify-between gap-3">
               <div>
-                <p className="text-xs font-black uppercase tracking-wider text-sky-700">ตาปัจจุบัน</p>
-                <h2 className="text-xl font-black">{active?.name ?? "Waiting"}</h2>
+                <p className="text-xs font-black uppercase tracking-wider text-rose-700">ตาปัจจุบัน · TURN {state.turnCount + 1}</p>
+                <h2 className="text-xl font-black text-slate-900">{active?.name ?? "Waiting"}</h2>
+                {landedTile ? <p className="mt-0.5 text-xs font-bold text-slate-500">ตำแหน่ง: {landedTile.name}</p> : null}
               </div>
-              <div className="rounded-lg bg-white px-3 py-2 text-center font-black">
+              <div className="rounded-xl border border-amber-200 bg-white px-3.5 py-2 text-center font-black shadow-sm">
                 {state.phase === "rolling" && turnSeconds !== null ? `${turnSeconds}s` : state.dice ? `${state.dice[0]} + ${state.dice[1]}` : turnSeconds !== null ? `${turnSeconds}s` : "--"}
               </div>
             </div>
@@ -304,6 +305,14 @@ export function App({ activity }: { activity?: ActivitySummary } = {}): JSX.Elem
               <Volume2 className="h-4 w-4" />
             </div>
             <div className="mt-3 grid grid-cols-1 gap-2">
+              {renderer === "3d" ? (
+                <div className="grid grid-cols-2 gap-1.5">
+                  <button type="button" className="rounded-lg bg-amber-50 px-2.5 py-2 text-xs font-bold text-amber-950 border border-amber-200" onClick={() => window.dispatchEvent(new CustomEvent("physics-monopoly:cinematic", { detail: { kind: "chase", tileIndex: active?.tileIndex ?? 0 } }))}>🎬 มุมกล้องรถแข่ง</button>
+                  <button type="button" className="rounded-lg bg-rose-50 px-2.5 py-2 text-xs font-bold text-rose-950 border border-rose-200" onClick={() => window.dispatchEvent(new CustomEvent("physics-monopoly:cinematic", { detail: { kind: "mortgaged", tileIndex: active?.tileIndex || 4 } }))}>🔒 ซีนจำนองตึก</button>
+                  <button type="button" className="rounded-lg bg-slate-100 px-2.5 py-2 text-xs font-bold text-slate-900 border border-slate-300" onClick={() => window.dispatchEvent(new CustomEvent("physics-monopoly:cinematic", { detail: { kind: "jail", tileIndex: 7 } }))}>⛓️ ซีนกรงขังคุก</button>
+                  <button type="button" className="rounded-lg bg-emerald-50 px-2.5 py-2 text-xs font-bold text-emerald-950 border border-emerald-200" onClick={() => window.dispatchEvent(new CustomEvent("physics-monopoly:cinematic", { detail: { kind: "heist", tileIndex: 0 } }))}>💸 ซีนเงินปลิว/โลโก้</button>
+                </div>
+              ) : null}
               <button className="rounded-lg bg-white px-3 py-2 text-sm font-bold" onClick={leaveGame}>ออกจากเกม / ล้างตัวตน</button>
             </div>
           </div>

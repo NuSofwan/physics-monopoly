@@ -48,6 +48,12 @@ function TabletopTurnDemo({ quality, pieces }: { quality: RenderQuality; pieces:
   }, [step, game.state.phase]);
   useEffect(() => setStep(value => value + 1), [game]);
   return <><p className="mb-2 font-bold">ตัวอย่างจำลองตา (ไม่ใช่เกมสด): ทอยเต๋า → เดิน → ซื้อ/อัปเกรด → ช่อง "ไปคุก" กรงจะหล่นลงมา</p>
+    <div className="mb-3 flex flex-wrap gap-2">
+      <button type="button" className="rounded-lg bg-amber-600 px-3 py-2 text-sm font-bold text-white" onClick={() => window.dispatchEvent(new CustomEvent("physics-monopoly:cinematic", { detail: { kind: "chase", tileIndex: 0 } }))}>🎬 มุมกล้องรถแข่งต่ำ (00:02)</button>
+      <button type="button" className="rounded-lg bg-rose-700 px-3 py-2 text-sm font-bold text-white" onClick={() => window.dispatchEvent(new CustomEvent("physics-monopoly:cinematic", { detail: { kind: "mortgaged", tileIndex: 4 } }))}>🔒 ป้าย MORTGAGED & ซูมหน้าต่าง (00:04)</button>
+      <button type="button" className="rounded-lg bg-slate-700 px-3 py-2 text-sm font-bold text-white" onClick={() => window.dispatchEvent(new CustomEvent("physics-monopoly:cinematic", { detail: { kind: "jail", tileIndex: 7 } }))}>⛓️ กรงเหล็กหล่นขังคุก (00:08)</button>
+      <button type="button" className="rounded-lg bg-emerald-700 px-3 py-2 text-sm font-bold text-white" onClick={() => window.dispatchEvent(new CustomEvent("physics-monopoly:cinematic", { detail: { kind: "heist", tileIndex: 0 } }))}>💸 ธนบัตรปลิวว่อน & หมุนซูมโลโก้ (00:11)</button>
+    </div>
     <Board3D state={game.state} moveEvent={game.moveEvent} quality={quality} onUnavailable={() => undefined} pieceStyle={pieces}/></>;
 }
 
